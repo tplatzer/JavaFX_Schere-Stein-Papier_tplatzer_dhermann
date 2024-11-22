@@ -11,7 +11,7 @@ public class App extends Application
     public Button paperButton;
     public Button scissorsButton;
     public Button springButton;
-    public ProgressIndicator kiProgressIndicator;
+    public ProgressIndicator enemieProgressIndicator;
 
     @Override
     public void start(Stage stage)
