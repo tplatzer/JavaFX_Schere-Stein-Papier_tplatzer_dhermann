@@ -18,7 +18,7 @@ public class App extends Application implements Initializable
     ;
     public Button paperButton = Controller.initializeButton(Paper.getId());
     public Button scissorsButton = Controller.initializeButton(Scissors.getId());
-    public Button springButton = Controller.initializeButton(Spring.getId());
+    public Button springButton = Controller.initializeButton(Well.getId());
     public ProgressIndicator enemieProgressIndicator;
 
     @Override
