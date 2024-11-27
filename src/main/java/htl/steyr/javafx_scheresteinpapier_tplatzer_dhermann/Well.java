@@ -1,6 +1,6 @@
 package htl.steyr.javafx_scheresteinpapier_tplatzer_dhermann;
 
-public class Spring
+public class Well
 {
-    public static String id = "spring";
+    public static String id = "well";
 }
