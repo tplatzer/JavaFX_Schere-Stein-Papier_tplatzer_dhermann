@@ -4,5 +4,8 @@ public class Well
 {
     public static final String id = "well";
 
-    public static String getId(){return id;}
+    public static String getId()
+    {
+        return id;
+    }
 }
