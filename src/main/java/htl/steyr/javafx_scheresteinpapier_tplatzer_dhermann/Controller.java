@@ -10,7 +10,7 @@ public class Controller
      * Rock
      * Paper
      * Sissores
-     * Spring
+     * Well
      */
     private static final int maxButtonWidth = 200;
     private static final int maxButtonHeight = 50;
@@ -48,7 +48,7 @@ public class Controller
             case Rock.id -> setUserInput(Rock.getId());
             case Paper.id -> setUserInput(Paper.getId());
             case Scissors.id -> setUserInput(Scissors.getId());
-            case Spring.id -> setUserInput(Spring.getId());
+            case Well.id -> setUserInput(Well.getId());
         }
     }
 

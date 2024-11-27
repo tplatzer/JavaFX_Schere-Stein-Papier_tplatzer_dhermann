@@ -18,7 +18,7 @@ public class App extends Application implements Initializable
     ;
     public Button paperButton = Controller.initializeButton(Paper.getId());
     public Button scissorsButton = Controller.initializeButton(Scissors.getId());
-    public Button springButton = Controller.initializeButton(Spring.getId());
+    public Button wellButton = Controller.initializeButton(Well.getId());
     public ProgressIndicator enemieProgressIndicator;
 
     @Override
@@ -37,7 +37,7 @@ public class App extends Application implements Initializable
         root.setSpacing(10);
         root.setMinSize(Controller.getMaxHboxWidth(), Controller.getMaxHboxHeight());
         root.setMaxSize(Controller.getMaxHboxWidth(), Controller.getMaxHboxHeight());
-        root.getChildren().addAll(rockButton, paperButton, scissorsButton, springButton, enemieProgressIndicator);
+        root.getChildren().addAll(rockButton, paperButton, scissorsButton, wellButton, enemieProgressIndicator);
 
         Scene scene = new Scene(root);
         stage.setScene(scene);
