@@ -8,6 +8,11 @@ import javafx.scene.control.ProgressIndicator;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import javafx.scene.Group;
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
 
 import java.net.URL;
 import java.util.ResourceBundle;
@@ -34,28 +39,9 @@ public class App extends Application implements Initializable
     }
 
     @Override
-    public void start(Stage stage)
+    public void start(Stage stage) throws FileNotFoundException
     {
-        enemieProgressIndicator = new ProgressIndicator();
-        enemieProgressIndicator.setProgress(0.5);
-        enemieProgressIndicator.setPrefSize(400, 100);
-        progressBox.getChildren().add(enemieProgressIndicator);
 
-//        enemyBox.getChildren().add();
-
-//        tableBox.getChildren().add();
-
-        buttonBox.setSpacing(10);
-        buttonBox.setMinSize(Controller.getMaxHboxWidth(), Controller.getMaxHboxHeight());
-        buttonBox.setMaxSize(Controller.getMaxHboxWidth(), Controller.getMaxHboxHeight());
-        buttonBox.getChildren().addAll(rockButton, paperButton, scissorsButton, springButton);
-
-        root.getChildren().addAll(progressBox, enemyBox, tableBox, buttonBox);
-
-        Scene scene = new Scene(root);
-        stage.setScene(scene);
-        stage.setTitle("Schere Stein Papier");
-        stage.show();
     }
 
     public static void main(String[] args)
