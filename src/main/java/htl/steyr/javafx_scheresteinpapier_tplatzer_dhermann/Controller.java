@@ -119,7 +119,16 @@ public class Controller
         button.setId(id);
         button.setText(id);
         button.setGraphic(new ImageView(image));
-        button.setOnAction(this::handleButtonClick);
+        button.setOnAction(event ->
+        {
+            try
+            {
+                handleButtonClick(event);
+            } catch (InterruptedException e)
+            {
+                throw new RuntimeException(e);
+            }
+        });
         return button;
     }
 
@@ -153,7 +162,7 @@ public class Controller
         return progressIndicator;
     }
 
-    private void handleButtonClick(ActionEvent event)
+    private void handleButtonClick(ActionEvent event) throws InterruptedException
     {
         Button sourceButton = (Button) event.getSource();
         String buttonId = sourceButton.getId();
@@ -171,9 +180,13 @@ public class Controller
         play();
     }
 
-    private void play()
+    private void play() throws InterruptedException
     {
         aiTurn();
+
+        Thread.sleep(10000);
+
+
         System.out.println(getAiChoice());
         System.out.println();
     }
