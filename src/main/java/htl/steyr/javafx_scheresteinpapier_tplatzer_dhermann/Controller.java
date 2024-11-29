@@ -75,20 +75,8 @@ public class Controller
 
         initializeButtonBox(10);
 
-        ImageView computerHand = initializeImageView(new Image("file:resources/masterHand_default.png"));
-        ImageView table = initializeImageView(new Image("file:resources/table.png"));
-
-//        ImageView computerHand = new ImageView();
-        computerHand.setImage(new Image("file:resources/masterHand_default.png"));
-        computerHand.fitWidthProperty().bind(getStage().widthProperty().multiply(0.1)); // 10% der Fensterbreite
-        computerHand.fitHeightProperty().bind(getStage().heightProperty().multiply(0.2)); // 20% der Fensterhöhe        computerHand.setFitHeight(200);
-        enemyBox.getChildren().add(computerHand);
-
-//        ImageView table = new ImageView();
-        table.setImage(new Image("file:resources/table.png"));
-        table.fitWidthProperty().bind(getStage().widthProperty().multiply(1));
-        table.fitHeightProperty().bind(getStage().heightProperty().multiply(.5));
-        tableBox.getChildren().add(table);
+        ImageView computerHand = initializeImageView(new Image("file:resources/masterHand_default.png"), .1, .2);
+        ImageView table = initializeImageView(new Image("file:resources/table.png"), 1, .5);
 
         addImageViewsToBoxes(getEnemyBox(), computerHand);
         addImageViewsToBoxes(getTableBox(), table);
@@ -149,10 +137,12 @@ public class Controller
         box.getChildren().add(image);
     }
 
-    private ImageView initializeImageView(Image image)
+    private ImageView initializeImageView(Image image, double widthFactor, double heightFactor)
     {
         ImageView imageView = new ImageView();
         imageView.setImage(image);
+        imageView.fitWidthProperty().bind(getStage().widthProperty().multiply(widthFactor));
+        imageView.fitHeightProperty().bind(getStage().heightProperty().multiply(heightFactor));
 
         return imageView;
     }
