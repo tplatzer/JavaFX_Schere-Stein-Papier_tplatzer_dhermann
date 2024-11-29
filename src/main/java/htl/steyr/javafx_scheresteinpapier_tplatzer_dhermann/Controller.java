@@ -8,6 +8,22 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 
+import javafx.application.Application;
+import javafx.fxml.Initializable;
+import javafx.scene.Scene;
+import javafx.scene.control.Button;
+import javafx.scene.control.ProgressIndicator;
+import javafx.scene.layout.HBox;
+import javafx.scene.layout.VBox;
+import javafx.stage.Stage;
+
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+
+import javafx.scene.Group;
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Random;
@@ -44,7 +60,7 @@ public class Controller
     private HBox tableBox = new HBox();
     private HBox buttonBox = new HBox();
 
-    public void initializeUserElements()
+    public void initializeUserElements() throws FileNotFoundException
     {
         playStonesIDs.put(0, Rock.getId());
         playStonesIDs.put(1, Paper.getId());
@@ -56,9 +72,35 @@ public class Controller
         setScissorsButton(initializeButton(playStonesIDs.getOrDefault(2, null)));
         setWellButton(initializeButton(playStonesIDs.getOrDefault(3, null)));
         setEnemieProgressIndicator(initializeProgressIndicator());
+
+        FileInputStream image = new FileInputStream("resources/masterHand_default.webp");
+
+
+        ImageView computerHand = new ImageView();
+        computerHand.setImage(new Image("file:resources/masterHand_default.png"));
+        enemyBox.getChildren().add(computerHand);
+
+        ImageView table = new ImageView();
+        table.setImage(new Image("file:resources/table.png"));
+        tableBox.getChildren().add(table);
+
+
+        rockButton.setGraphic(new ImageView(new Image("file:resources/img/hovered/stone.png")));
+        paperButton.setGraphic(new ImageView(new Image("file:resources/img/hovered/paper.png")));
+        scissorsButton.setGraphic(new ImageView(new Image("file:resources/img/hovered/scissors.png")));
+
+        rockButton.setOnAction(e -> setUserChoice(Rock.getId()));
+        paperButton.setOnAction(e -> setUserChoice(Paper.getId()));
+        scissorsButton.setOnAction(e -> setUserChoice(Scissors.getId()));
+
+        buttonBox.setSpacing(10);
+        buttonBox.setMinSize(Controller.getMaxHboxWidth(), Controller.getMaxHboxHeight());
+        buttonBox.setMaxSize(Controller.getMaxHboxWidth(), Controller.getMaxHboxHeight());
+        buttonBox.getChildren().addAll(rockButton, paperButton, scissorsButton, wellButton);
+
     }
 
-    public void start(Stage stage, Controller controller)
+    public void start(Stage stage, Controller controller) throws FileNotFoundException
     {
         setStage(stage);
         setController(controller);
@@ -74,10 +116,17 @@ public class Controller
         getRoot().setMaxSize(Controller.getMaxHboxWidth(), Controller.getMaxHboxHeight());
         getRoot().getChildren().addAll(rockButton, paperButton, scissorsButton, wellButton, enemieProgressIndicator);
 
-        Scene scene = new Scene(getRoot());
-        getStage().setScene(scene);
-        getStage().setTitle("Schere Stein Papier");
-        getStage().show();
+        root.getChildren().addAll(progressBox, enemyBox, tableBox, buttonBox);
+
+        Group group = new Group(root);
+        group.setAutoSizeChildren(true);
+
+        Scene scene = new Scene(group);
+        scene.getStylesheets().add("file:resources/style.css");
+        stage.setScene(scene);
+        stage.setTitle("Schere Stein Papier");
+//        stage.setMaxHeight(900);
+        stage.show();
     }
 
     public Button initializeButton(String id)
@@ -136,22 +185,27 @@ public class Controller
     {
         return maxButtonWidth;
     }
+
     public static int getMaxButtonHeight()
     {
         return maxButtonHeight;
     }
+
     public static int getMaxHboxWidth()
     {
         return maxHboxWidth;
     }
+
     public static int getMaxHboxHeight()
     {
         return maxHboxHeight;
     }
+
     public static int getMaxProgressIndicatorWidth()
     {
         return maxProgressIndicatorWidth;
     }
+
     public static int getMaxProgressIndicatorHeight()
     {
         return maxProgressIndicatorHeight;
@@ -161,78 +215,99 @@ public class Controller
     {
         return userChoice;
     }
+
     public void setUserChoice(String userChoice)
     {
         this.userChoice = userChoice;
     }
+
     public Button getRockButton()
     {
         return rockButton;
     }
+
     public void setRockButton(Button rockButton)
     {
         this.rockButton = rockButton;
     }
+
     public Button getPaperButton()
     {
         return paperButton;
     }
+
     public void setPaperButton(Button paperButton)
     {
         this.paperButton = paperButton;
     }
+
     public Button getScissorsButton()
     {
         return scissorsButton;
     }
+
     public void setScissorsButton(Button scissorsButton)
     {
         this.scissorsButton = scissorsButton;
     }
+
     public Button getWellButton()
     {
         return wellButton;
     }
+
     public void setWellButton(Button wellButton)
     {
         this.wellButton = wellButton;
     }
+
     public ProgressIndicator getEnemieProgressIndicator()
     {
         return enemieProgressIndicator;
     }
-    public void setEnemieProgressIndicator(ProgressIndicator enemieProgressIndicator) {
+
+    public void setEnemieProgressIndicator(ProgressIndicator enemieProgressIndicator)
+    {
         this.enemieProgressIndicator = enemieProgressIndicator;
     }
+
     public VBox getRoot()
     {
         return this.root;
     }
+
     public void setRoot(VBox root)
     {
         this.root = root;
     }
+
     public Stage getStage()
     {
         return this.stage;
     }
+
     public void setStage(Stage stage)
     {
         this.stage = stage;
     }
+
     public Controller getController()
     {
         return controller;
     }
+
     public void setController(Controller controller)
     {
         this.controller = controller;
     }
+
     public String getAiChoice()
     {
         return aiChoice;
     }
-    public void setAiChoice(int aiChoice) {
+
+    public void setAiChoice(int aiChoice)
+    {
         switch (aiChoice)
         {
             case 0 -> this.aiChoice = playStonesIDs.getOrDefault(0, null);
@@ -242,34 +317,42 @@ public class Controller
         }
 
     }
+
     public HBox getProgressBox()
     {
         return progressBox;
     }
+
     public void setProgressBox(HBox progressBox)
     {
         this.progressBox = progressBox;
     }
+
     public HBox getEnemyBox()
     {
         return enemyBox;
     }
+
     public void setEnemyBox(HBox enemyBox)
     {
         this.enemyBox = enemyBox;
     }
+
     public HBox getTableBox()
     {
         return tableBox;
     }
+
     public void setTableBox(HBox tableBox)
     {
         this.tableBox = tableBox;
     }
+
     public HBox getButtonBox()
     {
         return buttonBox;
     }
+
     public void setButtonBox(HBox buttonBox)
     {
         this.buttonBox = buttonBox;
