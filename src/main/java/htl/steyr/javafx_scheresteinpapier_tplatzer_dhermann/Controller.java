@@ -8,23 +8,10 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 
-import javafx.application.Application;
-import javafx.fxml.Initializable;
-import javafx.scene.Scene;
-import javafx.scene.control.Button;
-import javafx.scene.control.ProgressIndicator;
-import javafx.scene.layout.HBox;
-import javafx.scene.layout.VBox;
-import javafx.stage.Stage;
-
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-
 import javafx.scene.Group;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Random;
 
@@ -75,14 +62,14 @@ public class Controller
 
         initializeButtonBox(10);
 
-        ImageView computerHand = initializeImageView(new Image("file:resources/masterHand_default.png"), .1, .2);
+        ImageView computerHand = initializeImageView(new Image("file:resources/masterHand_default.png"), .4, .3);
         ImageView table = initializeImageView(new Image("file:resources/table.png"), 1, .5);
 
         addImageViewsToBoxes(getEnemyBox(), computerHand);
         addImageViewsToBoxes(getTableBox(), table);
     }
 
-    public void start(Stage stage, Controller controller) throws FileNotFoundException
+    public void start(Stage stage, Controller controller)
     {
         setStage(stage);
         setController(controller);
@@ -96,7 +83,6 @@ public class Controller
         getRoot().setSpacing(10);
         getRoot().setMinSize(Controller.getMaxHboxWidth(), Controller.getMaxHboxHeight());
         getRoot().setMaxSize(Controller.getMaxHboxWidth(), Controller.getMaxHboxHeight());
-//        getRoot().getChildren().addAll(rockButton, paperButton, scissorsButton, wellButton, enemieProgressIndicator);
 
         root.getChildren().addAll(progressBox, enemyBox, tableBox, buttonBox);
 
