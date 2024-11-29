@@ -17,7 +17,7 @@ public class Controller
      * Rock
      * Paper
      * Sissores
-     * Spring
+     * Well
      */
     private static final int maxButtonWidth = 200;
     private static final int maxButtonHeight = 50;
