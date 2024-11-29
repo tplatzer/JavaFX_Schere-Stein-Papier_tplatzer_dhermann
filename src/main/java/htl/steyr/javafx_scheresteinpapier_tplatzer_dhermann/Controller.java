@@ -8,6 +8,8 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 
+import java.io.FileNotFoundException;
+
 import javafx.scene.Group;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
@@ -61,15 +63,17 @@ public class Controller
         setEnemieProgressIndicator(initializeProgressIndicator());
 
         initializeButtonBox(10);
+        addProgressIndicatorToBox(getProgressBox(), getEnemieProgressIndicator());
 
-        ImageView computerHand = initializeImageView(new Image("file:resources/masterHand_default.png"), .4, .3);
+
+        ImageView computerHand = initializeImageView(new Image("file:resources/masterHand_default.png"), .1, .2);
         ImageView table = initializeImageView(new Image("file:resources/table.png"), 1, .5);
 
         addImageViewsToBoxes(getEnemyBox(), computerHand);
         addImageViewsToBoxes(getTableBox(), table);
     }
 
-    public void start(Stage stage, Controller controller)
+    public void start(Stage stage, Controller controller) throws FileNotFoundException
     {
         setStage(stage);
         setController(controller);
@@ -83,8 +87,7 @@ public class Controller
         getRoot().setSpacing(10);
         getRoot().setMinSize(Controller.getMaxHboxWidth(), Controller.getMaxHboxHeight());
         getRoot().setMaxSize(Controller.getMaxHboxWidth(), Controller.getMaxHboxHeight());
-
-        root.getChildren().addAll(progressBox, enemyBox, tableBox, buttonBox);
+        getRoot().getChildren().addAll(progressBox, enemyBox, tableBox, buttonBox);
 
         Group group = new Group(root);
         group.setAutoSizeChildren(true);
@@ -121,6 +124,11 @@ public class Controller
     private void addImageViewsToBoxes(HBox box, ImageView image)
     {
         box.getChildren().add(image);
+    }
+
+    private void addProgressIndicatorToBox(HBox box, ProgressIndicator progressIndicator)
+    {
+        box.getChildren().add(progressIndicator);
     }
 
     private ImageView initializeImageView(Image image, double widthFactor, double heightFactor)
