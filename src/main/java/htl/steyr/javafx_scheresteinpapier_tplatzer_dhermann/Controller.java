@@ -78,6 +78,18 @@ public class Controller
         ImageView computerHand = initializeImageView(new Image("file:resources/masterHand_default.png"));
         ImageView table = initializeImageView(new Image("file:resources/table.png"));
 
+//        ImageView computerHand = new ImageView();
+        computerHand.setImage(new Image("file:resources/masterHand_default.png"));
+        computerHand.fitWidthProperty().bind(getStage().widthProperty().multiply(0.1)); // 10% der Fensterbreite
+        computerHand.fitHeightProperty().bind(getStage().heightProperty().multiply(0.2)); // 20% der Fensterhöhe        computerHand.setFitHeight(200);
+        enemyBox.getChildren().add(computerHand);
+
+//        ImageView table = new ImageView();
+        table.setImage(new Image("file:resources/table.png"));
+        table.fitWidthProperty().bind(getStage().widthProperty().multiply(1));
+        table.fitHeightProperty().bind(getStage().heightProperty().multiply(.5));
+        tableBox.getChildren().add(table);
+
         addImageViewsToBoxes(getEnemyBox(), computerHand);
         addImageViewsToBoxes(getTableBox(), table);
     }
@@ -96,7 +108,7 @@ public class Controller
         getRoot().setSpacing(10);
         getRoot().setMinSize(Controller.getMaxHboxWidth(), Controller.getMaxHboxHeight());
         getRoot().setMaxSize(Controller.getMaxHboxWidth(), Controller.getMaxHboxHeight());
-        getRoot().getChildren().addAll(rockButton, paperButton, scissorsButton, wellButton, enemieProgressIndicator);
+//        getRoot().getChildren().addAll(rockButton, paperButton, scissorsButton, wellButton, enemieProgressIndicator);
 
         root.getChildren().addAll(progressBox, enemyBox, tableBox, buttonBox);
 

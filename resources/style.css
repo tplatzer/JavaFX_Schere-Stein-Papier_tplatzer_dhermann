@@ -7,3 +7,45 @@
     width: 10%;
     height: 10%;
 }
+
+#rock {
+    background-image: url("./img/faust.png");
+    -fx-background-size: 16px 16px; /* set the size of the image */
+    -fx-background-repeat: no-repeat;
+    -fx-background-position: center;
+}
+
+#rockButton {
+    background-image: url("./img/faust.png");
+    -fx-background-size: 16px 16px; /* set the size of the image */
+    -fx-background-repeat: no-repeat;
+    -fx-background-position: center;
+}
+
+#paper {
+    background-image: url("./img/papier.png");
+    -fx-background-size: 16px 16px; /* set the size of the image */
+    -fx-background-repeat: no-repeat;
+    -fx-background-position: center;
+}
+
+#paperButton {
+    background-image: url("./img/papier.png");
+    -fx-background-size: 16px 16px; /* set the size of the image */
+    -fx-background-repeat: no-repeat;
+    -fx-background-position: center;
+}
+
+#scissors {
+    background-image: url("./img/schere.png");
+    -fx-background-size: 16px 16px; /* set the size of the image */
+    -fx-background-repeat: no-repeat;
+    -fx-background-position: center;
+}
+
+#scissorsButton {
+    background-image: url("./img/schere.png");
+    -fx-background-size: 16px 16px; /* set the size of the image */
+    -fx-background-repeat: no-repeat;
+    -fx-background-position: center;
+}
