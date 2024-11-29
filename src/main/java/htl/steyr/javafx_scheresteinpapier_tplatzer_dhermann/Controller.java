@@ -8,23 +8,12 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 
-import javafx.application.Application;
-import javafx.fxml.Initializable;
-import javafx.scene.Scene;
-import javafx.scene.control.Button;
-import javafx.scene.control.ProgressIndicator;
-import javafx.scene.layout.HBox;
-import javafx.scene.layout.VBox;
-import javafx.stage.Stage;
-
-import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 
 import javafx.scene.Group;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Random;
 
@@ -74,6 +63,7 @@ public class Controller
         setEnemieProgressIndicator(initializeProgressIndicator());
 
         initializeButtonBox(10);
+        addProgressIndicatorToBox(getProgressBox(), getEnemieProgressIndicator());
 
         ImageView computerHand = initializeImageView(new Image("file:resources/masterHand_default.png"), .1, .2);
         ImageView table = initializeImageView(new Image("file:resources/table.png"), 1, .5);
@@ -96,9 +86,7 @@ public class Controller
         getRoot().setSpacing(10);
         getRoot().setMinSize(Controller.getMaxHboxWidth(), Controller.getMaxHboxHeight());
         getRoot().setMaxSize(Controller.getMaxHboxWidth(), Controller.getMaxHboxHeight());
-//        getRoot().getChildren().addAll(rockButton, paperButton, scissorsButton, wellButton, enemieProgressIndicator);
-
-        root.getChildren().addAll(progressBox, enemyBox, tableBox, buttonBox);
+        getRoot().getChildren().addAll(progressBox, enemyBox, tableBox, buttonBox);
 
         Group group = new Group(root);
         group.setAutoSizeChildren(true);
@@ -135,6 +123,11 @@ public class Controller
     private void addImageViewsToBoxes(HBox box, ImageView image)
     {
         box.getChildren().add(image);
+    }
+
+    private void addProgressIndicatorToBox(HBox box, ProgressIndicator progressIndicator)
+    {
+        box.getChildren().add(progressIndicator);
     }
 
     private ImageView initializeImageView(Image image, double widthFactor, double heightFactor)
