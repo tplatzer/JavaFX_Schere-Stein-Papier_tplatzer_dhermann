@@ -4,6 +4,7 @@ import javafx.event.ActionEvent;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.ProgressIndicator;
+import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 
@@ -37,6 +38,11 @@ public class Controller
     private Button scissorsButton;
     private Button wellButton;
     private ProgressIndicator enemieProgressIndicator;
+
+    private HBox progressBox = new HBox();
+    private HBox enemyBox = new HBox();
+    private HBox tableBox = new HBox();
+    private HBox buttonBox = new HBox();
 
     public void initializeUserElements()
     {
@@ -235,5 +241,37 @@ public class Controller
             case 3 -> this.aiChoice = playStonesIDs.getOrDefault(3, null);
         }
 
+    }
+    public HBox getProgressBox()
+    {
+        return progressBox;
+    }
+    public void setProgressBox(HBox progressBox)
+    {
+        this.progressBox = progressBox;
+    }
+    public HBox getEnemyBox()
+    {
+        return enemyBox;
+    }
+    public void setEnemyBox(HBox enemyBox)
+    {
+        this.enemyBox = enemyBox;
+    }
+    public HBox getTableBox()
+    {
+        return tableBox;
+    }
+    public void setTableBox(HBox tableBox)
+    {
+        this.tableBox = tableBox;
+    }
+    public HBox getButtonBox()
+    {
+        return buttonBox;
+    }
+    public void setButtonBox(HBox buttonBox)
+    {
+        this.buttonBox = buttonBox;
     }
 }
