@@ -65,7 +65,6 @@ public class Controller
         initializeButtonBox(10);
         addProgressIndicatorToBox(getProgressBox(), getEnemieProgressIndicator());
 
-
         ImageView computerHand = initializeImageView(new Image("file:resources/masterHand_default.png"), .1, .2);
         ImageView table = initializeImageView(new Image("file:resources/table.png"), 1, .5);
 
