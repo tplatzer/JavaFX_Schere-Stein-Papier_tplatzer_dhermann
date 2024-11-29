@@ -60,44 +60,26 @@ public class Controller
     private HBox tableBox = new HBox();
     private HBox buttonBox = new HBox();
 
-    public void initializeUserElements() throws FileNotFoundException
+    public void initializeUserElements()
     {
         playStonesIDs.put(0, Rock.getId());
         playStonesIDs.put(1, Paper.getId());
         playStonesIDs.put(2, Scissors.getId());
         playStonesIDs.put(3, Well.getId());
 
-        setRockButton(initializeButton(playStonesIDs.getOrDefault(0, null)));
-        setPaperButton(initializeButton(playStonesIDs.getOrDefault(1, null)));
-        setScissorsButton(initializeButton(playStonesIDs.getOrDefault(2, null)));
-        setWellButton(initializeButton(playStonesIDs.getOrDefault(3, null)));
+        setRockButton(initializeButton(playStonesIDs.getOrDefault(0, null), new Image("file:resources/img/hovered/stone.png")));
+        setPaperButton(initializeButton(playStonesIDs.getOrDefault(1, null), new Image("file:resources/img/hovered/paper.png")));
+        setScissorsButton(initializeButton(playStonesIDs.getOrDefault(2, null), new Image("file:resources/img/hovered/scissors.png")));
+        setWellButton(initializeButton(playStonesIDs.getOrDefault(3, null), new Image("file:resources/img/hovered/stone.png")));
         setEnemieProgressIndicator(initializeProgressIndicator());
 
-        FileInputStream image = new FileInputStream("resources/masterHand_default.webp");
+        initializeButtonBox(10);
 
+        ImageView computerHand = initializeImageView(new Image("file:resources/masterHand_default.png"));
+        ImageView table = initializeImageView(new Image("file:resources/table.png"));
 
-        ImageView computerHand = new ImageView();
-        computerHand.setImage(new Image("file:resources/masterHand_default.png"));
-        enemyBox.getChildren().add(computerHand);
-
-        ImageView table = new ImageView();
-        table.setImage(new Image("file:resources/table.png"));
-        tableBox.getChildren().add(table);
-
-
-        rockButton.setGraphic(new ImageView(new Image("file:resources/img/hovered/stone.png")));
-        paperButton.setGraphic(new ImageView(new Image("file:resources/img/hovered/paper.png")));
-        scissorsButton.setGraphic(new ImageView(new Image("file:resources/img/hovered/scissors.png")));
-
-        rockButton.setOnAction(e -> setUserChoice(Rock.getId()));
-        paperButton.setOnAction(e -> setUserChoice(Paper.getId()));
-        scissorsButton.setOnAction(e -> setUserChoice(Scissors.getId()));
-
-        buttonBox.setSpacing(10);
-        buttonBox.setMinSize(Controller.getMaxHboxWidth(), Controller.getMaxHboxHeight());
-        buttonBox.setMaxSize(Controller.getMaxHboxWidth(), Controller.getMaxHboxHeight());
-        buttonBox.getChildren().addAll(rockButton, paperButton, scissorsButton, wellButton);
-
+        addImageViewsToBoxes(getEnemyBox(), computerHand);
+        addImageViewsToBoxes(getTableBox(), table);
     }
 
     public void start(Stage stage, Controller controller) throws FileNotFoundException
@@ -129,18 +111,40 @@ public class Controller
         stage.show();
     }
 
-    public Button initializeButton(String id)
+    private Button initializeButton(String id, Image image)
     {
         Button button = new Button();
         button.setMinSize(getMaxButtonWidth(), getMaxButtonHeight());
         button.setMaxSize(getMaxButtonWidth(), getMaxButtonHeight());
         button.setId(id);
         button.setText(id);
+        button.setGraphic(new ImageView(image));
         button.setOnAction(this::handleButtonClick);
         return button;
     }
 
-    public ProgressIndicator initializeProgressIndicator()
+    private void addImageViewsToBoxes(HBox box, ImageView image)
+    {
+        box.getChildren().add(image);
+    }
+
+    private ImageView initializeImageView(Image image)
+    {
+        ImageView imageView = new ImageView();
+        imageView.setImage(image);
+
+        return imageView;
+    }
+
+    private void initializeButtonBox(int spacing)
+    {
+        buttonBox.setSpacing(spacing);
+        buttonBox.setMinSize(Controller.getMaxHboxWidth(), Controller.getMaxHboxHeight());
+        buttonBox.setMaxSize(Controller.getMaxHboxWidth(), Controller.getMaxHboxHeight());
+        buttonBox.getChildren().addAll(getRockButton(), getPaperButton(), getScissorsButton(), getWellButton());
+    }
+
+    private ProgressIndicator initializeProgressIndicator()
     {
         ProgressIndicator progressIndicator = new ProgressIndicator();
         progressIndicator.setId("enemie_progress_indicator");
@@ -149,7 +153,7 @@ public class Controller
         return progressIndicator;
     }
 
-    public void handleButtonClick(ActionEvent event)
+    private void handleButtonClick(ActionEvent event)
     {
         Button sourceButton = (Button) event.getSource();
         String buttonId = sourceButton.getId();
