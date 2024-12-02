@@ -2,6 +2,7 @@ package htl.steyr.javafx_scheresteinpapier_tplatzer_dhermann;
 
 import javafx.application.Platform;
 import javafx.event.ActionEvent;
+import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.ProgressIndicator;
@@ -62,12 +63,15 @@ public class Controller
 
     private void play()
     {
-        Thread sleepThread = new Thread(() -> {
-            try {
+        Thread sleepThread = new Thread(() ->
+        {
+            try
+            {
                 Thread.sleep(3000);
                 aiTurn();
                 updateComputerHand();
-            } catch (InterruptedException e) {
+            } catch (InterruptedException e)
+            {
                 e.printStackTrace();
             }
         });
@@ -211,6 +215,7 @@ public class Controller
     private void addImageViewsToBoxes(HBox box, ImageView image)
     {
         box.getChildren().add(image);
+        box.setAlignment(Pos.CENTER);
     }
 
     private void addProgressIndicatorToBox(HBox box, ProgressIndicator progressIndicator)
@@ -222,101 +227,127 @@ public class Controller
     {
         return maxButtonWidth;
     }
+
     public static int getMaxButtonHeight()
     {
         return maxButtonHeight;
     }
+
     public static int getMaxHboxWidth()
     {
         return maxHboxWidth;
     }
+
     public static int getMaxHboxHeight()
     {
         return maxHboxHeight;
     }
+
     public static int getMaxProgressIndicatorWidth()
     {
         return maxProgressIndicatorWidth;
     }
+
     public static int getMaxProgressIndicatorHeight()
     {
         return maxProgressIndicatorHeight;
     }
+
     public String getUserChoice()
     {
         return userChoice;
     }
+
     public void setUserChoice(String userChoice)
     {
         this.userChoice = userChoice;
     }
+
     public Button getRockButton()
     {
         return rockButton;
     }
+
     public void setRockButton(Button rockButton)
     {
         this.rockButton = rockButton;
     }
+
     public Button getPaperButton()
     {
         return paperButton;
     }
+
     public void setPaperButton(Button paperButton)
     {
         this.paperButton = paperButton;
     }
+
     public Button getScissorsButton()
     {
         return scissorsButton;
     }
+
     public void setScissorsButton(Button scissorsButton)
     {
         this.scissorsButton = scissorsButton;
     }
+
     public Button getWellButton()
     {
         return wellButton;
     }
+
     public void setWellButton(Button wellButton)
     {
         this.wellButton = wellButton;
     }
+
     public ProgressIndicator getEnemieProgressIndicator()
     {
         return enemieProgressIndicator;
     }
-    public void setEnemieProgressIndicator(ProgressIndicator enemieProgressIndicator) {
+
+    public void setEnemieProgressIndicator(ProgressIndicator enemieProgressIndicator)
+    {
         this.enemieProgressIndicator = enemieProgressIndicator;
     }
+
     public VBox getRoot()
     {
         return this.root;
     }
+
     public void setRoot(VBox root)
     {
         this.root = root;
     }
+
     public Stage getStage()
     {
         return this.stage;
     }
+
     public void setStage(Stage stage)
     {
         this.stage = stage;
     }
+
     public Controller getController()
     {
         return controller;
     }
+
     public void setController(Controller controller)
     {
         this.controller = controller;
     }
+
     public String getAiChoice()
     {
         return aiChoice;
     }
+
     public void setAiChoice(int aiChoice)
     {
         switch (aiChoice)
@@ -328,50 +359,62 @@ public class Controller
         }
 
     }
+
     public HashMap<Integer, String> getPlayStonesIDs()
     {
         return playStonesIDs;
     }
+
     public void setPlayStonesIDs(HashMap<Integer, String> playStonesIDs)
     {
         this.playStonesIDs = playStonesIDs;
     }
+
     public HBox getProgressBox()
     {
         return progressBox;
     }
+
     public void setProgressBox(HBox progressBox)
     {
         this.progressBox = progressBox;
     }
+
     public HBox getEnemyBox()
     {
         return enemyBox;
     }
+
     public void setEnemyBox(HBox enemyBox)
     {
         this.enemyBox = enemyBox;
     }
+
     public HBox getTableBox()
     {
         return tableBox;
     }
+
     public void setTableBox(HBox tableBox)
     {
         this.tableBox = tableBox;
     }
+
     public HBox getButtonBox()
     {
         return buttonBox;
     }
+
     public void setButtonBox(HBox buttonBox)
     {
         this.buttonBox = buttonBox;
     }
+
     public ImageView getComputerHand()
     {
         return computerHand;
     }
+
     public void setComputerHand(ImageView computerHand)
     {
         this.computerHand = computerHand;
