@@ -1,5 +1,6 @@
 package htl.steyr.javafx_scheresteinpapier_tplatzer_dhermann;
 
+import javafx.application.Platform;
 import javafx.event.ActionEvent;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
@@ -7,6 +8,8 @@ import javafx.scene.control.ProgressIndicator;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
+
+import java.io.FileNotFoundException;
 
 import javafx.scene.Group;
 import javafx.scene.image.Image;
@@ -41,6 +44,7 @@ public class Controller
     private Button scissorsButton;
     private Button wellButton;
     private ProgressIndicator enemieProgressIndicator;
+    private ImageView computerHand;
 
     private HBox progressBox = new HBox();
     private HBox enemyBox = new HBox();
@@ -60,18 +64,17 @@ public class Controller
         setWellButton(initializeButton(playStonesIDs.getOrDefault(3, null), new Image("file:resources/img/hovered/stone.png")));
         setEnemieProgressIndicator(initializeProgressIndicator());
 
-
         initializeButtonBox(10);
         addProgressIndicatorToBox(getProgressBox(), getEnemieProgressIndicator());
 
-        ImageView computerHand = initializeImageView(new Image("file:resources/masterHand_default.png"), .1, .2);
+        setComputerHand(initializeImageView(new Image("file:resources/masterHand_default.png"), .1, .2));
         ImageView table = initializeImageView(new Image("file:resources/table.png"), 1, .5);
 
         addImageViewsToBoxes(getEnemyBox(), computerHand);
         addImageViewsToBoxes(getTableBox(), table);
     }
 
-    public void start(Stage stage, Controller controller)
+    public void start(Stage stage, Controller controller) throws FileNotFoundException
     {
         setStage(stage);
         setController(controller);
@@ -150,10 +153,15 @@ public class Controller
     private ProgressIndicator initializeProgressIndicator()
     {
         ProgressIndicator progressIndicator = new ProgressIndicator();
-        progressIndicator.setId("enemy_progress_indicator");
+        progressIndicator.setId("enemie_progress_indicator");
         progressIndicator.setMinSize(maxButtonWidth, maxButtonHeight);
 
         return progressIndicator;
+    }
+
+    private void removeButtonBoxes()
+    {
+        Platform.runLater(() -> getButtonBox().setVisible(false));
     }
 
     private void handleButtonClick(ActionEvent event) throws InterruptedException
@@ -171,18 +179,38 @@ public class Controller
             case Well.id -> setUserChoice(playStonesIDs.getOrDefault(3, null));
         }
 
+        Thread removeButtonBoxThread = new Thread(this::removeButtonBoxes);
+        removeButtonBoxThread.setDaemon(true);
+        removeButtonBoxThread.start();
+
         play();
     }
 
-    private void play() throws InterruptedException
+    private void play()
     {
-        aiTurn();
+        Thread sleepThread = new Thread(() -> {
+            try {
+                Thread.sleep(3000);
+                aiTurn();
+                updateComputerHand();
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+        });
+        sleepThread.setDaemon(true);
+        sleepThread.start();
+    }
 
-        Thread.sleep(10000);
-
-
-        System.out.println(getAiChoice());
-        System.out.println();
+    private void updateComputerHand()
+    {
+        switch (getAiChoice())
+        {
+            case Rock.id -> getComputerHand().setImage(new Image("file:resources/masterHand_rock.png"));
+            case Paper.id -> getComputerHand().setImage(new Image("file:resources/masterHand_paper.png"));
+            case Scissors.id -> getComputerHand().setImage(new Image("file:resources/masterHand_scissors.png"));
+            case Well.id -> getComputerHand().setImage(new Image("file:resources/masterHand_well.png"));
+            default -> getComputerHand().setImage(new Image("file:resources/masterHand_default.png"));
+        }
     }
 
     private void aiTurn()
@@ -276,9 +304,7 @@ public class Controller
     {
         return enemieProgressIndicator;
     }
-
-    public void setEnemieProgressIndicator(ProgressIndicator enemieProgressIndicator)
-    {
+    public void setEnemieProgressIndicator(ProgressIndicator enemieProgressIndicator) {
         this.enemieProgressIndicator = enemieProgressIndicator;
     }
 
@@ -367,5 +393,13 @@ public class Controller
     public void setButtonBox(HBox buttonBox)
     {
         this.buttonBox = buttonBox;
+    }
+    public ImageView getComputerHand()
+    {
+        return computerHand;
+    }
+    public void setComputerHand(ImageView computerHand)
+    {
+        this.computerHand = computerHand;
     }
 }
