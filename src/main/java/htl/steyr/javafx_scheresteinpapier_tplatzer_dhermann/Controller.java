@@ -77,6 +77,9 @@ public class Controller
         });
         sleepThread.setDaemon(true);
         sleepThread.start();
+
+        System.out.println();
+        System.out.println(getAiChoice());
     }
 
     private void showWindow()
@@ -209,7 +212,8 @@ public class Controller
 
     private void aiTurn()
     {
-        setAiChoice(new Random().nextInt(4));
+        Random random = new Random();
+        setAiChoice(random.nextInt(4));
     }
 
     private void addImageViewsToBoxes(HBox box, ImageView image)
