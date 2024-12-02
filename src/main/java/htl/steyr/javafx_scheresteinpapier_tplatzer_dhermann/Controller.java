@@ -9,8 +9,6 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 
-import java.io.FileNotFoundException;
-
 import javafx.scene.Group;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
@@ -62,23 +60,34 @@ public class Controller
 
     private void play()
     {
+        System.out.println();
+        System.out.println("nach UpdateHand");
+
+        switch (getWinner())
+        {
+
+        }
+    }
+
+    private void aiTurn()
+    {
         Thread sleepThread = new Thread(() ->
         {
             try
             {
                 Thread.sleep(3000);
-                aiTurn();
+                generateAiTurn();
                 updateComputerHand();
             } catch (InterruptedException e)
             {
                 e.printStackTrace();
+            } finally
+            {
+                Platform.runLater(this::play);
             }
         });
         sleepThread.setDaemon(true);
         sleepThread.start();
-
-        System.out.println();
-        System.out.println(getAiChoice());
     }
 
     private void showWindow()
@@ -118,7 +127,75 @@ public class Controller
         removeButtonBoxThread.setDaemon(true);
         removeButtonBoxThread.start();
 
-        play();
+        aiTurn();
+    }
+
+    /**
+     * 0 = Unentschieden
+     * 1 = User
+     * 2 = AI
+     */
+    private int getWinner()
+    {
+        if (getUserChoice().equals(getAiChoice())) return 0;
+        if (getUserChoice().equals(Scissors.id))
+        {
+            switch (getAiChoice())
+            {
+                case Paper.id ->
+                {
+                    return 1;
+                }
+                case Rock.id, Well.id ->
+                {
+                    return 2;
+                }
+            }
+        }
+        if (getUserChoice().equals(Rock.id))
+        {
+            switch (getAiChoice())
+            {
+                case Scissors.id ->
+                {
+                    return 1;
+                }
+                case Paper.id, Well.id ->
+                {
+
+                }
+            }
+        }
+        if (getUserChoice().equals(Paper.id))
+        {
+            switch (getAiChoice())
+            {
+                case Rock.id, Well.id ->
+                {
+                    return 1;
+                }
+                case Scissors.id ->
+                {
+                    return 2;
+                }
+            }
+        }
+        if (getUserChoice().equals(Well.id))
+        {
+            switch (getAiChoice())
+            {
+                case Scissors.id, Rock.id ->
+                {
+                    return 1;
+                }
+                case Paper.id ->
+                {
+                    return 2;
+                }
+            }
+        }
+
+        return 0;
     }
 
     private void updateComputerHand()
@@ -166,13 +243,16 @@ public class Controller
         button.setGraphic(new ImageView(image));
         button.setOnAction(event ->
         {
-            try
+            new Thread(() ->
             {
-                handleButtonClick(event);
-            } catch (InterruptedException e)
-            {
-                throw new RuntimeException(e);
-            }
+                try
+                {
+                    handleButtonClick(event);
+                } catch (InterruptedException e)
+                {
+                    e.printStackTrace();
+                }
+            }).start();
         });
         return button;
     }
@@ -209,7 +289,7 @@ public class Controller
         Platform.runLater(() -> getButtonBox().setVisible(false));
     }
 
-    private void aiTurn()
+    private void generateAiTurn()
     {
         Random random = new Random();
         setAiChoice(random.nextInt(4));
