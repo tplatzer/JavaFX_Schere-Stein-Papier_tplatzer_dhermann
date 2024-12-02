@@ -35,7 +35,7 @@ public class Controller
 
     private String userChoice = null;
     private String aiChoice = null;
-    private final HashMap<Integer, String> playStonesIDs = new HashMap<>();
+    private HashMap<Integer, String> playStonesIDs = new HashMap<>();
     private Controller controller;
     private VBox root = new VBox();
     private Stage stage;
@@ -51,30 +51,7 @@ public class Controller
     private HBox tableBox = new HBox();
     private HBox buttonBox = new HBox();
 
-    public void initializeUserElements()
-    {
-        playStonesIDs.put(0, Rock.getId());
-        playStonesIDs.put(1, Paper.getId());
-        playStonesIDs.put(2, Scissors.getId());
-        playStonesIDs.put(3, Well.getId());
-
-        setRockButton(initializeButton(playStonesIDs.getOrDefault(0, null), new Image("file:resources/img/hovered/stone.png")));
-        setPaperButton(initializeButton(playStonesIDs.getOrDefault(1, null), new Image("file:resources/img/hovered/paper.png")));
-        setScissorsButton(initializeButton(playStonesIDs.getOrDefault(2, null), new Image("file:resources/img/hovered/scissors.png")));
-        setWellButton(initializeButton(playStonesIDs.getOrDefault(3, null), new Image("file:resources/img/hovered/stone.png")));
-        setEnemieProgressIndicator(initializeProgressIndicator());
-
-        initializeButtonBox(10);
-        addProgressIndicatorToBox(getProgressBox(), getEnemieProgressIndicator());
-
-        setComputerHand(initializeImageView(new Image("file:resources/masterHand_default.png"), .1, .2));
-        ImageView table = initializeImageView(new Image("file:resources/table.png"), 1, .5);
-
-        addImageViewsToBoxes(getEnemyBox(), computerHand);
-        addImageViewsToBoxes(getTableBox(), table);
-    }
-
-    public void start(Stage stage, Controller controller) throws FileNotFoundException
+    public void start(Stage stage, Controller controller)
     {
         setStage(stage);
         setController(controller);
@@ -83,22 +60,94 @@ public class Controller
         showWindow();
     }
 
-    public void showWindow()
+    private void play()
+    {
+        Thread sleepThread = new Thread(() -> {
+            try {
+                Thread.sleep(3000);
+                aiTurn();
+                updateComputerHand();
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+        });
+        sleepThread.setDaemon(true);
+        sleepThread.start();
+    }
+
+    private void showWindow()
     {
         getRoot().setSpacing(10);
         getRoot().setMinSize(Controller.getMaxHboxWidth(), Controller.getMaxHboxHeight());
         getRoot().setMaxSize(Controller.getMaxHboxWidth(), Controller.getMaxHboxHeight());
-        getRoot().getChildren().addAll(progressBox, enemyBox, tableBox, buttonBox);
+        getRoot().getChildren().addAll(getProgressBox(), getEnemyBox(), getTableBox(), getButtonBox());
 
-        Group group = new Group(root);
+        Group group = new Group(getRoot());
         group.setAutoSizeChildren(true);
 
         Scene scene = new Scene(group);
         scene.getStylesheets().add("file:resources/style.css");
-        stage.setScene(scene);
-        stage.setTitle("Schere Stein Papier");
+        getStage().setScene(scene);
+        getStage().setTitle("Schere Stein Papier");
 //        stage.setMaxHeight(900);
-        stage.show();
+        getStage().show();
+    }
+
+    private void handleButtonClick(ActionEvent event) throws InterruptedException
+    {
+        Button sourceButton = (Button) event.getSource();
+        String buttonId = sourceButton.getId();
+
+        System.out.println(buttonId);
+
+        switch (buttonId)
+        {
+            case Rock.id -> setUserChoice(getPlayStonesIDs().getOrDefault(0, null));
+            case Paper.id -> setUserChoice(getPlayStonesIDs().getOrDefault(1, null));
+            case Scissors.id -> setUserChoice(getPlayStonesIDs().getOrDefault(2, null));
+            case Well.id -> setUserChoice(getPlayStonesIDs().getOrDefault(3, null));
+        }
+
+        Thread removeButtonBoxThread = new Thread(this::removeButtonBoxes);
+        removeButtonBoxThread.setDaemon(true);
+        removeButtonBoxThread.start();
+
+        play();
+    }
+
+    private void updateComputerHand()
+    {
+        switch (getAiChoice())
+        {
+            case Rock.id -> getComputerHand().setImage(new Image("file:resources/masterHand_rock.png"));
+            case Paper.id -> getComputerHand().setImage(new Image("file:resources/masterHand_paper.png"));
+            case Scissors.id -> getComputerHand().setImage(new Image("file:resources/masterHand_scissors.png"));
+            case Well.id -> getComputerHand().setImage(new Image("file:resources/masterHand_well.png"));
+            default -> getComputerHand().setImage(new Image("file:resources/masterHand_default.png"));
+        }
+    }
+
+    private void initializeUserElements()
+    {
+        getPlayStonesIDs().put(0, Rock.getId());
+        getPlayStonesIDs().put(1, Paper.getId());
+        getPlayStonesIDs().put(2, Scissors.getId());
+        getPlayStonesIDs().put(3, Well.getId());
+
+        setRockButton(initializeButton(getPlayStonesIDs().getOrDefault(0, null), new Image("file:resources/img/hovered/stone.png")));
+        setPaperButton(initializeButton(getPlayStonesIDs().getOrDefault(1, null), new Image("file:resources/img/hovered/paper.png")));
+        setScissorsButton(initializeButton(getPlayStonesIDs().getOrDefault(2, null), new Image("file:resources/img/hovered/scissors.png")));
+        setWellButton(initializeButton(getPlayStonesIDs().getOrDefault(3, null), new Image("file:resources/img/hovered/stone.png")));
+        setEnemieProgressIndicator(initializeProgressIndicator());
+
+        initializeButtonBox(10);
+        addProgressIndicatorToBox(getProgressBox(), getEnemieProgressIndicator());
+
+        setComputerHand(initializeImageView(new Image("file:resources/masterHand_default.png"), .1, .2));
+        ImageView table = initializeImageView(new Image("file:resources/table.png"), 1, .5);
+
+        addImageViewsToBoxes(getEnemyBox(), getComputerHand());
+        addImageViewsToBoxes(getTableBox(), table);
     }
 
     private Button initializeButton(String id, Image image)
@@ -122,16 +171,6 @@ public class Controller
         return button;
     }
 
-    private void addImageViewsToBoxes(HBox box, ImageView image)
-    {
-        box.getChildren().add(image);
-    }
-
-    private void addProgressIndicatorToBox(HBox box, ProgressIndicator progressIndicator)
-    {
-        box.getChildren().add(progressIndicator);
-    }
-
     private ImageView initializeImageView(Image image, double widthFactor, double heightFactor)
     {
         ImageView imageView = new ImageView();
@@ -144,17 +183,17 @@ public class Controller
 
     private void initializeButtonBox(int spacing)
     {
-        buttonBox.setSpacing(spacing);
-        buttonBox.setMinSize(Controller.getMaxHboxWidth(), Controller.getMaxHboxHeight());
-        buttonBox.setMaxSize(Controller.getMaxHboxWidth(), Controller.getMaxHboxHeight());
-        buttonBox.getChildren().addAll(getRockButton(), getPaperButton(), getScissorsButton(), getWellButton());
+        getButtonBox().setSpacing(spacing);
+        getButtonBox().setMinSize(Controller.getMaxHboxWidth(), Controller.getMaxHboxHeight());
+        getButtonBox().setMaxSize(Controller.getMaxHboxWidth(), Controller.getMaxHboxHeight());
+        getButtonBox().getChildren().addAll(getRockButton(), getPaperButton(), getScissorsButton(), getWellButton());
     }
 
     private ProgressIndicator initializeProgressIndicator()
     {
         ProgressIndicator progressIndicator = new ProgressIndicator();
         progressIndicator.setId("enemie_progress_indicator");
-        progressIndicator.setMinSize(maxButtonWidth, maxButtonHeight);
+        progressIndicator.setMinSize(getMaxButtonWidth(), getMaxButtonHeight());
 
         return progressIndicator;
     }
@@ -164,61 +203,20 @@ public class Controller
         Platform.runLater(() -> getButtonBox().setVisible(false));
     }
 
-    private void handleButtonClick(ActionEvent event) throws InterruptedException
-    {
-        Button sourceButton = (Button) event.getSource();
-        String buttonId = sourceButton.getId();
-
-        System.out.println(buttonId);
-
-        switch (buttonId)
-        {
-            case Rock.id -> setUserChoice(playStonesIDs.getOrDefault(0, null));
-            case Paper.id -> setUserChoice(playStonesIDs.getOrDefault(1, null));
-            case Scissors.id -> setUserChoice(playStonesIDs.getOrDefault(2, null));
-            case Well.id -> setUserChoice(playStonesIDs.getOrDefault(3, null));
-        }
-
-        Thread removeButtonBoxThread = new Thread(this::removeButtonBoxes);
-        removeButtonBoxThread.setDaemon(true);
-        removeButtonBoxThread.start();
-
-        play();
-    }
-
-    private void play()
-    {
-        Thread sleepThread = new Thread(() -> {
-            try {
-                Thread.sleep(3000);
-                aiTurn();
-                updateComputerHand();
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
-        });
-        sleepThread.setDaemon(true);
-        sleepThread.start();
-    }
-
-    private void updateComputerHand()
-    {
-        switch (getAiChoice())
-        {
-            case Rock.id -> getComputerHand().setImage(new Image("file:resources/masterHand_rock.png"));
-            case Paper.id -> getComputerHand().setImage(new Image("file:resources/masterHand_paper.png"));
-            case Scissors.id -> getComputerHand().setImage(new Image("file:resources/masterHand_scissors.png"));
-            case Well.id -> getComputerHand().setImage(new Image("file:resources/masterHand_well.png"));
-            default -> getComputerHand().setImage(new Image("file:resources/masterHand_default.png"));
-        }
-    }
-
     private void aiTurn()
     {
-        Random random = new Random();
-        setAiChoice(random.nextInt(4));
+        setAiChoice(new Random().nextInt(4));
     }
 
+    private void addImageViewsToBoxes(HBox box, ImageView image)
+    {
+        box.getChildren().add(image);
+    }
+
+    private void addProgressIndicatorToBox(HBox box, ProgressIndicator progressIndicator)
+    {
+        box.getChildren().add(progressIndicator);
+    }
 
     public static int getMaxButtonWidth()
     {
@@ -329,6 +327,14 @@ public class Controller
             case 3 -> this.aiChoice = playStonesIDs.getOrDefault(3, null);
         }
 
+    }
+    public HashMap<Integer, String> getPlayStonesIDs()
+    {
+        return playStonesIDs;
+    }
+    public void setPlayStonesIDs(HashMap<Integer, String> playStonesIDs)
+    {
+        this.playStonesIDs = playStonesIDs;
     }
     public HBox getProgressBox()
     {
