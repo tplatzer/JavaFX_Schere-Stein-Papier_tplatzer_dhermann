@@ -9,14 +9,14 @@
 }
 
 #rock {
-    background-image: url("./img/faust.png");
+    background-image: url("img/stein.png");
     -fx-background-size: 16px 16px; /* set the size of the image */
     -fx-background-repeat: no-repeat;
     -fx-background-position: center;
 }
 
 #rockButton {
-    background-image: url("./img/faust.png");
+    background-image: url("img/stein.png");
     -fx-background-size: 16px 16px; /* set the size of the image */
     -fx-background-repeat: no-repeat;
     -fx-background-position: center;
@@ -45,6 +45,20 @@
 
 #scissorsButton {
     background-image: url("./img/schere.png");
+    -fx-background-size: 16px 16px; /* set the size of the image */
+    -fx-background-repeat: no-repeat;
+    -fx-background-position: center;
+}
+
+#well {
+    background-image: url("./img/brunnen.png");
+    -fx-background-size: 16px 16px; /* set the size of the image */
+    -fx-background-repeat: no-repeat;
+    -fx-background-position: center;
+}
+
+#wellButton {
+    background-image: url("./img/brunnen.png");
     -fx-background-size: 16px 16px; /* set the size of the image */
     -fx-background-repeat: no-repeat;
     -fx-background-position: center;
