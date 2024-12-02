@@ -8,8 +8,6 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 
-import java.io.FileNotFoundException;
-
 import javafx.scene.Group;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
@@ -62,9 +60,9 @@ public class Controller
         setWellButton(initializeButton(playStonesIDs.getOrDefault(3, null), new Image("file:resources/img/hovered/stone.png")));
         setEnemieProgressIndicator(initializeProgressIndicator());
 
+
         initializeButtonBox(10);
         addProgressIndicatorToBox(getProgressBox(), getEnemieProgressIndicator());
-
 
         ImageView computerHand = initializeImageView(new Image("file:resources/masterHand_default.png"), .1, .2);
         ImageView table = initializeImageView(new Image("file:resources/table.png"), 1, .5);
@@ -73,7 +71,7 @@ public class Controller
         addImageViewsToBoxes(getTableBox(), table);
     }
 
-    public void start(Stage stage, Controller controller) throws FileNotFoundException
+    public void start(Stage stage, Controller controller)
     {
         setStage(stage);
         setController(controller);
@@ -152,7 +150,7 @@ public class Controller
     private ProgressIndicator initializeProgressIndicator()
     {
         ProgressIndicator progressIndicator = new ProgressIndicator();
-        progressIndicator.setId("enemie_progress_indicator");
+        progressIndicator.setId("enemy_progress_indicator");
         progressIndicator.setMinSize(maxButtonWidth, maxButtonHeight);
 
         return progressIndicator;
