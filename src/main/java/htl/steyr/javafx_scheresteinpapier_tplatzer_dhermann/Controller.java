@@ -55,7 +55,7 @@ public class Controller
     private HBox progressBox = new HBox();
     private HBox enemyBox = new HBox();
     private HBox tableBox = new HBox();
-    private HBox buttonBox = new HBox();
+    private HBox playerBox = new HBox();
 
     public void start(Stage stage, Controller controller)
     {
@@ -241,12 +241,12 @@ public class Controller
     {
         switch (getPlayerChoice())
         {
-            /**
-             * Set Player Hand
-             */
+            case Rock.id -> getPlayerHand().setImage(new Image("file:resources/img/hovered/player_rock.png"));
+            case Paper.id -> getPlayerHand().setImage(new Image("file:resources/img/hovered/player_paper.png"));
+            case Scissors.id -> getPlayerHand().setImage(new Image("file:resources/img/hovered/player_scissors.png"));
+            case Well.id -> getPlayerHand().setImage(new Image("file:resources/img/hovered/player_well.png"));
+            default -> getPlayerHand().setImage(new Image("file:resources/img/hovered/player_default.png"));
         }
-
-        System.out.println("Player Choice: " + getPlayerChoice());
     }
 
     private void updateComputerHand()
@@ -319,14 +319,16 @@ public class Controller
         setWellButton(initializeButton(getPlayStonesIDs().getOrDefault(3, null), new Image("file:resources/img/player_well.png")));
         setEnemieProgressIndicator(initializeProgressIndicator());
 
-        initializeButtonBox(10);
+        initializePlayerBox(10);
         addProgressIndicatorToBox(getProgressBox(), getEnemieProgressIndicator());
 
-        setComputerHand(initializeImageView(new Image("file:resources/masterHand_default.png"), .1, .2));
-        setTable(initializeImageView(new Image("file:resources/table.png"), 1, .5));
+        setComputerHand(initializeImageView(true, new Image("file:resources/masterHand_default.png"), .1, .2));
+        setTable(initializeImageView(true, new Image("file:resources/table.png"), 1, .5));
+        setPlayerHand(initializeImageView(false, new Image("file:resources/player_default.png"), .1, .2));
 
         addImageViewsToBoxes(getEnemyBox(), getComputerHand());
-        addImageViewsToBoxes(getTableBox(), table);
+        addImageViewsToBoxes(getTableBox(), getTable());
+        addImageViewsToBoxes(getPlayerBox(), getPlayerHand());
     }
 
     private Button initializeButton(String id, Image image)
@@ -356,10 +358,11 @@ public class Controller
         return button;
     }
 
-    private ImageView initializeImageView(Image image, double widthFactor, double heightFactor)
+    private ImageView initializeImageView(boolean visibility, Image image, double widthFactor, double heightFactor)
     {
         ImageView imageView = new ImageView();
         imageView.setImage(image);
+        imageView.setVisible(visibility);
         imageView.fitWidthProperty().bind(getStage().widthProperty().multiply(widthFactor));
         imageView.fitHeightProperty().bind(getStage().heightProperty().multiply(heightFactor));
 
@@ -393,7 +396,7 @@ public class Controller
     }
 
 
-    private void initializeButtonBox(int spacing)
+    private void initializePlayerBox(int spacing)
     {
         getPlayerBox().setSpacing(spacing); // Abstand zwischen Buttons
         getPlayerBox().setAlignment(Pos.CENTER); // Inhalte zentrieren
@@ -429,7 +432,14 @@ public class Controller
 
     private void removeButtonBoxes()
     {
-        Platform.runLater(() -> getPlayerBox().setVisible(false));
+        Platform.runLater(() ->
+        {
+            for (Node node : getPlayerBox().getChildren())
+            {
+                node.setVisible(false);
+            }
+            getPlayerHand().setVisible(true);
+        });
     }
 
     private void aiTurn()
@@ -680,5 +690,15 @@ public class Controller
     public void setTable(ImageView table)
     {
         this.table = table;
+    }
+
+    public ImageView getPlayerHand()
+    {
+        return playerHand;
+    }
+
+    public void setPlayerHand(ImageView playerHand)
+    {
+        this.playerHand = playerHand;
     }
 }
