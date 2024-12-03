@@ -48,12 +48,13 @@ public class Controller
     private Button scissorsButton;
     private Button wellButton;
     private ProgressIndicator enemieProgressIndicator;
+    private ImageView table;
     private ImageView computerHand;
 
     private HBox progressBox = new HBox();
     private HBox enemyBox = new HBox();
     private HBox tableBox = new HBox();
-    private HBox buttonBox = new HBox();
+    private HBox playerBox = new HBox();
 
     public void start(Stage stage, Controller controller)
     {
@@ -92,9 +93,9 @@ public class Controller
         getRoot().setSpacing(10);
         getRoot().setMinSize(Controller.getMaxHboxWidth(), Controller.getMaxHboxHeight());
         getRoot().setMaxSize(Controller.getMaxHboxWidth(), Controller.getMaxHboxHeight());
-        getRoot().getChildren().addAll(getProgressBox(), getEnemyBox(), getTableBox(), getButtonBox());
+        getRoot().getChildren().addAll(getProgressBox(), getEnemyBox(), getTableBox(), getPlayerBox());
         getRoot().getStylesheets().add("file:resources/style.css");
-        getRoot().prefWidthProperty().bind(stage.widthProperty());
+        getRoot().prefWidthProperty().bind(getStage().widthProperty());
 
         Group group = new Group(getRoot());
         group.setAutoSizeChildren(true);
@@ -120,7 +121,7 @@ public class Controller
     {
         setDefaultValues();
 
-        getButtonBox().setVisible(true);
+        getPlayerBox().setVisible(true);
 
         getRoot().getChildren().remove(getGameEndBox());
 
@@ -321,7 +322,7 @@ public class Controller
         addProgressIndicatorToBox(getProgressBox(), getEnemieProgressIndicator());
 
         setComputerHand(initializeImageView(new Image("file:resources/masterHand_default.png"), .1, .2));
-        ImageView table = initializeImageView(new Image("file:resources/table.png"), 1, .5);
+        setTable(initializeImageView(new Image("file:resources/table.png"), 1, .5));
 
         addImageViewsToBoxes(getEnemyBox(), getComputerHand());
         addImageViewsToBoxes(getTableBox(), table);
@@ -393,10 +394,10 @@ public class Controller
 
     private void initializeButtonBox(int spacing)
     {
-        getButtonBox().setSpacing(spacing); // Abstand zwischen Buttons
-        getButtonBox().setAlignment(Pos.CENTER); // Inhalte zentrieren
-        getButtonBox().setFillHeight(false); // Inhalte nicht in die Höhe ziehen
-        getButtonBox().prefWidthProperty().bind(getStage().widthProperty()); // Breite der HBox anpassen
+        getPlayerBox().setSpacing(spacing); // Abstand zwischen Buttons
+        getPlayerBox().setAlignment(Pos.CENTER); // Inhalte zentrieren
+        getPlayerBox().setFillHeight(false); // Inhalte nicht in die Höhe ziehen
+        getPlayerBox().prefWidthProperty().bind(getStage().widthProperty()); // Breite der HBox anpassen
 
         // Buttons flexibel machen
         HBox.setHgrow(getRockButton(), Priority.ALWAYS);
@@ -411,7 +412,7 @@ public class Controller
         getWellButton().setMaxWidth(Double.MAX_VALUE);
 
         // Buttons zur HBox hinzufügen
-        getButtonBox().getChildren().addAll(getRockButton(), getPaperButton(), getScissorsButton(), getWellButton());
+        getPlayerBox().getChildren().addAll(getRockButton(), getPaperButton(), getScissorsButton(), getWellButton());
     }
 
 
@@ -427,7 +428,7 @@ public class Controller
 
     private void removeButtonBoxes()
     {
-        Platform.runLater(() -> getButtonBox().setVisible(false));
+        Platform.runLater(() -> getPlayerBox().setVisible(false));
     }
 
     private void aiTurn()
@@ -630,14 +631,14 @@ public class Controller
         this.tableBox = tableBox;
     }
 
-    public HBox getButtonBox()
+    public HBox getPlayerBox()
     {
-        return buttonBox;
+        return playerBox;
     }
 
-    public void setButtonBox(HBox buttonBox)
+    public void setPlayerBox(HBox playerBox)
     {
-        this.buttonBox = buttonBox;
+        this.playerBox = playerBox;
     }
 
     public ImageView getComputerHand()
@@ -668,5 +669,15 @@ public class Controller
     public void setWinner(String winner)
     {
         this.winner = winner;
+    }
+
+    public ImageView getTable()
+    {
+        return table;
+    }
+
+    public void setTable(ImageView table)
+    {
+        this.table = table;
     }
 }
