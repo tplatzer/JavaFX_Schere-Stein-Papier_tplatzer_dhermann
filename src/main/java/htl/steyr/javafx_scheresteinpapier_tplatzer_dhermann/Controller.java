@@ -196,7 +196,35 @@ public class Controller
         return imageView;
     }
 
-    private void initializeButtonBox(int spacing) {
+    private void initializeImageBox(HBox imageBox, ImageView imageView)
+    {
+        // Center the content in the HBox
+        imageBox.setAlignment(Pos.CENTER);
+
+        // Make HBox grow/shrink with window
+        imageBox.prefWidthProperty().bind(getStage().widthProperty());
+        imageBox.prefHeightProperty().bind(getStage().heightProperty());
+
+        // Center the ImageView itself
+        imageView.setPreserveRatio(true);
+
+        // Make ImageView resize with window
+        imageView.fitWidthProperty().bind(imageBox.widthProperty().multiply(0.8)); // 80% of box width
+        imageView.fitHeightProperty().bind(imageBox.heightProperty().multiply(0.8)); // 80% of box height
+
+        // Allow HBox to grow
+        HBox.setHgrow(imageBox, Priority.ALWAYS);
+
+        // Add ImageView to HBox if not already added
+        if (!imageBox.getChildren().contains(imageView))
+        {
+            imageBox.getChildren().add(imageView);
+        }
+    }
+
+
+    private void initializeButtonBox(int spacing)
+    {
         getButtonBox().setSpacing(spacing); // Abstand zwischen Buttons
         getButtonBox().setAlignment(Pos.CENTER); // Inhalte zentrieren
         getButtonBox().setFillHeight(false); // Inhalte nicht in die Höhe ziehen
@@ -217,8 +245,6 @@ public class Controller
         // Buttons zur HBox hinzufügen
         getButtonBox().getChildren().addAll(getRockButton(), getPaperButton(), getScissorsButton(), getWellButton());
     }
-
-
 
 
     private ProgressIndicator initializeProgressIndicator()
@@ -243,6 +269,8 @@ public class Controller
 
     private void addImageViewsToBoxes(HBox box, ImageView image)
     {
+//        initializeImageBox(box, image);
+
         box.setAlignment(Pos.CENTER); // Zentriere ImageView
         box.setSpacing(20); // Optional: Abstand für mehrere Elemente
         box.prefWidthProperty().bind(getStage().widthProperty()); // Passe Breite an Fensterbreite an
