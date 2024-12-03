@@ -271,9 +271,8 @@ public class Controller
         {
             for (javafx.scene.Node node : getGameEndBox().getChildren())
             {
-                if (node instanceof Label)
+                if (node instanceof Label winnerMessageLabel)
                 {
-                    Label winnerMessageLabel = (Label) node;
                     winnerMessageLabel.setText(newWinnerMessage);
                     break;
                 }
