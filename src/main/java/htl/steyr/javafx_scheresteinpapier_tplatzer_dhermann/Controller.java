@@ -2,16 +2,19 @@ package htl.steyr.javafx_scheresteinpapier_tplatzer_dhermann;
 
 import javafx.application.Platform;
 import javafx.event.ActionEvent;
+import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.ProgressIndicator;
 import javafx.scene.layout.HBox;
+import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 
 import javafx.scene.Group;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
+import javafx.stage.Window;
 
 import java.util.HashMap;
 import java.util.Random;
@@ -110,15 +113,18 @@ public class Controller
         getRoot().setMinSize(Controller.getMaxHboxWidth(), Controller.getMaxHboxHeight());
         getRoot().setMaxSize(Controller.getMaxHboxWidth(), Controller.getMaxHboxHeight());
         getRoot().getChildren().addAll(getProgressBox(), getEnemyBox(), getTableBox(), getButtonBox());
+        getRoot().getStylesheets().add("file:resources/style.css");
+        getRoot().prefWidthProperty().bind(stage.widthProperty());
 
         Group group = new Group(getRoot());
         group.setAutoSizeChildren(true);
+        group.getStylesheets().add("file:resources/style.css");
 
         Scene scene = new Scene(group);
         scene.getStylesheets().add("file:resources/style.css");
         getStage().setScene(scene);
         getStage().setTitle("Schere Stein Papier");
-//        stage.setMaxHeight(900);
+        stage.setHeight(900);
         getStage().show();
     }
 
@@ -231,10 +237,10 @@ public class Controller
         getPlayStonesIDs().put(2, Scissors.getId());
         getPlayStonesIDs().put(3, Well.getId());
 
-        setRockButton(initializeButton(getPlayStonesIDs().getOrDefault(0, null), new Image("file:resources/img/hovered/stone.png")));
-        setPaperButton(initializeButton(getPlayStonesIDs().getOrDefault(1, null), new Image("file:resources/img/hovered/paper.png")));
-        setScissorsButton(initializeButton(getPlayStonesIDs().getOrDefault(2, null), new Image("file:resources/img/hovered/scissors.png")));
-        setWellButton(initializeButton(getPlayStonesIDs().getOrDefault(3, null), new Image("file:resources/img/hovered/stone.png")));
+        setRockButton(initializeButton(getPlayStonesIDs().getOrDefault(0, null), new Image("file:resources/img/stein.png")));
+        setPaperButton(initializeButton(getPlayStonesIDs().getOrDefault(1, null), new Image("file:resources/img/papier.png")));
+        setScissorsButton(initializeButton(getPlayStonesIDs().getOrDefault(2, null), new Image("file:resources/img/schere.png")));
+        setWellButton(initializeButton(getPlayStonesIDs().getOrDefault(3, null), new Image("file:resources/img/brunnen.png")));
         setEnemieProgressIndicator(initializeProgressIndicator());
 
         initializeButtonBox(10);
@@ -253,8 +259,11 @@ public class Controller
         button.setMinSize(getMaxButtonWidth(), getMaxButtonHeight());
         button.setMaxSize(getMaxButtonWidth(), getMaxButtonHeight());
         button.setId(id);
-        button.setText(id);
-        button.setGraphic(new ImageView(image));
+//        button.setText(id);
+        ImageView iv = new ImageView(image);
+        iv.fitWidthProperty().bind(button.widthProperty());
+        iv.fitHeightProperty().bind(button.heightProperty());
+        button.setGraphic(iv);
         button.setOnAction(event ->
         {
             new Thread(() ->
@@ -281,13 +290,56 @@ public class Controller
         return imageView;
     }
 
+    private void initializeImageBox(HBox imageBox, ImageView imageView)
+    {
+        // Center the content in the HBox
+        imageBox.setAlignment(Pos.CENTER);
+
+        // Make HBox grow/shrink with window
+        imageBox.prefWidthProperty().bind(getStage().widthProperty());
+        imageBox.prefHeightProperty().bind(getStage().heightProperty());
+
+        // Center the ImageView itself
+        imageView.setPreserveRatio(true);
+
+        // Make ImageView resize with window
+        imageView.fitWidthProperty().bind(imageBox.widthProperty().multiply(0.8)); // 80% of box width
+        imageView.fitHeightProperty().bind(imageBox.heightProperty().multiply(0.8)); // 80% of box height
+
+        // Allow HBox to grow
+        HBox.setHgrow(imageBox, Priority.ALWAYS);
+
+        // Add ImageView to HBox if not already added
+        if (!imageBox.getChildren().contains(imageView))
+        {
+            imageBox.getChildren().add(imageView);
+        }
+    }
+
+
     private void initializeButtonBox(int spacing)
     {
-        getButtonBox().setSpacing(spacing);
-        getButtonBox().setMinSize(Controller.getMaxHboxWidth(), Controller.getMaxHboxHeight());
-        getButtonBox().setMaxSize(Controller.getMaxHboxWidth(), Controller.getMaxHboxHeight());
+        getButtonBox().setSpacing(spacing); // Abstand zwischen Buttons
+        getButtonBox().setAlignment(Pos.CENTER); // Inhalte zentrieren
+        getButtonBox().setFillHeight(false); // Inhalte nicht in die Höhe ziehen
+        getButtonBox().prefWidthProperty().bind(getStage().widthProperty()); // Breite der HBox anpassen
+
+        // Buttons flexibel machen
+        HBox.setHgrow(getRockButton(), Priority.ALWAYS);
+        HBox.setHgrow(getPaperButton(), Priority.ALWAYS);
+        HBox.setHgrow(getScissorsButton(), Priority.ALWAYS);
+        HBox.setHgrow(getWellButton(), Priority.ALWAYS);
+
+        // Buttons maximale Flexibilität geben
+        getRockButton().setMaxWidth(Double.MAX_VALUE);
+        getPaperButton().setMaxWidth(Double.MAX_VALUE);
+        getScissorsButton().setMaxWidth(Double.MAX_VALUE);
+        getWellButton().setMaxWidth(Double.MAX_VALUE);
+
+        // Buttons zur HBox hinzufügen
         getButtonBox().getChildren().addAll(getRockButton(), getPaperButton(), getScissorsButton(), getWellButton());
     }
+
 
     private ProgressIndicator initializeProgressIndicator()
     {
@@ -311,8 +363,14 @@ public class Controller
 
     private void addImageViewsToBoxes(HBox box, ImageView image)
     {
+//        initializeImageBox(box, image);
+
+        box.setAlignment(Pos.CENTER); // Zentriere ImageView
+        box.setSpacing(20); // Optional: Abstand für mehrere Elemente
+        box.prefWidthProperty().bind(getStage().widthProperty()); // Passe Breite an Fensterbreite an
         box.getChildren().add(image);
     }
+
 
     private void addProgressIndicatorToBox(HBox box, ProgressIndicator progressIndicator)
     {
