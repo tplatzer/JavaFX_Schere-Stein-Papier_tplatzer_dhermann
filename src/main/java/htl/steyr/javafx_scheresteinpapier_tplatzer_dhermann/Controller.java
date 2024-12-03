@@ -243,7 +243,7 @@ public class Controller
              */
         }
 
-        System.out.println("Player Choice " + getPlayerChoice());
+        System.out.println("Player Choice: " + getPlayerChoice());
     }
 
     private void updateComputerHand()
