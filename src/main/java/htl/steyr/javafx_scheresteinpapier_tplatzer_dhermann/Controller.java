@@ -3,6 +3,7 @@ package htl.steyr.javafx_scheresteinpapier_tplatzer_dhermann;
 import javafx.application.Platform;
 import javafx.event.ActionEvent;
 import javafx.geometry.Pos;
+import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
@@ -269,7 +270,7 @@ public class Controller
     {
         if (!getGameEndBox().getChildren().isEmpty())
         {
-            for (javafx.scene.Node node : getGameEndBox().getChildren())
+            for (Node node : getGameEndBox().getChildren())
             {
                 if (node instanceof Label winnerMessageLabel)
                 {
