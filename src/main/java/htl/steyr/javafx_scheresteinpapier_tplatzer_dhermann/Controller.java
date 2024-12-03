@@ -73,7 +73,7 @@ public class Controller {
                 updateComputerHand();
                 getEnemieProgressIndicator().setVisible(false);
             } catch (InterruptedException e) {
-                e.printStackTrace();
+                System.out.println(e.getMessage());
             } finally {
                 Platform.runLater(this::selectWinner);
             }
@@ -215,7 +215,7 @@ public class Controller {
     private void updatePlayerHand()
     {
         switch (getPlayerChoice()) {
-            /**
+            /*
              * Set Player Hand
              */
         }
@@ -309,15 +309,13 @@ public class Controller {
         iv.fitWidthProperty().bind(button.widthProperty());
         iv.fitHeightProperty().bind(button.heightProperty());
         button.setGraphic(iv);
-        button.setOnAction(event -> {
-            new Thread(() -> {
-                try {
-                    handleButtonClick(event);
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                }
-            }).start();
-        });
+        button.setOnAction(event -> new Thread(() -> {
+            try {
+                handleButtonClick(event);
+            } catch (InterruptedException e) {
+                System.out.println(e.getMessage());
+            }
+        }).start());
         return button;
     }
 
@@ -417,9 +415,6 @@ public class Controller {
     {
         box.getChildren().add(progressIndicator);
     }
-
-
-
 
 
     public static int getMaxButtonWidth()
