@@ -50,11 +50,12 @@ public class Controller
     private ProgressIndicator enemieProgressIndicator;
     private ImageView table;
     private ImageView computerHand;
+    private ImageView playerHand;
 
     private HBox progressBox = new HBox();
     private HBox enemyBox = new HBox();
     private HBox tableBox = new HBox();
-    private HBox playerBox = new HBox();
+    private HBox buttonBox = new HBox();
 
     public void start(Stage stage, Controller controller)
     {
