@@ -5,6 +5,7 @@ import javafx.event.ActionEvent;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
+import javafx.scene.control.Label;
 import javafx.scene.control.ProgressIndicator;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
@@ -14,7 +15,6 @@ import javafx.stage.Stage;
 import javafx.scene.Group;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
-import javafx.stage.Window;
 
 import java.util.HashMap;
 import java.util.Random;
@@ -34,11 +34,13 @@ public class Controller
     private static final int maxProgressIndicatorWidth = 200;
     private static final int maxProgressIndicatorHeight = 100;
 
-    private String userChoice = null;
+    private String playerChoice = null;
     private String aiChoice = null;
+    private String winner = null;
     private HashMap<Integer, String> playStonesIDs = new HashMap<>();
     private Controller controller;
     private VBox root = new VBox();
+    private HBox gameEndBox = new HBox();
     private Stage stage;
     private Button rockButton;
     private Button paperButton;
@@ -54,21 +56,12 @@ public class Controller
 
     public void start(Stage stage, Controller controller)
     {
+        setDefaultValues();
         setStage(stage);
         setController(controller);
         initializeUserElements();
 
         showWindow();
-    }
-
-    private void selectWinner()
-    {
-        switch (getWinner())
-        {
-            case 1 -> playerWon();
-            case 2 -> aiWon();
-            case 0 -> draw();
-        }
     }
 
     private void play()
@@ -80,6 +73,7 @@ public class Controller
                 Thread.sleep(3000);
                 aiTurn();
                 updateComputerHand();
+                getEnemieProgressIndicator().setVisible(false);
             } catch (InterruptedException e)
             {
                 e.printStackTrace();
@@ -90,21 +84,6 @@ public class Controller
         });
         sleepThread.setDaemon(true);
         sleepThread.start();
-    }
-
-    private void playerWon()
-    {
-
-    }
-
-    private void aiWon()
-    {
-
-    }
-
-    private void draw()
-    {
-
     }
 
     private void showWindow()
@@ -124,8 +103,29 @@ public class Controller
         scene.getStylesheets().add("file:resources/style.css");
         getStage().setScene(scene);
         getStage().setTitle("Schere Stein Papier");
-        stage.setHeight(900);
+        getStage().setHeight(900);
         getStage().show();
+    }
+
+    private void showGameEndScreen()
+    {
+        initializeGameEndBox();
+
+        Platform.runLater(() -> getRoot().getChildren().add(getGameEndBox()));
+    }
+
+
+    private void restartGame()
+    {
+        setDefaultValues();
+
+        getButtonBox().setVisible(true);
+
+        getRoot().getChildren().remove(getGameEndBox());
+
+        getComputerHand().setImage(new Image("file:resources/masterHand_default.png"));
+
+        getEnemieProgressIndicator().setVisible(false);
     }
 
     private void handleButtonClick(ActionEvent event) throws InterruptedException
@@ -133,15 +133,17 @@ public class Controller
         Button sourceButton = (Button) event.getSource();
         String buttonId = sourceButton.getId();
 
-        System.out.println(buttonId);
-
         switch (buttonId)
         {
-            case Rock.id -> setUserChoice(getPlayStonesIDs().getOrDefault(0, null));
-            case Paper.id -> setUserChoice(getPlayStonesIDs().getOrDefault(1, null));
-            case Scissors.id -> setUserChoice(getPlayStonesIDs().getOrDefault(2, null));
-            case Well.id -> setUserChoice(getPlayStonesIDs().getOrDefault(3, null));
+            case Rock.id -> setPlayerChoice(getPlayStonesIDs().getOrDefault(0, null));
+            case Paper.id -> setPlayerChoice(getPlayStonesIDs().getOrDefault(1, null));
+            case Scissors.id -> setPlayerChoice(getPlayStonesIDs().getOrDefault(2, null));
+            case Well.id -> setPlayerChoice(getPlayStonesIDs().getOrDefault(3, null));
         }
+
+        updatePlayerHand();
+
+        getEnemieProgressIndicator().setVisible(true);
 
         Thread removeButtonBoxThread = new Thread(this::removeButtonBoxes);
         removeButtonBoxThread.setDaemon(true);
@@ -152,13 +154,13 @@ public class Controller
 
     /**
      * 0 = Unentschieden
-     * 1 = User
+     * 1 = Player
      * 2 = AI
      */
-    private int getWinner()
+    private int evaluateWinner()
     {
-        if (getUserChoice().equals(getAiChoice())) return 0;
-        if (getUserChoice().equals(Scissors.id))
+        if (getPlayerChoice().equals(getAiChoice())) return 0;
+        if (getPlayerChoice().equals(Scissors.id))
         {
             switch (getAiChoice())
             {
@@ -172,7 +174,7 @@ public class Controller
                 }
             }
         }
-        if (getUserChoice().equals(Rock.id))
+        if (getPlayerChoice().equals(Rock.id))
         {
             switch (getAiChoice())
             {
@@ -186,7 +188,7 @@ public class Controller
                 }
             }
         }
-        if (getUserChoice().equals(Paper.id))
+        if (getPlayerChoice().equals(Paper.id))
         {
             switch (getAiChoice())
             {
@@ -200,7 +202,7 @@ public class Controller
                 }
             }
         }
-        if (getUserChoice().equals(Well.id))
+        if (getPlayerChoice().equals(Well.id))
         {
             switch (getAiChoice())
             {
@@ -218,6 +220,32 @@ public class Controller
         return 0;
     }
 
+    private void selectWinner()
+    {
+        switch (evaluateWinner())
+        {
+            case 1 -> setWinner("Player");
+            case 2 -> setWinner("AI");
+            case 0 -> setWinner("No Winner");
+        }
+
+        updateGameEndText(getWinner() + " has won the Game!");
+
+        showGameEndScreen();
+    }
+
+    private void updatePlayerHand()
+    {
+        switch (getPlayerChoice())
+        {
+            /**
+             * Set Player Hand
+             */
+        }
+
+        System.out.println(getPlayerChoice());
+    }
+
     private void updateComputerHand()
     {
         switch (getAiChoice())
@@ -230,6 +258,52 @@ public class Controller
         }
     }
 
+    private void setDefaultValues()
+    {
+        setPlayerChoice(null);
+        setAiChoice(-1);
+        setWinner(null);
+    }
+
+    private void updateGameEndText(String newWinnerMessage)
+    {
+        if (!getGameEndBox().getChildren().isEmpty())
+        {
+            for (javafx.scene.Node node : getGameEndBox().getChildren())
+            {
+                if (node instanceof Label)
+                {
+                    Label winnerMessageLabel = (Label) node;
+                    winnerMessageLabel.setText(newWinnerMessage);
+                    break;
+                }
+            }
+        }
+    }
+
+    private void initializeGameEndBox()
+    {
+        if (!getGameEndBox().getChildren().isEmpty())
+        {
+            return;
+        }
+
+        getGameEndBox().setSpacing(10);
+        getGameEndBox().setStyle("-fx-background-color: rgba(0, 0, 0, 0.8); -fx-padding: 20;");
+        getGameEndBox().setAlignment(Pos.CENTER);
+
+        Label winnerMessage = new Label(getWinner() + " has won the Game!");
+        winnerMessage.setStyle("-fx-font-size: 20px; -fx-text-fill: white;");
+
+        Button exitButton = new Button("Exit");
+        exitButton.setOnAction(event -> Platform.exit());
+
+        Button playAgainButton = new Button("Play Again");
+        playAgainButton.setOnAction(event -> restartGame());
+
+        getGameEndBox().getChildren().addAll(winnerMessage, exitButton, playAgainButton);
+    }
+
     private void initializeUserElements()
     {
         getPlayStonesIDs().put(0, Rock.getId());
@@ -237,10 +311,10 @@ public class Controller
         getPlayStonesIDs().put(2, Scissors.getId());
         getPlayStonesIDs().put(3, Well.getId());
 
-        setRockButton(initializeButton(getPlayStonesIDs().getOrDefault(0, null), new Image("file:resources/img/stein.png")));
-        setPaperButton(initializeButton(getPlayStonesIDs().getOrDefault(1, null), new Image("file:resources/img/papier.png")));
-        setScissorsButton(initializeButton(getPlayStonesIDs().getOrDefault(2, null), new Image("file:resources/img/schere.png")));
-        setWellButton(initializeButton(getPlayStonesIDs().getOrDefault(3, null), new Image("file:resources/img/brunnen.png")));
+        setRockButton(initializeButton(getPlayStonesIDs().getOrDefault(0, null), new Image("file:resources/img/stone.png")));
+        setPaperButton(initializeButton(getPlayStonesIDs().getOrDefault(1, null), new Image("file:resources/img/paper.png")));
+        setScissorsButton(initializeButton(getPlayStonesIDs().getOrDefault(2, null), new Image("file:resources/img/scissors.png")));
+        setWellButton(initializeButton(getPlayStonesIDs().getOrDefault(3, null), new Image("file:resources/img/player_well.png")));
         setEnemieProgressIndicator(initializeProgressIndicator());
 
         initializeButtonBox(10);
@@ -346,6 +420,7 @@ public class Controller
         ProgressIndicator progressIndicator = new ProgressIndicator();
         progressIndicator.setId("enemie_progress_indicator");
         progressIndicator.setMinSize(getMaxButtonWidth(), getMaxButtonHeight());
+        progressIndicator.setVisible(false);
 
         return progressIndicator;
     }
@@ -381,106 +456,132 @@ public class Controller
     {
         return maxButtonWidth;
     }
+
     public static int getMaxButtonHeight()
     {
         return maxButtonHeight;
     }
+
     public static int getMaxHboxWidth()
     {
         return maxHboxWidth;
     }
+
     public static int getMaxHboxHeight()
     {
         return maxHboxHeight;
     }
+
     public static int getMaxProgressIndicatorWidth()
     {
         return maxProgressIndicatorWidth;
     }
+
     public static int getMaxProgressIndicatorHeight()
     {
         return maxProgressIndicatorHeight;
     }
-    public String getUserChoice()
+
+    public String getPlayerChoice()
     {
-        return userChoice;
+        return playerChoice;
     }
-    public void setUserChoice(String userChoice)
+
+    public void setPlayerChoice(String playerChoice)
     {
-        this.userChoice = userChoice;
+        this.playerChoice = playerChoice;
     }
+
     public Button getRockButton()
     {
         return rockButton;
     }
+
     public void setRockButton(Button rockButton)
     {
         this.rockButton = rockButton;
     }
+
     public Button getPaperButton()
     {
         return paperButton;
     }
+
     public void setPaperButton(Button paperButton)
     {
         this.paperButton = paperButton;
     }
+
     public Button getScissorsButton()
     {
         return scissorsButton;
     }
+
     public void setScissorsButton(Button scissorsButton)
     {
         this.scissorsButton = scissorsButton;
     }
+
     public Button getWellButton()
     {
         return wellButton;
     }
+
     public void setWellButton(Button wellButton)
     {
         this.wellButton = wellButton;
     }
+
     public ProgressIndicator getEnemieProgressIndicator()
     {
         return enemieProgressIndicator;
     }
+
     public void setEnemieProgressIndicator(ProgressIndicator enemieProgressIndicator)
     {
         this.enemieProgressIndicator = enemieProgressIndicator;
     }
+
     public VBox getRoot()
     {
         return this.root;
     }
+
     public void setRoot(VBox root)
     {
         this.root = root;
     }
+
     public Stage getStage()
     {
         return this.stage;
     }
+
     public void setStage(Stage stage)
     {
         this.stage = stage;
     }
+
     public Controller getController()
     {
         return controller;
     }
+
     public void setController(Controller controller)
     {
         this.controller = controller;
     }
+
     public String getAiChoice()
     {
         return aiChoice;
     }
+
     public void setAiChoice(int aiChoice)
     {
         switch (aiChoice)
         {
+            case -1 -> this.aiChoice = null;
             case 0 -> this.aiChoice = playStonesIDs.getOrDefault(0, null);
             case 1 -> this.aiChoice = playStonesIDs.getOrDefault(1, null);
             case 2 -> this.aiChoice = playStonesIDs.getOrDefault(2, null);
@@ -488,52 +589,84 @@ public class Controller
         }
 
     }
+
     public HashMap<Integer, String> getPlayStonesIDs()
     {
         return playStonesIDs;
     }
+
     public void setPlayStonesIDs(HashMap<Integer, String> playStonesIDs)
     {
         this.playStonesIDs = playStonesIDs;
     }
+
     public HBox getProgressBox()
     {
         return progressBox;
     }
+
     public void setProgressBox(HBox progressBox)
     {
         this.progressBox = progressBox;
     }
+
     public HBox getEnemyBox()
     {
         return enemyBox;
     }
+
     public void setEnemyBox(HBox enemyBox)
     {
         this.enemyBox = enemyBox;
     }
+
     public HBox getTableBox()
     {
         return tableBox;
     }
+
     public void setTableBox(HBox tableBox)
     {
         this.tableBox = tableBox;
     }
+
     public HBox getButtonBox()
     {
         return buttonBox;
     }
+
     public void setButtonBox(HBox buttonBox)
     {
         this.buttonBox = buttonBox;
     }
+
     public ImageView getComputerHand()
     {
         return computerHand;
     }
+
     public void setComputerHand(ImageView computerHand)
     {
         this.computerHand = computerHand;
+    }
+
+    public HBox getGameEndBox()
+    {
+        return gameEndBox;
+    }
+
+    public void setGameEndBox(HBox gameEndBox)
+    {
+        this.gameEndBox = gameEndBox;
+    }
+
+    public String getWinner()
+    {
+        return winner;
+    }
+
+    public void setWinner(String winner)
+    {
+        this.winner = winner;
     }
 }
