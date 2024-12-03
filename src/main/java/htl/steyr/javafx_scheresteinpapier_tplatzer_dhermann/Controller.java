@@ -25,7 +25,7 @@ public class Controller
     /**
      * Rock
      * Paper
-     * Sissores
+     * Scissors
      * Well
      */
     private static final int maxButtonWidth = 200;
