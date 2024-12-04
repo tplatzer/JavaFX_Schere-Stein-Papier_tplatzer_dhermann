@@ -20,16 +20,15 @@ import javafx.scene.image.ImageView;
 import java.util.HashMap;
 import java.util.Random;
 
-public class Controller
-{
+public class Controller {
     /**
      * Rock
      * Paper
      * Scissors
      * Well
      */
-    private static final int maxButtonWidth = 200;
-    private static final int maxButtonHeight = 50;
+    private static final int maxButtonWidth = 100;
+    private static final int maxButtonHeight = 100;
     private static final int maxHboxWidth = 1000;
     private static final int maxHboxHeight = 700;
     private static final int maxProgressIndicatorWidth = 200;
@@ -69,19 +68,15 @@ public class Controller
 
     private void play()
     {
-        Thread sleepThread = new Thread(() ->
-        {
-            try
-            {
+        Thread sleepThread = new Thread(() -> {
+            try {
                 Thread.sleep(3000);
                 aiTurn();
                 updateComputerHand();
                 getEnemieProgressIndicator().setVisible(false);
-            } catch (InterruptedException e)
-            {
-                e.printStackTrace();
-            } finally
-            {
+            } catch (InterruptedException e) {
+                System.out.println(e.getMessage());
+            } finally {
                 Platform.runLater(this::selectWinner);
             }
         });
@@ -89,26 +84,25 @@ public class Controller
         sleepThread.start();
     }
 
-    private void showWindow()
-    {
+    private void showWindow() {
         getRoot().setSpacing(10);
+        getRoot().setAlignment(Pos.CENTER); // Zentriere alle Kinder
         getRoot().setMinSize(Controller.getMaxHboxWidth(), Controller.getMaxHboxHeight());
         getRoot().setMaxSize(Controller.getMaxHboxWidth(), Controller.getMaxHboxHeight());
+        getRoot().prefWidthProperty().bind(getStage().widthProperty());
+        getRoot().prefHeightProperty().bind(getStage().heightProperty()); // Binde Höhe an die Stage
         getRoot().getChildren().addAll(getProgressBox(), getEnemyBox(), getTableBox(), getPlayerBox());
         getRoot().getStylesheets().add("file:resources/style.css");
-        getRoot().prefWidthProperty().bind(getStage().widthProperty());
 
-        Group group = new Group(getRoot());
-        group.setAutoSizeChildren(true);
-        group.getStylesheets().add("file:resources/style.css");
-
-        Scene scene = new Scene(group);
+        Scene scene = new Scene(getRoot());
         scene.getStylesheets().add("file:resources/style.css");
         getStage().setScene(scene);
         getStage().setTitle("Schere Stein Papier");
         getStage().setHeight(900);
         getStage().show();
     }
+
+
 
     private void showGameEndScreen()
     {
@@ -136,8 +130,7 @@ public class Controller
         Button sourceButton = (Button) event.getSource();
         String buttonId = sourceButton.getId();
 
-        switch (buttonId)
-        {
+        switch (buttonId) {
             case Rock.id -> setPlayerChoice(getPlayStonesIDs().getOrDefault(0, null));
             case Paper.id -> setPlayerChoice(getPlayStonesIDs().getOrDefault(1, null));
             case Scissors.id -> setPlayerChoice(getPlayStonesIDs().getOrDefault(2, null));
@@ -148,9 +141,9 @@ public class Controller
 
         getEnemieProgressIndicator().setVisible(true);
 
-        Thread removeButtonBoxThread = new Thread(this::removeButtonBoxes);
-        removeButtonBoxThread.setDaemon(true);
-        removeButtonBoxThread.start();
+        Thread removeplayerBoxThread = new Thread(this::removeplayerBoxes);
+        removeplayerBoxThread.setDaemon(true);
+        removeplayerBoxThread.start();
 
         play();
     }
@@ -163,58 +156,42 @@ public class Controller
     private int evaluateWinner()
     {
         if (getPlayerChoice().equals(getAiChoice())) return 0;
-        if (getPlayerChoice().equals(Scissors.id))
-        {
-            switch (getAiChoice())
-            {
-                case Paper.id ->
-                {
+        if (getPlayerChoice().equals(Scissors.id)) {
+            switch (getAiChoice()) {
+                case Paper.id -> {
                     return 1;
                 }
-                case Rock.id, Well.id ->
-                {
+                case Rock.id, Well.id -> {
                     return 2;
                 }
             }
         }
-        if (getPlayerChoice().equals(Rock.id))
-        {
-            switch (getAiChoice())
-            {
-                case Scissors.id ->
-                {
+        if (getPlayerChoice().equals(Rock.id)) {
+            switch (getAiChoice()) {
+                case Scissors.id -> {
                     return 1;
                 }
-                case Paper.id, Well.id ->
-                {
+                case Paper.id, Well.id -> {
                     return 2;
                 }
             }
         }
-        if (getPlayerChoice().equals(Paper.id))
-        {
-            switch (getAiChoice())
-            {
-                case Rock.id, Well.id ->
-                {
+        if (getPlayerChoice().equals(Paper.id)) {
+            switch (getAiChoice()) {
+                case Rock.id, Well.id -> {
                     return 1;
                 }
-                case Scissors.id ->
-                {
+                case Scissors.id -> {
                     return 2;
                 }
             }
         }
-        if (getPlayerChoice().equals(Well.id))
-        {
-            switch (getAiChoice())
-            {
-                case Scissors.id, Rock.id ->
-                {
+        if (getPlayerChoice().equals(Well.id)) {
+            switch (getAiChoice()) {
+                case Scissors.id, Rock.id -> {
                     return 1;
                 }
-                case Paper.id ->
-                {
+                case Paper.id -> {
                     return 2;
                 }
             }
@@ -225,8 +202,7 @@ public class Controller
 
     private void selectWinner()
     {
-        switch (evaluateWinner())
-        {
+        switch (evaluateWinner()) {
             case 1 -> setWinner("Player");
             case 2 -> setWinner("AI");
             case 0 -> setWinner("No Winner");
@@ -239,8 +215,7 @@ public class Controller
 
     private void updatePlayerHand()
     {
-        switch (getPlayerChoice())
-        {
+        switch (getPlayerChoice()) {
             case Rock.id -> getPlayerHand().setImage(new Image("file:resources/img/hovered/player_rock.png"));
             case Paper.id -> getPlayerHand().setImage(new Image("file:resources/img/hovered/player_paper.png"));
             case Scissors.id -> getPlayerHand().setImage(new Image("file:resources/img/hovered/player_scissors.png"));
@@ -251,8 +226,7 @@ public class Controller
 
     private void updateComputerHand()
     {
-        switch (getAiChoice())
-        {
+        switch (getAiChoice()) {
             case Rock.id -> getComputerHand().setImage(new Image("file:resources/masterHand_rock.png"));
             case Paper.id -> getComputerHand().setImage(new Image("file:resources/masterHand_paper.png"));
             case Scissors.id -> getComputerHand().setImage(new Image("file:resources/masterHand_scissors.png"));
@@ -270,12 +244,9 @@ public class Controller
 
     private void updateGameEndText(String newWinnerMessage)
     {
-        if (!getGameEndBox().getChildren().isEmpty())
-        {
-            for (Node node : getGameEndBox().getChildren())
-            {
-                if (node instanceof Label winnerMessageLabel)
-                {
+        if (!getGameEndBox().getChildren().isEmpty()) {
+            for (Node node : getGameEndBox().getChildren()) {
+                if (node instanceof Label winnerMessageLabel) {
                     winnerMessageLabel.setText(newWinnerMessage);
                     break;
                 }
@@ -285,8 +256,7 @@ public class Controller
 
     private void initializeGameEndBox()
     {
-        if (!getGameEndBox().getChildren().isEmpty())
-        {
+        if (!getGameEndBox().getChildren().isEmpty()) {
             return;
         }
 
@@ -323,8 +293,14 @@ public class Controller
         addProgressIndicatorToBox(getProgressBox(), getEnemieProgressIndicator());
 
         setComputerHand(initializeImageView(true, new Image("file:resources/masterHand_default.png"), .1, .2));
-        setTable(initializeImageView(true, new Image("file:resources/table.png"), 1, .5));
+        setTable(initializeImageView(true, new Image("file:resources/table.png"), 1, .3));
         setPlayerHand(initializeImageView(false, new Image("file:resources/player_default.png"), .1, .2));
+
+        getPlayerBox().getStyleClass().add("hbox");
+        getEnemyBox().getStyleClass().add("hbox");
+        getTableBox().getStyleClass().add("hbox");
+        getProgressBox().getStyleClass().add("hbox");
+
 
         addImageViewsToBoxes(getEnemyBox(), getComputerHand());
         addImageViewsToBoxes(getTableBox(), getTable());
@@ -342,15 +318,11 @@ public class Controller
         iv.fitWidthProperty().bind(button.widthProperty());
         iv.fitHeightProperty().bind(button.heightProperty());
         button.setGraphic(iv);
-        button.setOnAction(event ->
-        {
-            new Thread(() ->
-            {
-                try
-                {
+        button.setOnAction(event -> {
+            new Thread(() -> {
+                try {
                     handleButtonClick(event);
-                } catch (InterruptedException e)
-                {
+                } catch (InterruptedException e) {
                     e.printStackTrace();
                 }
             }).start();
@@ -369,36 +341,23 @@ public class Controller
         return imageView;
     }
 
-    private void initializeImageBox(HBox imageBox, ImageView imageView)
-    {
-        // Center the content in the HBox
-        imageBox.setAlignment(Pos.CENTER);
-
-        // Make HBox grow/shrink with window
+    private void initializeImageBox(HBox imageBox, ImageView imageView) {
+        imageBox.setAlignment(Pos.CENTER); // Inhalte zentrieren
         imageBox.prefWidthProperty().bind(getStage().widthProperty());
-        imageBox.prefHeightProperty().bind(getStage().heightProperty());
+        imageBox.prefHeightProperty().bind(getStage().heightProperty().multiply(0.3)); // Höhe dynamisch anpassen
 
-        // Center the ImageView itself
-        imageView.setPreserveRatio(true);
+        imageView.setPreserveRatio(true); // Bildverhältnis beibehalten
+        imageView.fitWidthProperty().bind(imageBox.widthProperty().multiply(0.8));
+        imageView.fitHeightProperty().bind(imageBox.heightProperty().multiply(0.8));
 
-        // Make ImageView resize with window
-        imageView.fitWidthProperty().bind(imageBox.widthProperty().multiply(0.8)); // 80% of box width
-        imageView.fitHeightProperty().bind(imageBox.heightProperty().multiply(0.8)); // 80% of box height
-
-        // Allow HBox to grow
-        HBox.setHgrow(imageBox, Priority.ALWAYS);
-
-        // Add ImageView to HBox if not already added
-        if (!imageBox.getChildren().contains(imageView))
-        {
+        if (!imageBox.getChildren().contains(imageView)) {
             imageBox.getChildren().add(imageView);
         }
     }
 
 
-    private void initializePlayerBox(int spacing)
-    {
-        getPlayerBox().setSpacing(spacing); // Abstand zwischen Buttons
+    private void initializePlayerBox(int spacing) {
+        getPlayerBox().setSpacing(spacing);
         getPlayerBox().setAlignment(Pos.CENTER); // Inhalte zentrieren
         getPlayerBox().setFillHeight(false); // Inhalte nicht in die Höhe ziehen
         getPlayerBox().prefWidthProperty().bind(getStage().widthProperty()); // Breite der HBox anpassen
@@ -415,6 +374,10 @@ public class Controller
         getScissorsButton().setMaxWidth(Double.MAX_VALUE);
         getWellButton().setMaxWidth(Double.MAX_VALUE);
 
+        // **Hinzufügen: Höhe und Zentrierung sicherstellen**
+        getPlayerBox().prefHeightProperty().bind(getStage().heightProperty().multiply(0.1));
+        getPlayerBox().setAlignment(Pos.CENTER);
+
         // Buttons zur HBox hinzufügen
         getPlayerBox().getChildren().addAll(getRockButton(), getPaperButton(), getScissorsButton(), getWellButton());
     }
@@ -429,12 +392,10 @@ public class Controller
         return progressIndicator;
     }
 
-    private void removeButtonBoxes()
+    private void removeplayerBoxes()
     {
-        Platform.runLater(() ->
-        {
-            for (Node node : getPlayerBox().getChildren())
-            {
+        Platform.runLater(() -> {
+            for (Node node : getPlayerBox().getChildren()) {
                 node.setVisible(false);
             }
             getPlayerHand().setVisible(true);
@@ -590,8 +551,7 @@ public class Controller
 
     public void setAiChoice(int aiChoice)
     {
-        switch (aiChoice)
-        {
+        switch (aiChoice) {
             case -1 -> this.aiChoice = null;
             case 0 -> this.aiChoice = playStonesIDs.getOrDefault(0, null);
             case 1 -> this.aiChoice = playStonesIDs.getOrDefault(1, null);
