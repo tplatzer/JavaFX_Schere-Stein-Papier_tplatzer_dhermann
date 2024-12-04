@@ -9,18 +9,19 @@ import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.ProgressIndicator;
 import javafx.scene.layout.HBox;
+import javafx.scene.layout.Pane;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 
-import javafx.scene.Group;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 
 import java.util.HashMap;
 import java.util.Random;
 
-public class Controller {
+public class Controller
+{
     /**
      * Rock
      * Paper
@@ -37,6 +38,8 @@ public class Controller {
     private String playerChoice = null;
     private String aiChoice = null;
     private String winner = null;
+    private int playerWins = 0;
+    private int aiWins = 0;
     private HashMap<Integer, String> playStonesIDs = new HashMap<>();
     private Controller controller;
     private VBox root = new VBox();
@@ -50,6 +53,9 @@ public class Controller {
     private ImageView table;
     private ImageView computerHand;
     private ImageView playerHand;
+    private VBox winsCounterBox = new VBox();
+    private HBox playerWinsCounterBox;
+    private HBox aiWinsCounterBox;
 
     private HBox progressBox = new HBox();
     private HBox enemyBox = new HBox();
@@ -68,15 +74,19 @@ public class Controller {
 
     private void play()
     {
-        Thread sleepThread = new Thread(() -> {
-            try {
+        Thread sleepThread = new Thread(() ->
+        {
+            try
+            {
                 Thread.sleep(3000);
                 aiTurn();
                 updateComputerHand();
                 getEnemieProgressIndicator().setVisible(false);
-            } catch (InterruptedException e) {
+            } catch (InterruptedException e)
+            {
                 System.out.println(e.getMessage());
-            } finally {
+            } finally
+            {
                 Platform.runLater(this::selectWinner);
             }
         });
@@ -84,14 +94,15 @@ public class Controller {
         sleepThread.start();
     }
 
-    private void showWindow() {
+    private void showWindow()
+    {
         getRoot().setSpacing(10);
         getRoot().setAlignment(Pos.CENTER); // Zentriere alle Kinder
         getRoot().setMinSize(Controller.getMaxHboxWidth(), Controller.getMaxHboxHeight());
         getRoot().setMaxSize(Controller.getMaxHboxWidth(), Controller.getMaxHboxHeight());
         getRoot().prefWidthProperty().bind(getStage().widthProperty());
         getRoot().prefHeightProperty().bind(getStage().heightProperty()); // Binde Höhe an die Stage
-        getRoot().getChildren().addAll(getProgressBox(), getEnemyBox(), getTableBox(), getPlayerBox());
+        getRoot().getChildren().addAll(getProgressBox(), getEnemyBox(), getTableBox(), getPlayerBox(), getWinsCounterBox());
         getRoot().getStylesheets().add("file:resources/style.css");
 
         Scene scene = new Scene(getRoot());
@@ -102,15 +113,13 @@ public class Controller {
         getStage().show();
     }
 
-
-
     private void showGameEndScreen()
     {
         initializeGameEndBox();
+        getWinsCounterBox().setVisible(true);
 
         Platform.runLater(() -> getRoot().getChildren().add(getGameEndBox()));
     }
-
 
     private void restartGame()
     {
@@ -118,9 +127,11 @@ public class Controller {
 
         for (Node node : getPlayerBox().getChildren())
         {
+            if (node == getPlayerHand()) continue;
             node.setVisible(true);
         }
-        getPlayerHand().setVisible(false);
+
+        getWinsCounterBox().setVisible(false);
 
         getRoot().getChildren().remove(getGameEndBox());
 
@@ -134,7 +145,8 @@ public class Controller {
         Button sourceButton = (Button) event.getSource();
         String buttonId = sourceButton.getId();
 
-        switch (buttonId) {
+        switch (buttonId)
+        {
             case Rock.id -> setPlayerChoice(getPlayStonesIDs().getOrDefault(0, null));
             case Paper.id -> setPlayerChoice(getPlayStonesIDs().getOrDefault(1, null));
             case Scissors.id -> setPlayerChoice(getPlayStonesIDs().getOrDefault(2, null));
@@ -160,42 +172,58 @@ public class Controller {
     private int evaluateWinner()
     {
         if (getPlayerChoice().equals(getAiChoice())) return 0;
-        if (getPlayerChoice().equals(Scissors.id)) {
-            switch (getAiChoice()) {
-                case Paper.id -> {
+        if (getPlayerChoice().equals(Scissors.id))
+        {
+            switch (getAiChoice())
+            {
+                case Paper.id ->
+                {
                     return 1;
                 }
-                case Rock.id, Well.id -> {
+                case Rock.id, Well.id ->
+                {
                     return 2;
                 }
             }
         }
-        if (getPlayerChoice().equals(Rock.id)) {
-            switch (getAiChoice()) {
-                case Scissors.id -> {
+        if (getPlayerChoice().equals(Rock.id))
+        {
+            switch (getAiChoice())
+            {
+                case Scissors.id ->
+                {
                     return 1;
                 }
-                case Paper.id, Well.id -> {
+                case Paper.id, Well.id ->
+                {
                     return 2;
                 }
             }
         }
-        if (getPlayerChoice().equals(Paper.id)) {
-            switch (getAiChoice()) {
-                case Rock.id, Well.id -> {
+        if (getPlayerChoice().equals(Paper.id))
+        {
+            switch (getAiChoice())
+            {
+                case Rock.id, Well.id ->
+                {
                     return 1;
                 }
-                case Scissors.id -> {
+                case Scissors.id ->
+                {
                     return 2;
                 }
             }
         }
-        if (getPlayerChoice().equals(Well.id)) {
-            switch (getAiChoice()) {
-                case Scissors.id, Rock.id -> {
+        if (getPlayerChoice().equals(Well.id))
+        {
+            switch (getAiChoice())
+            {
+                case Scissors.id, Rock.id ->
+                {
                     return 1;
                 }
-                case Paper.id -> {
+                case Paper.id ->
+                {
                     return 2;
                 }
             }
@@ -206,12 +234,15 @@ public class Controller {
 
     private void selectWinner()
     {
-        switch (evaluateWinner()) {
+        switch (evaluateWinner())
+        {
             case 1 -> setWinner("Player");
             case 2 -> setWinner("AI");
             case 0 -> setWinner("No Winner");
         }
+        incrementWins();
 
+        updateWinsCounterBoxes();
         updateGameEndText(getWinner() + " has won the Game!");
 
         showGameEndScreen();
@@ -219,7 +250,8 @@ public class Controller {
 
     private void updatePlayerHand()
     {
-        switch (getPlayerChoice()) {
+        switch (getPlayerChoice())
+        {
             case Rock.id -> getPlayerHand().setImage(new Image("file:resources/img/hovered/player_rock.png"));
             case Paper.id -> getPlayerHand().setImage(new Image("file:resources/img/hovered/player_paper.png"));
             case Scissors.id -> getPlayerHand().setImage(new Image("file:resources/img/hovered/player_scissors.png"));
@@ -230,12 +262,30 @@ public class Controller {
 
     private void updateComputerHand()
     {
-        switch (getAiChoice()) {
+        switch (getAiChoice())
+        {
             case Rock.id -> getComputerHand().setImage(new Image("file:resources/masterHand_rock.png"));
             case Paper.id -> getComputerHand().setImage(new Image("file:resources/masterHand_paper.png"));
             case Scissors.id -> getComputerHand().setImage(new Image("file:resources/masterHand_scissors.png"));
             case Well.id -> getComputerHand().setImage(new Image("file:resources/masterHand_well.png"));
             default -> getComputerHand().setImage(new Image("file:resources/masterHand_default.png"));
+        }
+    }
+
+    private void updateWinsCounterBoxes()
+    {
+        updateWinsCounterBox(getPlayerWinsCounterBox(), getPlayerWins());
+        updateWinsCounterBox(getAiWinsCounterBox(), getAiWins());
+    }
+
+    private void updateWinsCounterBox(HBox box, int wins)
+    {
+        if (!box.getChildren().isEmpty())
+        {
+            if (box.getChildren().getLast() instanceof Label winsCounterLabel)
+            {
+                winsCounterLabel.setText(String.valueOf(wins));
+            }
         }
     }
 
@@ -248,9 +298,12 @@ public class Controller {
 
     private void updateGameEndText(String newWinnerMessage)
     {
-        if (!getGameEndBox().getChildren().isEmpty()) {
-            for (Node node : getGameEndBox().getChildren()) {
-                if (node instanceof Label winnerMessageLabel) {
+        if (!getGameEndBox().getChildren().isEmpty())
+        {
+            for (Node node : getGameEndBox().getChildren())
+            {
+                if (node instanceof Label winnerMessageLabel)
+                {
                     winnerMessageLabel.setText(newWinnerMessage);
                     break;
                 }
@@ -258,9 +311,21 @@ public class Controller {
         }
     }
 
+    private void incrementWins()
+    {
+        if (getWinner().equals("Player"))
+        {
+            setPlayerWins(getPlayerWins() + 1);
+        } else if (getWinner().equals("AI"))
+        {
+            setAiWins(getAiWins() + 1);
+        }
+    }
+
     private void initializeGameEndBox()
     {
-        if (!getGameEndBox().getChildren().isEmpty()) {
+        if (!getGameEndBox().getChildren().isEmpty())
+        {
             return;
         }
 
@@ -280,12 +345,36 @@ public class Controller {
         getGameEndBox().getChildren().addAll(winnerMessage, exitButton, playAgainButton);
     }
 
+    private HBox initializeWinsCounterPane(Pos position, String user)
+    {
+        HBox box = new HBox();
+        Label counterLabel = new Label();
+        Label userLabel = new Label(user);
+
+        box.setAlignment(position);
+        box.setSpacing(10);
+        box.setStyle("-fx-background-color: rgba(0, 0, 0, 0.8); -fx-padding: 10;");
+        box.getChildren().addAll(counterLabel, userLabel);
+        box.setVisible(false);
+
+        getWinsCounterBox().getChildren().add(box);
+
+        return box;
+    }
+
+    /**
+     *     private Pane playerWinsPane;
+     *     private Pane aiWinsPane;
+     */
     private void initializeUserElements()
     {
         getPlayStonesIDs().put(0, Rock.getId());
         getPlayStonesIDs().put(1, Paper.getId());
         getPlayStonesIDs().put(2, Scissors.getId());
         getPlayStonesIDs().put(3, Well.getId());
+
+        setPlayerWinsCounterBox(initializeWinsCounterPane(Pos.TOP_RIGHT, "Player"));
+        setAiWinsCounterBox(initializeWinsCounterPane(Pos.TOP_LEFT, "AI"));
 
         setRockButton(initializeButton(getPlayStonesIDs().getOrDefault(0, null), new Image("file:resources/img/stone.png")));
         setPaperButton(initializeButton(getPlayStonesIDs().getOrDefault(1, null), new Image("file:resources/img/paper.png")));
@@ -305,7 +394,6 @@ public class Controller {
         getTableBox().getStyleClass().add("hbox");
         getProgressBox().getStyleClass().add("hbox");
 
-
         addImageViewsToBoxes(getEnemyBox(), getComputerHand());
         addImageViewsToBoxes(getTableBox(), getTable());
         addImageViewsToBoxes(getPlayerBox(), getPlayerHand());
@@ -322,11 +410,15 @@ public class Controller {
         iv.fitWidthProperty().bind(button.widthProperty());
         iv.fitHeightProperty().bind(button.heightProperty());
         button.setGraphic(iv);
-        button.setOnAction(event -> {
-            new Thread(() -> {
-                try {
+        button.setOnAction(event ->
+        {
+            new Thread(() ->
+            {
+                try
+                {
                     handleButtonClick(event);
-                } catch (InterruptedException e) {
+                } catch (InterruptedException e)
+                {
                     e.printStackTrace();
                 }
             }).start();
@@ -345,7 +437,8 @@ public class Controller {
         return imageView;
     }
 
-    private void initializeImageBox(HBox imageBox, ImageView imageView) {
+    private void initializeImageBox(HBox imageBox, ImageView imageView)
+    {
         imageBox.setAlignment(Pos.CENTER); // Inhalte zentrieren
         imageBox.prefWidthProperty().bind(getStage().widthProperty());
         imageBox.prefHeightProperty().bind(getStage().heightProperty().multiply(0.3)); // Höhe dynamisch anpassen
@@ -354,13 +447,15 @@ public class Controller {
         imageView.fitWidthProperty().bind(imageBox.widthProperty().multiply(0.8));
         imageView.fitHeightProperty().bind(imageBox.heightProperty().multiply(0.8));
 
-        if (!imageBox.getChildren().contains(imageView)) {
+        if (!imageBox.getChildren().contains(imageView))
+        {
             imageBox.getChildren().add(imageView);
         }
     }
 
 
-    private void initializePlayerBox(int spacing) {
+    private void initializePlayerBox(int spacing)
+    {
         getPlayerBox().setSpacing(spacing);
         getPlayerBox().setAlignment(Pos.CENTER); // Inhalte zentrieren
         getPlayerBox().setFillHeight(false); // Inhalte nicht in die Höhe ziehen
@@ -398,11 +493,13 @@ public class Controller {
 
     private void removePlayerBoxes()
     {
-        Platform.runLater(() -> {
-            for (Node node : getPlayerBox().getChildren()) {
+        Platform.runLater(() ->
+        {
+            for (Node node : getPlayerBox().getChildren())
+            {
+                if (node == getPlayerHand()) continue;
                 node.setVisible(false);
             }
-            getPlayerHand().setVisible(true);
         });
     }
 
@@ -555,7 +652,8 @@ public class Controller {
 
     public void setAiChoice(int aiChoice)
     {
-        switch (aiChoice) {
+        switch (aiChoice)
+        {
             case -1 -> this.aiChoice = null;
             case 0 -> this.aiChoice = playStonesIDs.getOrDefault(0, null);
             case 1 -> this.aiChoice = playStonesIDs.getOrDefault(1, null);
@@ -663,5 +761,55 @@ public class Controller {
     public void setPlayerHand(ImageView playerHand)
     {
         this.playerHand = playerHand;
+    }
+
+    public int getPlayerWins()
+    {
+        return playerWins;
+    }
+
+    public void setPlayerWins(int playerWins)
+    {
+        this.playerWins = playerWins;
+    }
+
+    public int getAiWins()
+    {
+        return aiWins;
+    }
+
+    public void setAiWins(int aiWins)
+    {
+        this.aiWins = aiWins;
+    }
+
+    public HBox getPlayerWinsCounterBox()
+    {
+        return playerWinsCounterBox;
+    }
+
+    public void setPlayerWinsCounterBox(HBox playerWinsPane)
+    {
+        this.playerWinsCounterBox = playerWinsPane;
+    }
+
+    public HBox getAiWinsCounterBox()
+    {
+        return aiWinsCounterBox;
+    }
+
+    public void setAiWinsCounterBox(HBox aiWinsCounterPane)
+    {
+        this.aiWinsCounterBox = aiWinsCounterPane;
+    }
+
+    public VBox getWinsCounterBox()
+    {
+        return winsCounterBox;
+    }
+
+    public void setWinsCounterBox(VBox winsCounterBox)
+    {
+        this.winsCounterBox = winsCounterBox;
     }
 }
