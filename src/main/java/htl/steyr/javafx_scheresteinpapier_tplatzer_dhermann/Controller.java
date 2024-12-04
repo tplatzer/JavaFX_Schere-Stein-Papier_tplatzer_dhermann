@@ -9,15 +9,12 @@ import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.ProgressIndicator;
-import javafx.scene.layout.Background;
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
-
-import javafx.scene.Group;
-import javafx.scene.image.Image;
-import javafx.scene.image.ImageView;
 
 import java.util.HashMap;
 import java.util.Random;
@@ -58,8 +55,23 @@ public class Controller {
     private HBox tableBox = new HBox();
     private HBox playerBox = new HBox();
 
-    public void start(Stage stage, Controller controller)
-    {
+    public static int getMaxHboxWidth() {
+        return maxHboxWidth;
+    }
+
+    public static int getMaxHboxHeight() {
+        return maxHboxHeight;
+    }
+
+    public static int getMaxProgressIndicatorWidth() {
+        return maxProgressIndicatorWidth;
+    }
+
+    public static int getMaxProgressIndicatorHeight() {
+        return maxProgressIndicatorHeight;
+    }
+
+    public void start(Stage stage, Controller controller) {
         setDefaultValues();
         setStage(stage);
         setController(controller);
@@ -68,8 +80,7 @@ public class Controller {
         showWindow();
     }
 
-    private void play()
-    {
+    private void play() {
         Thread sleepThread = new Thread(() -> {
             try {
                 Thread.sleep(3000);
@@ -118,17 +129,13 @@ public class Controller {
 
     }
 
-
-    private void showGameEndScreen()
-    {
+    private void showGameEndScreen() {
         initializeGameEndBox();
 
         Platform.runLater(() -> getRoot().getChildren().add(getGameEndBox()));
     }
 
-
-    private void restartGame()
-    {
+    private void restartGame() {
         setDefaultValues();
 
         getPlayerBox().setVisible(true);
@@ -140,8 +147,7 @@ public class Controller {
         getEnemieProgressIndicator().setVisible(false);
     }
 
-    private void handleButtonClick(ActionEvent event) throws InterruptedException
-    {
+    private void handleButtonClick(ActionEvent event) throws InterruptedException {
         Button sourceButton = (Button) event.getSource();
         String buttonId = sourceButton.getId();
 
@@ -168,8 +174,7 @@ public class Controller {
      * 1 = Player
      * 2 = AI
      */
-    private int evaluateWinner()
-    {
+    private int evaluateWinner() {
         if (getPlayerChoice().equals(getAiChoice())) return 0;
         if (getPlayerChoice().equals(Scissors.id)) {
             switch (getAiChoice()) {
@@ -215,8 +220,7 @@ public class Controller {
         return 0;
     }
 
-    private void selectWinner()
-    {
+    private void selectWinner() {
         switch (evaluateWinner()) {
             case 1 -> setWinner("Player");
             case 2 -> setWinner("AI");
@@ -228,8 +232,7 @@ public class Controller {
         showGameEndScreen();
     }
 
-    private void updatePlayerHand()
-    {
+    private void updatePlayerHand() {
         switch (getPlayerChoice()) {
             case Rock.id -> getPlayerHand().setImage(new Image("file:resources/img/hovered/player_rock.png"));
             case Paper.id -> getPlayerHand().setImage(new Image("file:resources/img/hovered/player_paper.png"));
@@ -239,8 +242,7 @@ public class Controller {
         }
     }
 
-    private void updateComputerHand()
-    {
+    private void updateComputerHand() {
         switch (getAiChoice()) {
             case Rock.id -> getComputerHand().setImage(new Image("file:resources/masterHand_rock.png"));
             case Paper.id -> getComputerHand().setImage(new Image("file:resources/masterHand_paper.png"));
@@ -250,15 +252,13 @@ public class Controller {
         }
     }
 
-    private void setDefaultValues()
-    {
+    private void setDefaultValues() {
         setPlayerChoice(null);
         setAiChoice(-1);
         setWinner(null);
     }
 
-    private void updateGameEndText(String newWinnerMessage)
-    {
+    private void updateGameEndText(String newWinnerMessage) {
         if (!getGameEndBox().getChildren().isEmpty()) {
             for (Node node : getGameEndBox().getChildren()) {
                 if (node instanceof Label winnerMessageLabel) {
@@ -269,8 +269,7 @@ public class Controller {
         }
     }
 
-    private void initializeGameEndBox()
-    {
+    private void initializeGameEndBox() {
         if (!getGameEndBox().getChildren().isEmpty()) {
             return;
         }
@@ -291,8 +290,7 @@ public class Controller {
         getGameEndBox().getChildren().addAll(winnerMessage, exitButton, playAgainButton);
     }
 
-    private void initializeUserElements()
-    {
+    private void initializeUserElements() {
         getPlayStonesIDs().put(0, Rock.getId());
         getPlayStonesIDs().put(1, Paper.getId());
         getPlayStonesIDs().put(2, Scissors.getId());
@@ -319,11 +317,11 @@ public class Controller {
 
         addImageViewsToBoxes(getEnemyBox(), getComputerHand());
         addImageViewsToBoxes(getTableBox(), getTable());
-        addImageViewsToBoxes(getPlayerBox(), getPlayerHand());
+        getPlayerBox().getChildren().removeAll();
+        getPlayerBox().getChildren().addAll(getRockButton(), getPaperButton(), getPlayerHand(), getScissorsButton(), getWellButton());
     }
 
-    private Button initializeButton(String id, Image image)
-    {
+    private Button initializeButton(String id, Image image) {
         Button button = new Button();
         button.setPrefHeight(getMaxHboxHeight());
         button.setId(id);
@@ -340,8 +338,7 @@ public class Controller {
         return button;
     }
 
-    private ImageView initializeImageView(boolean visibility, Image image, double widthFactor, double heightFactor)
-    {
+    private ImageView initializeImageView(boolean visibility, Image image, double widthFactor, double heightFactor) {
         ImageView imageView = new ImageView();
         imageView.setImage(image);
         imageView.setVisible(visibility);
@@ -365,13 +362,11 @@ public class Controller {
         }
     }
 
-
     private void initializePlayerBox() {
         getPlayerBox().setFillHeight(false); // Inhalte nicht in die Höhe ziehen
         getPlayerBox().prefWidthProperty().bind(getStage().widthProperty()); // Breite der HBox an Fensterbreite binden
         getPlayerBox().setAlignment(Pos.CENTER); // Buttons in der Mitte zentrieren
         getPlayerBox().setSpacing(20); // Abstand zwischen Buttons
-
 
         // Button-Einstellungen
         Button[] buttons = {getRockButton(), getPaperButton(), getScissorsButton(), getWellButton()};
@@ -380,14 +375,9 @@ public class Controller {
             button.prefWidthProperty().bind(getPlayerBox().widthProperty().divide(4).subtract(20)); // gleichmäßige Breite
             button.prefHeightProperty().bind(getPlayerBox().heightProperty().multiply(0.8)); // Höhe relativ zur HBox
         }
-
-        // Buttons hinzufügen
-        getPlayerBox().getChildren().addAll(buttons);
     }
 
-
-    private ProgressIndicator initializeProgressIndicator()
-    {
+    private ProgressIndicator initializeProgressIndicator() {
         ProgressIndicator progressIndicator = new ProgressIndicator();
         progressIndicator.setId("enemie_progress_indicator");
 //        progressIndicator.setMinSize(getMaxButtonWidth(), getMaxButtonHeight());
@@ -396,8 +386,7 @@ public class Controller {
         return progressIndicator;
     }
 
-    private void removePlayerBox()
-    {
+    private void removePlayerBox() {
         Platform.runLater(() -> {
             for (Node node : getPlayerBox().getChildren()) {
                 node.setVisible(false);
@@ -406,14 +395,12 @@ public class Controller {
         });
     }
 
-    private void aiTurn()
-    {
+    private void aiTurn() {
         Random random = new Random();
         setAiChoice(random.nextInt(4));
     }
 
-    private void addImageViewsToBoxes(HBox box, ImageView image)
-    {
+    private void addImageViewsToBoxes(HBox box, ImageView image) {
 //        initializeImageBox(box, image);
 
         box.setAlignment(Pos.CENTER); // Zentriere ImageView
@@ -422,139 +409,87 @@ public class Controller {
         box.getChildren().add(image);
     }
 
-
-    private void addProgressIndicatorToBox(HBox box, ProgressIndicator progressIndicator)
-    {
+    private void addProgressIndicatorToBox(HBox box, ProgressIndicator progressIndicator) {
         box.getChildren().add(progressIndicator);
     }
 
-    /*public static int getMaxButtonWidth()
-    {
-        return maxButtonWidth;
-    }
-
-    public static int getMaxButtonHeight()
-    {
-        return maxButtonHeight;
-    }*/
-
-    public static int getMaxHboxWidth()
-    {
-        return maxHboxWidth;
-    }
-
-    public static int getMaxHboxHeight()
-    {
-        return maxHboxHeight;
-    }
-
-    public static int getMaxProgressIndicatorWidth()
-    {
-        return maxProgressIndicatorWidth;
-    }
-
-    public static int getMaxProgressIndicatorHeight()
-    {
-        return maxProgressIndicatorHeight;
-    }
-
-    public String getPlayerChoice()
-    {
+    public String getPlayerChoice() {
         return playerChoice;
     }
 
-    public void setPlayerChoice(String playerChoice)
-    {
+    public void setPlayerChoice(String playerChoice) {
         this.playerChoice = playerChoice;
     }
 
-    public Button getRockButton()
-    {
+    public Button getRockButton() {
         return rockButton;
     }
 
-    public void setRockButton(Button rockButton)
-    {
+    public void setRockButton(Button rockButton) {
         this.rockButton = rockButton;
     }
 
-    public Button getPaperButton()
-    {
+    public Button getPaperButton() {
         return paperButton;
     }
 
-    public void setPaperButton(Button paperButton)
-    {
+    public void setPaperButton(Button paperButton) {
         this.paperButton = paperButton;
     }
 
-    public Button getScissorsButton()
-    {
+    public Button getScissorsButton() {
         return scissorsButton;
     }
 
-    public void setScissorsButton(Button scissorsButton)
-    {
+    public void setScissorsButton(Button scissorsButton) {
         this.scissorsButton = scissorsButton;
     }
 
-    public Button getWellButton()
-    {
+    public Button getWellButton() {
         return wellButton;
     }
 
-    public void setWellButton(Button wellButton)
-    {
+    public void setWellButton(Button wellButton) {
         this.wellButton = wellButton;
     }
 
-    public ProgressIndicator getEnemieProgressIndicator()
-    {
+    public ProgressIndicator getEnemieProgressIndicator() {
         return enemieProgressIndicator;
     }
 
-    public void setEnemieProgressIndicator(ProgressIndicator enemieProgressIndicator)
-    {
+    public void setEnemieProgressIndicator(ProgressIndicator enemieProgressIndicator) {
         this.enemieProgressIndicator = enemieProgressIndicator;
     }
 
-    public VBox getRoot()
-    {
+    public VBox getRoot() {
         return this.root;
     }
 
-    public void setRoot(VBox root)
-    {
+    public void setRoot(VBox root) {
         this.root = root;
     }
 
-    public Stage getStage()
-    {
+    public Stage getStage() {
         return this.stage;
     }
 
-    public void setStage(Stage stage)
-    {
+    public void setStage(Stage stage) {
         this.stage = stage;
     }
 
-    public Controller getController()
-    {
+    public Controller getController() {
         return controller;
     }
 
-    public void setController(Controller controller)
-    {
+    public void setController(Controller controller) {
         this.controller = controller;
     }
 
-    public String getAiChoice()
-    {
+    public String getAiChoice() {
         return aiChoice;
     }
 
-    public void setAiChoice(int aiChoice)
-    {
+    public void setAiChoice(int aiChoice) {
         switch (aiChoice) {
             case -1 -> this.aiChoice = null;
             case 0 -> this.aiChoice = playStonesIDs.getOrDefault(0, null);
@@ -565,103 +500,83 @@ public class Controller {
 
     }
 
-    public HashMap<Integer, String> getPlayStonesIDs()
-    {
+    public HashMap<Integer, String> getPlayStonesIDs() {
         return playStonesIDs;
     }
 
-    public void setPlayStonesIDs(HashMap<Integer, String> playStonesIDs)
-    {
+    public void setPlayStonesIDs(HashMap<Integer, String> playStonesIDs) {
         this.playStonesIDs = playStonesIDs;
     }
 
-    public HBox getProgressBox()
-    {
+    public HBox getProgressBox() {
         return progressBox;
     }
 
-    public void setProgressBox(HBox progressBox)
-    {
+    public void setProgressBox(HBox progressBox) {
         this.progressBox = progressBox;
     }
 
-    public HBox getEnemyBox()
-    {
+    public HBox getEnemyBox() {
         return enemyBox;
     }
 
-    public void setEnemyBox(HBox enemyBox)
-    {
+    public void setEnemyBox(HBox enemyBox) {
         this.enemyBox = enemyBox;
     }
 
-    public HBox getTableBox()
-    {
+    public HBox getTableBox() {
         return tableBox;
     }
 
-    public void setTableBox(HBox tableBox)
-    {
+    public void setTableBox(HBox tableBox) {
         this.tableBox = tableBox;
     }
 
-    public HBox getPlayerBox()
-    {
+    public HBox getPlayerBox() {
         return playerBox;
     }
 
-    public void setPlayerBox(HBox playerBox)
-    {
+    public void setPlayerBox(HBox playerBox) {
         this.playerBox = playerBox;
     }
 
-    public ImageView getComputerHand()
-    {
+    public ImageView getComputerHand() {
         return computerHand;
     }
 
-    public void setComputerHand(ImageView computerHand)
-    {
+    public void setComputerHand(ImageView computerHand) {
         this.computerHand = computerHand;
     }
 
-    public HBox getGameEndBox()
-    {
+    public HBox getGameEndBox() {
         return gameEndBox;
     }
 
-    public void setGameEndBox(HBox gameEndBox)
-    {
+    public void setGameEndBox(HBox gameEndBox) {
         this.gameEndBox = gameEndBox;
     }
 
-    public String getWinner()
-    {
+    public String getWinner() {
         return winner;
     }
 
-    public void setWinner(String winner)
-    {
+    public void setWinner(String winner) {
         this.winner = winner;
     }
 
-    public ImageView getTable()
-    {
+    public ImageView getTable() {
         return table;
     }
 
-    public void setTable(ImageView table)
-    {
+    public void setTable(ImageView table) {
         this.table = table;
     }
 
-    public ImageView getPlayerHand()
-    {
+    public ImageView getPlayerHand() {
         return playerHand;
     }
 
-    public void setPlayerHand(ImageView playerHand)
-    {
+    public void setPlayerHand(ImageView playerHand) {
         this.playerHand = playerHand;
     }
 }
