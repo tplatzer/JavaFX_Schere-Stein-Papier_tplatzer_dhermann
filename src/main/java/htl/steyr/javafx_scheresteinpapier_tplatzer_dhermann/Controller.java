@@ -419,7 +419,6 @@ public class Controller
         getPlayerBox().getChildren().addAll(getRockButton(), getPaperButton(), getScissorsButton(), getWellButton());
     }
 
-
     private ProgressIndicator initializeProgressIndicator()
     {
         ProgressIndicator progressIndicator = new ProgressIndicator();
