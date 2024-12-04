@@ -116,7 +116,11 @@ public class Controller {
     {
         setDefaultValues();
 
-        getPlayerBox().setVisible(true);
+        for (Node node : getPlayerBox().getChildren())
+        {
+            node.setVisible(true);
+        }
+        getPlayerHand().setVisible(false);
 
         getRoot().getChildren().remove(getGameEndBox());
 
@@ -141,7 +145,7 @@ public class Controller {
 
         getEnemieProgressIndicator().setVisible(true);
 
-        Thread removeplayerBoxThread = new Thread(this::removeplayerBoxes);
+        Thread removeplayerBoxThread = new Thread(this::removePlayerBoxes);
         removeplayerBoxThread.setDaemon(true);
         removeplayerBoxThread.start();
 
@@ -392,7 +396,7 @@ public class Controller {
         return progressIndicator;
     }
 
-    private void removeplayerBoxes()
+    private void removePlayerBoxes()
     {
         Platform.runLater(() -> {
             for (Node node : getPlayerBox().getChildren()) {
