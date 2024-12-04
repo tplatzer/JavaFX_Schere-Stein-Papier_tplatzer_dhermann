@@ -1,6 +1,7 @@
 package htl.steyr.javafx_scheresteinpapier_tplatzer_dhermann;
 
 import javafx.application.Platform;
+import javafx.beans.property.ReadOnlyDoubleProperty;
 import javafx.event.ActionEvent;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
@@ -8,6 +9,7 @@ import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.ProgressIndicator;
+import javafx.scene.layout.Background;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
@@ -27,8 +29,8 @@ public class Controller {
      * Scissors
      * Well
      */
-    private static final int maxButtonWidth = 100;
-    private static final int maxButtonHeight = 100;
+    /*private static final int maxButtonWidth = 100;
+    private static final int maxButtonHeight = 100;*/
     private static final int maxHboxWidth = 1000;
     private static final int maxHboxHeight = 700;
     private static final int maxProgressIndicatorWidth = 200;
@@ -99,9 +101,22 @@ public class Controller {
         getStage().setScene(scene);
         getStage().setTitle("Schere Stein Papier");
         getStage().setHeight(900);
+        adjustElements();
         getStage().show();
     }
 
+    private void adjustElements() {
+        ReadOnlyDoubleProperty stageWidthProperty = getStage().widthProperty();
+        ReadOnlyDoubleProperty stageHeightProperty = getStage().heightProperty();
+
+        for (Node node : getPlayerBox().getChildren()) {
+            if (node instanceof Button button) {
+                button.prefWidthProperty().bind(stageWidthProperty);
+                button.prefHeightProperty().bind(stageHeightProperty);
+            }
+        }
+
+    }
 
 
     private void showGameEndScreen()
@@ -141,9 +156,9 @@ public class Controller {
 
         getEnemieProgressIndicator().setVisible(true);
 
-        Thread removeplayerBoxThread = new Thread(this::removeplayerBoxes);
-        removeplayerBoxThread.setDaemon(true);
-        removeplayerBoxThread.start();
+        Thread removePlayerBoxThread = new Thread(this::removePlayerBox);
+        removePlayerBoxThread.setDaemon(true);
+        removePlayerBoxThread.start();
 
         play();
     }
@@ -289,7 +304,7 @@ public class Controller {
         setWellButton(initializeButton(getPlayStonesIDs().getOrDefault(3, null), new Image("file:resources/img/player_well.png")));
         setEnemieProgressIndicator(initializeProgressIndicator());
 
-        initializePlayerBox(10);
+        initializePlayerBox();
         addProgressIndicatorToBox(getProgressBox(), getEnemieProgressIndicator());
 
         setComputerHand(initializeImageView(true, new Image("file:resources/masterHand_default.png"), .1, .2));
@@ -310,14 +325,8 @@ public class Controller {
     private Button initializeButton(String id, Image image)
     {
         Button button = new Button();
-        button.setMinSize(getMaxButtonWidth(), getMaxButtonHeight());
-        button.setMaxSize(getMaxButtonWidth(), getMaxButtonHeight());
+        button.setPrefHeight(getMaxHboxHeight());
         button.setId(id);
-//        button.setText(id);
-        ImageView iv = new ImageView(image);
-        iv.fitWidthProperty().bind(button.widthProperty());
-        iv.fitHeightProperty().bind(button.heightProperty());
-        button.setGraphic(iv);
         button.setOnAction(event -> {
             new Thread(() -> {
                 try {
@@ -327,6 +336,7 @@ public class Controller {
                 }
             }).start();
         });
+        button.getStyleClass().add("button");
         return button;
     }
 
@@ -356,30 +366,23 @@ public class Controller {
     }
 
 
-    private void initializePlayerBox(int spacing) {
-        getPlayerBox().setSpacing(spacing);
-        getPlayerBox().setAlignment(Pos.CENTER); // Inhalte zentrieren
+    private void initializePlayerBox() {
         getPlayerBox().setFillHeight(false); // Inhalte nicht in die Höhe ziehen
-        getPlayerBox().prefWidthProperty().bind(getStage().widthProperty()); // Breite der HBox anpassen
+        getPlayerBox().prefWidthProperty().bind(getStage().widthProperty()); // Breite der HBox an Fensterbreite binden
+        getPlayerBox().setAlignment(Pos.CENTER); // Buttons in der Mitte zentrieren
+        getPlayerBox().setSpacing(20); // Abstand zwischen Buttons
 
-        // Buttons flexibel machen
-        HBox.setHgrow(getRockButton(), Priority.ALWAYS);
-        HBox.setHgrow(getPaperButton(), Priority.ALWAYS);
-        HBox.setHgrow(getScissorsButton(), Priority.ALWAYS);
-        HBox.setHgrow(getWellButton(), Priority.ALWAYS);
 
-        // Buttons maximale Flexibilität geben
-        getRockButton().setMaxWidth(Double.MAX_VALUE);
-        getPaperButton().setMaxWidth(Double.MAX_VALUE);
-        getScissorsButton().setMaxWidth(Double.MAX_VALUE);
-        getWellButton().setMaxWidth(Double.MAX_VALUE);
+        // Button-Einstellungen
+        Button[] buttons = {getRockButton(), getPaperButton(), getScissorsButton(), getWellButton()};
+        for (Button button : buttons) {
+            HBox.setHgrow(button, Priority.ALWAYS); // Button in HBox wachsen lassen
+            button.prefWidthProperty().bind(getPlayerBox().widthProperty().divide(4).subtract(20)); // gleichmäßige Breite
+            button.prefHeightProperty().bind(getPlayerBox().heightProperty().multiply(0.8)); // Höhe relativ zur HBox
+        }
 
-        // **Hinzufügen: Höhe und Zentrierung sicherstellen**
-        getPlayerBox().prefHeightProperty().bind(getStage().heightProperty().multiply(0.1));
-        getPlayerBox().setAlignment(Pos.CENTER);
-
-        // Buttons zur HBox hinzufügen
-        getPlayerBox().getChildren().addAll(getRockButton(), getPaperButton(), getScissorsButton(), getWellButton());
+        // Buttons hinzufügen
+        getPlayerBox().getChildren().addAll(buttons);
     }
 
 
@@ -387,13 +390,13 @@ public class Controller {
     {
         ProgressIndicator progressIndicator = new ProgressIndicator();
         progressIndicator.setId("enemie_progress_indicator");
-        progressIndicator.setMinSize(getMaxButtonWidth(), getMaxButtonHeight());
+//        progressIndicator.setMinSize(getMaxButtonWidth(), getMaxButtonHeight());
         progressIndicator.setVisible(false);
 
         return progressIndicator;
     }
 
-    private void removeplayerBoxes()
+    private void removePlayerBox()
     {
         Platform.runLater(() -> {
             for (Node node : getPlayerBox().getChildren()) {
@@ -425,7 +428,7 @@ public class Controller {
         box.getChildren().add(progressIndicator);
     }
 
-    public static int getMaxButtonWidth()
+    /*public static int getMaxButtonWidth()
     {
         return maxButtonWidth;
     }
@@ -433,7 +436,7 @@ public class Controller {
     public static int getMaxButtonHeight()
     {
         return maxButtonHeight;
-    }
+    }*/
 
     public static int getMaxHboxWidth()
     {
