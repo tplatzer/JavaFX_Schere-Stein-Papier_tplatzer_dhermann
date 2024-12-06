@@ -12,19 +12,14 @@ import javafx.scene.control.ProgressIndicator;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.HBox;
-import javafx.scene.layout.Pane;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 
-import javafx.scene.image.Image;
-import javafx.scene.image.ImageView;
-
 import java.util.HashMap;
 import java.util.Random;
 
-public class Controller
-{
+public class Controller {
     /**
      * Rock
      * Paper
@@ -93,17 +88,14 @@ public class Controller
     private void play() {
         Thread sleepThread = new Thread(() ->
         {
-            try
-            {
+            try {
                 Thread.sleep(3000);
                 aiTurn();
                 updateComputerHand();
                 getEnemieProgressIndicator().setVisible(false);
-            } catch (InterruptedException e)
-            {
+            } catch (InterruptedException e) {
                 System.out.println(e.getMessage());
-            } finally
-            {
+            } finally {
                 Platform.runLater(this::selectWinner);
             }
         });
@@ -154,8 +146,7 @@ public class Controller
     {
         setDefaultValues();
 
-        for (Node node : getPlayerBox().getChildren())
-        {
+        for (Node node : getPlayerBox().getChildren()) {
             if (node == getPlayerHand()) continue;
             node.setVisible(true);
         }
@@ -174,8 +165,7 @@ public class Controller
         Button sourceButton = (Button) event.getSource();
         String buttonId = sourceButton.getId();
 
-        switch (buttonId)
-        {
+        switch (buttonId) {
             case Rock.id -> setPlayerChoice(getPlayStonesIDs().getOrDefault(0, null));
             case Paper.id -> setPlayerChoice(getPlayStonesIDs().getOrDefault(1, null));
             case Scissors.id -> setPlayerChoice(getPlayStonesIDs().getOrDefault(2, null));
@@ -200,58 +190,42 @@ public class Controller
      */
     private int evaluateWinner() {
         if (getPlayerChoice().equals(getAiChoice())) return 0;
-        if (getPlayerChoice().equals(Scissors.id))
-        {
-            switch (getAiChoice())
-            {
-                case Paper.id ->
-                {
+        if (getPlayerChoice().equals(Scissors.id)) {
+            switch (getAiChoice()) {
+                case Paper.id -> {
                     return 1;
                 }
-                case Rock.id, Well.id ->
-                {
+                case Rock.id, Well.id -> {
                     return 2;
                 }
             }
         }
-        if (getPlayerChoice().equals(Rock.id))
-        {
-            switch (getAiChoice())
-            {
-                case Scissors.id ->
-                {
+        if (getPlayerChoice().equals(Rock.id)) {
+            switch (getAiChoice()) {
+                case Scissors.id -> {
                     return 1;
                 }
-                case Paper.id, Well.id ->
-                {
+                case Paper.id, Well.id -> {
                     return 2;
                 }
             }
         }
-        if (getPlayerChoice().equals(Paper.id))
-        {
-            switch (getAiChoice())
-            {
-                case Rock.id, Well.id ->
-                {
+        if (getPlayerChoice().equals(Paper.id)) {
+            switch (getAiChoice()) {
+                case Rock.id, Well.id -> {
                     return 1;
                 }
-                case Scissors.id ->
-                {
+                case Scissors.id -> {
                     return 2;
                 }
             }
         }
-        if (getPlayerChoice().equals(Well.id))
-        {
-            switch (getAiChoice())
-            {
-                case Scissors.id, Rock.id ->
-                {
+        if (getPlayerChoice().equals(Well.id)) {
+            switch (getAiChoice()) {
+                case Scissors.id, Rock.id -> {
                     return 1;
                 }
-                case Paper.id ->
-                {
+                case Paper.id -> {
                     return 2;
                 }
             }
@@ -261,8 +235,7 @@ public class Controller
     }
 
     private void selectWinner() {
-        switch (evaluateWinner())
-        {
+        switch (evaluateWinner()) {
             case 1 -> setWinner("Player");
             case 2 -> setWinner("AI");
             case 0 -> setWinner("No Winner");
@@ -276,8 +249,7 @@ public class Controller
     }
 
     private void updatePlayerHand() {
-        switch (getPlayerChoice())
-        {
+        switch (getPlayerChoice()) {
             case Rock.id -> getPlayerHand().setImage(new Image("file:resources/img/hovered/player_rock.png"));
             case Paper.id -> getPlayerHand().setImage(new Image("file:resources/img/hovered/player_paper.png"));
             case Scissors.id -> getPlayerHand().setImage(new Image("file:resources/img/hovered/player_scissors.png"));
@@ -287,8 +259,7 @@ public class Controller
     }
 
     private void updateComputerHand() {
-        switch (getAiChoice())
-        {
+        switch (getAiChoice()) {
             case Rock.id -> getComputerHand().setImage(new Image("file:resources/masterHand_rock.png"));
             case Paper.id -> getComputerHand().setImage(new Image("file:resources/masterHand_paper.png"));
             case Scissors.id -> getComputerHand().setImage(new Image("file:resources/masterHand_scissors.png"));
@@ -305,10 +276,8 @@ public class Controller
 
     private void updateWinsCounterBox(HBox box, int wins)
     {
-        if (!box.getChildren().isEmpty())
-        {
-            if (box.getChildren().getLast() instanceof Label winsCounterLabel)
-            {
+        if (!box.getChildren().isEmpty()) {
+            if (box.getChildren().getLast() instanceof Label winsCounterLabel) {
                 winsCounterLabel.setText(String.valueOf(wins));
             }
         }
@@ -321,12 +290,9 @@ public class Controller
     }
 
     private void updateGameEndText(String newWinnerMessage) {
-        if (!getGameEndBox().getChildren().isEmpty())
-        {
-            for (Node node : getGameEndBox().getChildren())
-            {
-                if (node instanceof Label winnerMessageLabel)
-                {
+        if (!getGameEndBox().getChildren().isEmpty()) {
+            for (Node node : getGameEndBox().getChildren()) {
+                if (node instanceof Label winnerMessageLabel) {
                     winnerMessageLabel.setText(newWinnerMessage);
                     break;
                 }
@@ -336,18 +302,15 @@ public class Controller
 
     private void incrementWins()
     {
-        if (getWinner().equals("Player"))
-        {
+        if (getWinner().equals("Player")) {
             setPlayerWins(getPlayerWins() + 1);
-        } else if (getWinner().equals("AI"))
-        {
+        } else if (getWinner().equals("AI")) {
             setAiWins(getAiWins() + 1);
         }
     }
 
     private void initializeGameEndBox() {
-        if (!getGameEndBox().getChildren().isEmpty())
-        {
+        if (!getGameEndBox().getChildren().isEmpty()) {
             return;
         }
 
@@ -402,8 +365,8 @@ public class Controller
         initializePlayerBox();
         addProgressIndicatorToBox(getProgressBox(), getEnemieProgressIndicator());
 
-        setComputerHand(initializeImageView(true, new Image("file:resources/masterHand_default.png"), .1, .2));
-        setTable(initializeImageView(true, new Image("file:resources/table.png"), 1, .3));
+        setComputerHand(initializeImageView(true, new Image("file:resources/masterHand_default.png"), .2, .3));
+        setTable(initializeImageView(true, new Image("file:resources/table.png"), 1, .2));
         setPlayerHand(initializeImageView(false, new Image("file:resources/player_default.png"), .1, .2));
 
         getPlayerBox().getStyleClass().add("hbox");
@@ -413,6 +376,8 @@ public class Controller
 
         addImageViewsToBoxes(getEnemyBox(), getComputerHand());
         addImageViewsToBoxes(getTableBox(), getTable());
+        getPlayerBox().getChildren().removeAll();
+        getPlayerBox().getChildren().addAll(getRockButton(), getPaperButton(), getPlayerHand(), getScissorsButton(), getWellButton());
     }
 
     private Button initializeButton(String id, Image image) {
@@ -423,11 +388,9 @@ public class Controller
         {
             new Thread(() ->
             {
-                try
-                {
+                try {
                     handleButtonClick(event);
-                } catch (InterruptedException e)
-                {
+                } catch (InterruptedException e) {
                     e.printStackTrace();
                 }
             }).start();
@@ -455,8 +418,7 @@ public class Controller
         imageView.fitWidthProperty().bind(imageBox.widthProperty().multiply(0.8));
         imageView.fitHeightProperty().bind(imageBox.heightProperty().multiply(0.8));
 
-        if (!imageBox.getChildren().contains(imageView))
-        {
+        if (!imageBox.getChildren().contains(imageView)) {
             imageBox.getChildren().add(imageView);
         }
     }
@@ -479,7 +441,7 @@ public class Controller
     private ProgressIndicator initializeProgressIndicator() {
         ProgressIndicator progressIndicator = new ProgressIndicator();
         progressIndicator.setId("enemie_progress_indicator");
-//        progressIndicator.setMinSize(getMaxButtonWidth(), getMaxButtonHeight());
+        progressIndicator.setMinSize(100, 50);
         progressIndicator.setVisible(false);
 
         return progressIndicator;
@@ -489,8 +451,7 @@ public class Controller
     {
         Platform.runLater(() ->
         {
-            for (Node node : getPlayerBox().getChildren())
-            {
+            for (Node node : getPlayerBox().getChildren()) {
                 if (node == getPlayerHand()) continue;
                 node.setVisible(false);
             }
@@ -611,8 +572,7 @@ public class Controller
     }
 
     public void setAiChoice(int aiChoice) {
-        switch (aiChoice)
-        {
+        switch (aiChoice) {
             case -1 -> this.aiChoice = null;
             case 0 -> this.aiChoice = playStonesIDs.getOrDefault(0, null);
             case 1 -> this.aiChoice = playStonesIDs.getOrDefault(1, null);
