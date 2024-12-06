@@ -1,5 +1,6 @@
 package htl.steyr.javafx_scheresteinpapier_tplatzer_dhermann;
 
+import javafx.animation.TranslateTransition;
 import javafx.application.Platform;
 import javafx.beans.property.ReadOnlyDoubleProperty;
 import javafx.event.ActionEvent;
@@ -14,7 +15,10 @@ import javafx.scene.image.ImageView;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
+import javafx.scene.paint.Color;
+import javafx.scene.shape.Rectangle;
 import javafx.stage.Stage;
+import javafx.util.Duration;
 
 import java.util.HashMap;
 import java.util.Random;
@@ -179,6 +183,9 @@ public class Controller {
         Thread removeplayerBoxThread = new Thread(this::removePlayerBoxes);
         removeplayerBoxThread.setDaemon(true);
         removeplayerBoxThread.start();
+
+        prepareAnimation();
+        System.out.println("Animation done");
 
         play();
     }
@@ -476,6 +483,43 @@ public class Controller {
     private void addProgressIndicatorToBox(HBox box, ProgressIndicator progressIndicator) {
         box.getChildren().add(progressIndicator);
     }
+
+    private void prepareAnimation() {
+        // Schwarze Balken
+        Rectangle topBar = new Rectangle(800, 100, Color.BLACK);
+        Rectangle bottomBar = new Rectangle(800, 100, Color.BLACK);
+        topBar.setTranslateY(-100); // Start außerhalb des Bildschirms
+        bottomBar.setTranslateY(getRoot().getHeight() + 100); // Start außerhalb des Bildschirms
+
+        startAnimation(topBar, bottomBar);
+    }
+
+    private void startAnimation(Rectangle rTop, Rectangle rBot) {
+        getRoot().getChildren().removeAll();
+        getRoot().getChildren().addAll(rTop, getComputerHand(), getTableBox(), getPlayerBox(), rBot);
+
+        getRoot().setStyle("-fx-background-color: white;");
+
+        TranslateTransition topBarAnimation = new TranslateTransition(Duration.seconds(1), rTop);
+        topBarAnimation.setToY(0); // Bewege den oberen Balken in den sichtbaren Bereich
+
+        TranslateTransition bottomBarAnimation = new TranslateTransition(Duration.seconds(1), rBot);
+        bottomBarAnimation.setToY(getRoot().getHeight()); // Bewege den unteren Balken in den sichtbaren Bereich
+
+        // Animation für die Hände
+        TranslateTransition playerHandAnimation = new TranslateTransition(Duration.seconds(1), getPlayerHand());
+        playerHandAnimation.setToX(50); // Bewege in die linke Ecke
+
+        TranslateTransition computerHandAnimation = new TranslateTransition(Duration.seconds(1), getComputerHand());
+        computerHandAnimation.setToX(getRoot().getWidth()); // Bewege in die rechte Ecke
+
+        // Starte die Animationen
+        topBarAnimation.play();
+        bottomBarAnimation.play();
+        playerHandAnimation.play();
+        computerHandAnimation.play();
+    }
+
 
     public String getPlayerChoice() {
         return playerChoice;
