@@ -10,9 +10,9 @@ public class App extends Application
     Controller controller = new Controller();
 
     @Override
-    public void start(Stage stage) throws FileNotFoundException
+    public void start(Stage stage)
     {
-        controller.start(stage, controller);
+        controller.start(stage);
     }
 
     public static void main(String[] args)
