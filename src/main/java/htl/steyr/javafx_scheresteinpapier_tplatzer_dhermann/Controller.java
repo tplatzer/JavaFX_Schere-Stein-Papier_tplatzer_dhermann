@@ -19,6 +19,7 @@ import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
+import javafx.stage.Modality;
 import javafx.stage.Stage;
 import javafx.util.Duration;
 
@@ -119,6 +120,11 @@ public class Controller {
                 .addAll(getProgressBox(), getEnemyBox(), getTableBox(), getPlayerBox(), getWinsCounterBox());
         getRoot().getStylesheets().add("file:resources/style.css");
 
+        /*
+        StackPane stackPane = new StackPane();
+        stackPane.getChildren().addAll(getRoot()); // Das Hauptlayout wird in den StackPane gelegt
+        getStage().setScene(new Scene(stackPane));
+        */
         Scene scene = new Scene(getRoot());
         scene.getStylesheets().add("file:resources/style.css");
         getStage().setScene(scene);
@@ -140,22 +146,33 @@ public class Controller {
 
     }
 
+    /* private void showGameEndScreen() {
+         initializeGameEndBox();
+         getWinsCounterBox().setVisible(true);
+
+         Platform.runLater(() -> {
+             TranslateTransition endBoxAnimaiton = new TranslateTransition(Duration.seconds(1), getGameEndBox());
+             endBoxAnimaiton.setToY((-1) * (getRoot().getHeight() / 2));
+             getRoot().getChildren().add(getGameEndBox());
+             endBoxAnimaiton.play();
+
+             endBoxAnimaiton.setOnFinished(event -> {
+                 rTop.setTranslateY(topBarAnimation.getToY());
+                 rBot.setTranslateY(bottomBarAnimation.getToY());
+             });
+         });
+     }*/
     private void showGameEndScreen() {
         initializeGameEndBox();
-        getWinsCounterBox().setVisible(true);
 
-        Platform.runLater(() -> {
-            TranslateTransition endBoxAnimaiton = new TranslateTransition(Duration.seconds(1), getGameEndBox());
-            endBoxAnimaiton.setToY((-1) * (getRoot().getHeight() / 2));
-            getRoot().getChildren().add(getGameEndBox());
-            endBoxAnimaiton.play();
-
-            endBoxAnimaiton.setOnFinished(event -> {
-                rTop.setTranslateY(topBarAnimation.getToY());
-                rBot.setTranslateY(bottomBarAnimation.getToY());
-            });
-        });
+        // Als Popup anzeigen
+        Stage popupStage = new Stage();
+        popupStage.initOwner(getStage());
+        popupStage.initModality(Modality.WINDOW_MODAL);
+        popupStage.setScene(new Scene(getGameEndBox()));
+        popupStage.show();
     }
+
 
     private void restartGame() {
         setDefaultValues();
@@ -512,20 +529,29 @@ public class Controller {
 
             getRoot().setStyle("-fx-background-color: white;");
 
-            topBarAnimation = new TranslateTransition(Duration.seconds(1), rTop);
-            topBarAnimation.setToY(0);
+            if (getRoot().getHeight() < 900) {
+                topBarAnimation = new TranslateTransition(Duration.seconds(1), rTop);
+                topBarAnimation.setToY(0);
 
-            bottomBarAnimation = new TranslateTransition(Duration.seconds(1), rBot);
-            bottomBarAnimation.setToY(0);
+                bottomBarAnimation = new TranslateTransition(Duration.seconds(1), rBot);
+                bottomBarAnimation.setToY(0);
+            } else {
+                topBarAnimation = new TranslateTransition(Duration.seconds(1), rTop);
+                topBarAnimation.setToY((-1) * (getRoot().getHeight() / 50));
+
+                bottomBarAnimation = new TranslateTransition(Duration.seconds(1), rBot);
+                bottomBarAnimation.setToY((getRoot().getHeight() / 50));
+            }
+
 
             TranslateTransition playerHandTranslateAnimation = new TranslateTransition(Duration.seconds(1),
                     getPlayerHand());
             playerHandTranslateAnimation.setToX((-1) * (getRoot().getWidth() / 2.5));
-            playerHandTranslateAnimation.setToY(-400);
+            playerHandTranslateAnimation.setToY((-1) * (getRoot().getHeight() / 2.2));
 
             TranslateTransition computerHandAnimation = new TranslateTransition(Duration.seconds(1), getComputerHand());
             computerHandAnimation.setToX((getRoot().getWidth() / 2.5));
-            computerHandAnimation.setToY(80);
+            computerHandAnimation.setToY((getRoot().getHeight() / 13.5));
 
             TranslateTransition progressIndicatorAnimation = new TranslateTransition(Duration.seconds(1),
                     getEnemieProgressIndicator());
