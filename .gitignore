@@ -116,4 +116,5 @@ fabric.properties
 .idea/**/azureSettings.xml
 
 # End of https://www.toptal.com/developers/gitignore/api/intellij
-./target/
+target/generated-sources
+target/classes
