@@ -159,6 +159,7 @@ public class Controller
             if (node == getPlayerHand()) continue;
             node.setVisible(true);
         }
+        getPlayerHand().setVisible(false);
 
         getWinsCounterBox().setVisible(false);
 
@@ -493,6 +494,7 @@ public class Controller
                 if (node == getPlayerHand()) continue;
                 node.setVisible(false);
             }
+            getPlayerHand().setVisible(true);
         });
     }
 
