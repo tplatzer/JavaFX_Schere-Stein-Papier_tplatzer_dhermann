@@ -362,10 +362,6 @@ public class Controller
         return box;
     }
 
-    /**
-     *     private Pane playerWinsPane;
-     *     private Pane aiWinsPane;
-     */
     private void initializeUserElements()
     {
         getPlayStonesIDs().put(0, Rock.getId());
@@ -452,7 +448,6 @@ public class Controller
             imageBox.getChildren().add(imageView);
         }
     }
-
 
     private void initializePlayerBox(int spacing)
     {
