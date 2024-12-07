@@ -33,8 +33,8 @@ public class Controller
      * Scissors
      * Well
      */
-    private static final int maxHboxWidth = 1000;
-    private static final int maxHboxHeight = 700;
+    private static final int maxHBoxWidth = 1000;
+    private static final int maxHBoxHeight = 700;
     private final HashMap<Integer, String> playStonesIDs = new HashMap<>();
     private final VBox root = new VBox();
     private final HBox gameEndBox = new HBox();
@@ -64,16 +64,6 @@ public class Controller
     private ImageView playerHand;
     private HBox playerWinsCounterBox;
     private HBox aiWinsCounterBox;
-
-    public static int getMaxHboxWidth()
-    {
-        return maxHboxWidth;
-    }
-
-    public static int getMaxHboxHeight()
-    {
-        return maxHboxHeight;
-    }
 
     public void start(Stage stage)
     {
@@ -110,8 +100,8 @@ public class Controller
     {
         getRoot().setSpacing(10);
         getRoot().setAlignment(Pos.CENTER); // Zentriere alle Kinder
-        getRoot().setMinSize(Controller.getMaxHboxWidth(), Controller.getMaxHboxHeight());
-        getRoot().setMaxSize(Controller.getMaxHboxWidth(), Controller.getMaxHboxHeight());
+        getRoot().setMinSize(Controller.getMaxHBoxWidth(), Controller.getMaxHBoxHeight());
+        getRoot().setMaxSize(Controller.getMaxHBoxWidth(), Controller.getMaxHBoxHeight());
         getRoot().prefWidthProperty().bind(getStage().widthProperty());
         getRoot().prefHeightProperty().bind(getStage().heightProperty()); // Binde Höhe an die Stage
         getRoot().getChildren()
@@ -128,7 +118,6 @@ public class Controller
 
     private void showGameEndScreen()
     {
-
         // Als Popup anzeigen
         setGameEndedPopupStage(initializeGameEndedPopup());
 
@@ -433,7 +422,7 @@ public class Controller
     private Button initializeButton(String id)
     {
         Button button = new Button();
-        button.setPrefHeight(getMaxHboxHeight());
+        button.setPrefHeight(getMaxHBoxHeight());
         button.setId(id);
         button.setOnAction(event -> new Thread(() ->
         {
@@ -696,6 +685,16 @@ public class Controller
     public HashMap<Integer, String> getPlayStonesIDs()
     {
         return playStonesIDs;
+    }
+
+    public static int getMaxHBoxWidth()
+    {
+        return maxHBoxWidth;
+    }
+
+    public static int getMaxHBoxHeight()
+    {
+        return maxHBoxHeight;
     }
 
     public HBox getProgressBox()
