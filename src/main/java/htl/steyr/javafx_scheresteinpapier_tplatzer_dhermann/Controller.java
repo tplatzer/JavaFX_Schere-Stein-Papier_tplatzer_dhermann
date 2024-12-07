@@ -53,6 +53,7 @@ public class Controller
     private Rectangle rBot = new Rectangle(100, 100, Color.BLACK);
     private TranslateTransition bottomBarAnimation;
     private Stage stage;
+    private Stage gameEndedPopupStage;
     private Button rockButton;
     private Button paperButton;
     private Button scissorsButton;
@@ -127,19 +128,28 @@ public class Controller
 
     private void showGameEndScreen()
     {
-        initializeGameEndBox();
 
         // Als Popup anzeigen
-        Stage popupStage = new Stage();
-        popupStage.initOwner(getStage());
-        popupStage.initModality(Modality.WINDOW_MODAL);
-        popupStage.setScene(new Scene(getGameEndBox()));
-        popupStage.show();
+        setGameEndedPopupStage(initializeGameEndedPopup());
+
+        getGameEndedPopupStage().show();
     }
 
+    private Stage initializeGameEndedPopup()
+    {
+        initializeGameEndBox();
+
+        Stage stage = new Stage();
+        stage.initOwner(getStage());
+        stage.initModality(Modality.WINDOW_MODAL);
+        stage.setScene(new Scene(getGameEndBox()));
+        return stage;
+    }
 
     private void restartGame()
     {
+        getGameEndedPopupStage().close();
+
         setDefaultValues();
 
         for (Node node : getPlayerBox().getChildren())
@@ -798,4 +808,13 @@ public class Controller
         return winsCounterBox;
     }
 
+    public Stage getGameEndedPopupStage()
+    {
+        return gameEndedPopupStage;
+    }
+
+    public void setGameEndedPopupStage(Stage gameEndedPopupStage)
+    {
+        this.gameEndedPopupStage = gameEndedPopupStage;
+    }
 }
