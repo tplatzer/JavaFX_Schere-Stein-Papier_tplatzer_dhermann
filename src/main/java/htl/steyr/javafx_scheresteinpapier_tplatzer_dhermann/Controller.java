@@ -143,7 +143,6 @@ public class Controller
 
         for (Node node : getPlayerBox().getChildren())
         {
-            if (node == getPlayerHand()) continue;
             node.setVisible(true);
         }
         getPlayerHand().setVisible(false);
