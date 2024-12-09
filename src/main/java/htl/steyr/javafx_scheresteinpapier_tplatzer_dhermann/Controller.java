@@ -1,5 +1,8 @@
 package htl.steyr.javafx_scheresteinpapier_tplatzer_dhermann;
 
+import javafx.animation.ParallelTransition;
+import javafx.animation.ScaleTransition;
+import javafx.animation.TranslateTransition;
 import javafx.application.Platform;
 import javafx.event.ActionEvent;
 import javafx.geometry.Pos;
@@ -8,14 +11,16 @@ import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.ProgressIndicator;
-import javafx.scene.layout.HBox;
-import javafx.scene.layout.Pane;
-import javafx.scene.layout.Priority;
-import javafx.scene.layout.VBox;
-import javafx.stage.Stage;
-
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
+import javafx.scene.layout.HBox;
+import javafx.scene.layout.Priority;
+import javafx.scene.layout.VBox;
+import javafx.scene.paint.Color;
+import javafx.scene.shape.Rectangle;
+import javafx.stage.Modality;
+import javafx.stage.Stage;
+import javafx.util.Duration;
 
 import java.util.HashMap;
 import java.util.Random;
@@ -28,23 +33,27 @@ public class Controller
      * Scissors
      * Well
      */
-    private static final int maxButtonWidth = 100;
-    private static final int maxButtonHeight = 100;
-    private static final int maxHboxWidth = 1000;
-    private static final int maxHboxHeight = 700;
-    private static final int maxProgressIndicatorWidth = 200;
-    private static final int maxProgressIndicatorHeight = 100;
-
+    private static final int maxHBoxWidth = 1000;
+    private static final int maxHBoxHeight = 700;
+    private final HashMap<Integer, String> playStonesIDs = new HashMap<>();
+    private final VBox root = new VBox();
+    private final HBox gameEndBox = new HBox();
+    private final VBox winsCounterBox = new VBox();
+    private final HBox progressBox = new HBox();
+    private final HBox enemyBox = new HBox();
+    private final HBox tableBox = new HBox();
+    private final HBox playerBox = new HBox();
     private String playerChoice = null;
     private String aiChoice = null;
     private String winner = null;
     private int playerWins = 0;
     private int aiWins = 0;
-    private HashMap<Integer, String> playStonesIDs = new HashMap<>();
-    private Controller controller;
-    private VBox root = new VBox();
-    private HBox gameEndBox = new HBox();
+    private Rectangle rTop = new Rectangle(100, 100, Color.BLACK);
+    private TranslateTransition topBarAnimation;
+    private Rectangle rBot = new Rectangle(100, 100, Color.BLACK);
+    private TranslateTransition bottomBarAnimation;
     private Stage stage;
+    private Stage gameEndedPopupStage;
     private Button rockButton;
     private Button paperButton;
     private Button scissorsButton;
@@ -53,20 +62,13 @@ public class Controller
     private ImageView table;
     private ImageView computerHand;
     private ImageView playerHand;
-    private VBox winsCounterBox = new VBox();
     private HBox playerWinsCounterBox;
     private HBox aiWinsCounterBox;
 
-    private HBox progressBox = new HBox();
-    private HBox enemyBox = new HBox();
-    private HBox tableBox = new HBox();
-    private HBox playerBox = new HBox();
-
-    public void start(Stage stage, Controller controller)
+    public void start(Stage stage)
     {
         setDefaultValues();
         setStage(stage);
-        setController(controller);
         initializeUserElements();
 
         showWindow();
@@ -98,11 +100,12 @@ public class Controller
     {
         getRoot().setSpacing(10);
         getRoot().setAlignment(Pos.CENTER); // Zentriere alle Kinder
-        getRoot().setMinSize(Controller.getMaxHboxWidth(), Controller.getMaxHboxHeight());
-        getRoot().setMaxSize(Controller.getMaxHboxWidth(), Controller.getMaxHboxHeight());
+        getRoot().setMinSize(Controller.getMaxHBoxWidth(), Controller.getMaxHBoxHeight());
+        getRoot().setMaxSize(Controller.getMaxHBoxWidth(), Controller.getMaxHBoxHeight());
         getRoot().prefWidthProperty().bind(getStage().widthProperty());
         getRoot().prefHeightProperty().bind(getStage().heightProperty()); // Binde Höhe an die Stage
-        getRoot().getChildren().addAll(getProgressBox(), getEnemyBox(), getTableBox(), getPlayerBox(), getWinsCounterBox());
+        getRoot().getChildren()
+                .addAll(getProgressBox(), getEnemyBox(), getTableBox(), getPlayerBox(), getWinsCounterBox());
         getRoot().getStylesheets().add("file:resources/style.css");
 
         Scene scene = new Scene(getRoot());
@@ -115,19 +118,31 @@ public class Controller
 
     private void showGameEndScreen()
     {
-        initializeGameEndBox();
-        getWinsCounterBox().setVisible(true);
+        // Als Popup anzeigen
+        setGameEndedPopupStage(initializeGameEndedPopup());
 
-        Platform.runLater(() -> getRoot().getChildren().add(getGameEndBox()));
+        getGameEndedPopupStage().show();
+    }
+
+    private Stage initializeGameEndedPopup()
+    {
+        initializeGameEndBox();
+
+        Stage stage = new Stage();
+        stage.initOwner(getStage());
+        stage.initModality(Modality.WINDOW_MODAL);
+        stage.setScene(new Scene(getGameEndBox()));
+        return stage;
     }
 
     private void restartGame()
     {
+        getGameEndedPopupStage().close();
+
         setDefaultValues();
 
         for (Node node : getPlayerBox().getChildren())
         {
-            if (node == getPlayerHand()) continue;
             node.setVisible(true);
         }
         getPlayerHand().setVisible(false);
@@ -161,6 +176,9 @@ public class Controller
         Thread removeplayerBoxThread = new Thread(this::removePlayerBoxes);
         removeplayerBoxThread.setDaemon(true);
         removeplayerBoxThread.start();
+
+        prepareAnimation();
+        System.out.println("Animation done");
 
         play();
     }
@@ -373,17 +391,17 @@ public class Controller
         setPlayerWinsCounterBox(initializeWinsCounterPane(Pos.TOP_RIGHT, "Player"));
         setAiWinsCounterBox(initializeWinsCounterPane(Pos.TOP_LEFT, "AI"));
 
-        setRockButton(initializeButton(getPlayStonesIDs().getOrDefault(0, null), new Image("file:resources/img/stone.png")));
-        setPaperButton(initializeButton(getPlayStonesIDs().getOrDefault(1, null), new Image("file:resources/img/paper.png")));
-        setScissorsButton(initializeButton(getPlayStonesIDs().getOrDefault(2, null), new Image("file:resources/img/scissors.png")));
-        setWellButton(initializeButton(getPlayStonesIDs().getOrDefault(3, null), new Image("file:resources/img/player_well.png")));
+        setRockButton(initializeButton(getPlayStonesIDs().getOrDefault(0, null)));
+        setPaperButton(initializeButton(getPlayStonesIDs().getOrDefault(1, null)));
+        setScissorsButton(initializeButton(getPlayStonesIDs().getOrDefault(2, null)));
+        setWellButton(initializeButton(getPlayStonesIDs().getOrDefault(3, null)));
         setEnemieProgressIndicator(initializeProgressIndicator());
 
-        initializePlayerBox(10);
+        initializePlayerBox();
         addProgressIndicatorToBox(getProgressBox(), getEnemieProgressIndicator());
 
-        setComputerHand(initializeImageView(true, new Image("file:resources/masterHand_default.png"), .1, .2));
-        setTable(initializeImageView(true, new Image("file:resources/table.png"), 1, .3));
+        setComputerHand(initializeImageView(true, new Image("file:resources/masterHand_default.png"), .2, .3));
+        setTable(initializeImageView(true, new Image("file:resources/table.png"), 1, .2));
         setPlayerHand(initializeImageView(false, new Image("file:resources/player_default.png"), .1, .2));
 
         getPlayerBox().getStyleClass().add("hbox");
@@ -393,33 +411,28 @@ public class Controller
 
         addImageViewsToBoxes(getEnemyBox(), getComputerHand());
         addImageViewsToBoxes(getTableBox(), getTable());
-        addImageViewsToBoxes(getPlayerBox(), getPlayerHand());
+        getPlayerBox().getChildren().removeAll();
+        getPlayerBox().getChildren()
+                .addAll(getRockButton(), getPaperButton(), getPlayerHand(), getScissorsButton(), getWellButton());
+        getPlayerHand().prefHeight(getRockButton().heightProperty().getValue());
+        getPlayerHand().prefWidth(getRockButton().widthProperty().getValue());
     }
 
-    private Button initializeButton(String id, Image image)
+    private Button initializeButton(String id)
     {
         Button button = new Button();
-        button.setMinSize(getMaxButtonWidth(), getMaxButtonHeight());
-        button.setMaxSize(getMaxButtonWidth(), getMaxButtonHeight());
+        button.setPrefHeight(getMaxHBoxHeight());
         button.setId(id);
-//        button.setText(id);
-        ImageView iv = new ImageView(image);
-        iv.fitWidthProperty().bind(button.widthProperty());
-        iv.fitHeightProperty().bind(button.heightProperty());
-        button.setGraphic(iv);
-        button.setOnAction(event ->
+        button.setOnAction(event -> new Thread(() ->
         {
-            new Thread(() ->
+            try
             {
-                try
-                {
-                    handleButtonClick(event);
-                } catch (InterruptedException e)
-                {
-                    e.printStackTrace();
-                }
-            }).start();
-        });
+                handleButtonClick(event);
+            } catch (InterruptedException e)
+            {
+                System.out.println(e.getMessage());
+            }
+        }).start());
         return button;
     }
 
@@ -434,54 +447,29 @@ public class Controller
         return imageView;
     }
 
-    private void initializeImageBox(HBox imageBox, ImageView imageView)
+    private void initializePlayerBox()
     {
-        imageBox.setAlignment(Pos.CENTER); // Inhalte zentrieren
-        imageBox.prefWidthProperty().bind(getStage().widthProperty());
-        imageBox.prefHeightProperty().bind(getStage().heightProperty().multiply(0.3)); // Höhe dynamisch anpassen
-
-        imageView.setPreserveRatio(true); // Bildverhältnis beibehalten
-        imageView.fitWidthProperty().bind(imageBox.widthProperty().multiply(0.8));
-        imageView.fitHeightProperty().bind(imageBox.heightProperty().multiply(0.8));
-
-        if (!imageBox.getChildren().contains(imageView))
-        {
-            imageBox.getChildren().add(imageView);
-        }
-    }
-
-    private void initializePlayerBox(int spacing)
-    {
-        getPlayerBox().setSpacing(spacing);
-        getPlayerBox().setAlignment(Pos.CENTER); // Inhalte zentrieren
         getPlayerBox().setFillHeight(false); // Inhalte nicht in die Höhe ziehen
-        getPlayerBox().prefWidthProperty().bind(getStage().widthProperty()); // Breite der HBox anpassen
+        getPlayerBox().prefWidthProperty().bind(getStage().widthProperty()); // Breite der HBox an Fensterbreite binden
+        getPlayerBox().setAlignment(Pos.CENTER); // Buttons in der Mitte zentrieren
+        getPlayerBox().setSpacing(20); // Abstand zwischen Buttons
 
-        // Buttons flexibel machen
-        HBox.setHgrow(getRockButton(), Priority.ALWAYS);
-        HBox.setHgrow(getPaperButton(), Priority.ALWAYS);
-        HBox.setHgrow(getScissorsButton(), Priority.ALWAYS);
-        HBox.setHgrow(getWellButton(), Priority.ALWAYS);
-
-        // Buttons maximale Flexibilität geben
-        getRockButton().setMaxWidth(Double.MAX_VALUE);
-        getPaperButton().setMaxWidth(Double.MAX_VALUE);
-        getScissorsButton().setMaxWidth(Double.MAX_VALUE);
-        getWellButton().setMaxWidth(Double.MAX_VALUE);
-
-        // **Hinzufügen: Höhe und Zentrierung sicherstellen**
-        getPlayerBox().prefHeightProperty().bind(getStage().heightProperty().multiply(0.1));
-        getPlayerBox().setAlignment(Pos.CENTER);
-
-        // Buttons zur HBox hinzufügen
-        getPlayerBox().getChildren().addAll(getRockButton(), getPaperButton(), getScissorsButton(), getWellButton());
+        // Button-Einstellungen
+        Button[] buttons = {getRockButton(), getPaperButton(), getScissorsButton(), getWellButton()};
+        for (Button button : buttons)
+        {
+            HBox.setHgrow(button, Priority.ALWAYS); // Button in HBox wachsen lassen
+            button.prefWidthProperty()
+                    .bind(getPlayerBox().widthProperty().divide(4).subtract(20)); // gleichmäßige Breite
+            button.prefHeightProperty().bind(getPlayerBox().heightProperty().multiply(0.8)); // Höhe relativ zur HBox
+        }
     }
 
     private ProgressIndicator initializeProgressIndicator()
     {
         ProgressIndicator progressIndicator = new ProgressIndicator();
         progressIndicator.setId("enemie_progress_indicator");
-        progressIndicator.setMinSize(getMaxButtonWidth(), getMaxButtonHeight());
+        progressIndicator.setMinSize(100, 50);
         progressIndicator.setVisible(false);
 
         return progressIndicator;
@@ -496,6 +484,8 @@ public class Controller
                 if (node == getPlayerHand()) continue;
                 node.setVisible(false);
             }
+            getPlayerHand().prefWidth(playerHand.getFitWidth() * 2);
+            getPlayerHand().prefHeight(playerHand.getFitHeight() * 2);
             getPlayerHand().setVisible(true);
         });
     }
@@ -508,49 +498,95 @@ public class Controller
 
     private void addImageViewsToBoxes(HBox box, ImageView image)
     {
-//        initializeImageBox(box, image);
-
         box.setAlignment(Pos.CENTER); // Zentriere ImageView
         box.setSpacing(20); // Optional: Abstand für mehrere Elemente
         box.prefWidthProperty().bind(getStage().widthProperty()); // Passe Breite an Fensterbreite an
         box.getChildren().add(image);
     }
 
-
     private void addProgressIndicatorToBox(HBox box, ProgressIndicator progressIndicator)
     {
         box.getChildren().add(progressIndicator);
     }
 
-    public static int getMaxButtonWidth()
+    private void prepareAnimation()
     {
-        return maxButtonWidth;
+        // Schwarze Balken
+        rTop = new Rectangle(getRoot().getWidth(), 100, Color.BLACK);
+        rBot = new Rectangle(getRoot().getWidth(), 100, Color.BLACK);
+        rTop.setTranslateY(-100); // Start außerhalb des Bildschirms
+        rBot.setTranslateY(100); // Start außerhalb des Bildschirms
+
+        startAnimation();
     }
 
-    public static int getMaxButtonHeight()
+    private void startAnimation()
     {
-        return maxButtonHeight;
+        Platform.runLater(() ->
+        {
+            getRoot().getChildren().clear(); // use clear() instead of removeAll()
+            getRoot().getChildren().addAll(rTop, getComputerHand(), getTableBox(), getPlayerHand(), rBot);
+
+            getRoot().setStyle("-fx-background-color: white;");
+
+            if (getRoot().getHeight() < 900)
+            {
+                topBarAnimation = new TranslateTransition(Duration.seconds(1), rTop);
+                topBarAnimation.setToY(0);
+
+                bottomBarAnimation = new TranslateTransition(Duration.seconds(1), rBot);
+                bottomBarAnimation.setToY(0);
+            } else
+            {
+                topBarAnimation = new TranslateTransition(Duration.seconds(1), rTop);
+                topBarAnimation.setToY((-1) * (getRoot().getHeight() / 50));
+
+                bottomBarAnimation = new TranslateTransition(Duration.seconds(1), rBot);
+                bottomBarAnimation.setToY((getRoot().getHeight() / 50));
+            }
+
+
+            TranslateTransition playerHandTranslateAnimation = new TranslateTransition(Duration.seconds(1),
+                    getPlayerHand());
+            playerHandTranslateAnimation.setToX((-1) * (getRoot().getWidth() / 2.5));
+            playerHandTranslateAnimation.setToY((-1) * (getRoot().getHeight() / 2.2));
+
+            ParallelTransition parallelTransition = getParallelTransition(playerHandTranslateAnimation);
+            parallelTransition.play();
+        });
     }
 
-    public static int getMaxHboxWidth()
+    private ParallelTransition getParallelTransition(TranslateTransition playerHandTranslateAnimation)
     {
-        return maxHboxWidth;
+        TranslateTransition computerHandAnimation = new TranslateTransition(Duration.seconds(1), getComputerHand());
+        computerHandAnimation.setToX((getRoot().getWidth() / 2.5));
+        computerHandAnimation.setToY((getRoot().getHeight() / 13.5));
+
+        TranslateTransition progressIndicatorAnimation = new TranslateTransition(Duration.seconds(1),
+                getEnemieProgressIndicator());
+        progressIndicatorAnimation.setToX((getRoot().getWidth() / 2.5));
+
+
+        ScaleTransition playerHandScaleAnimation = new ScaleTransition(Duration.seconds(1), getPlayerHand());
+        playerHandScaleAnimation.setFromX(1.0);
+        playerHandScaleAnimation.setToX(2);
+        playerHandScaleAnimation.setFromY(1);
+        playerHandScaleAnimation.setFromY(2);
+
+        ScaleTransition tableAnimation = new ScaleTransition(Duration.seconds(1), getTable());
+        tableAnimation.setFromX(1.0);
+        tableAnimation.setToX(.6);
+        tableAnimation.setFromY(1);
+        tableAnimation.setFromY(1.5);
+
+        return new ParallelTransition(topBarAnimation,
+                bottomBarAnimation,
+                playerHandTranslateAnimation,
+                playerHandScaleAnimation,
+                computerHandAnimation,
+                tableAnimation);
     }
 
-    public static int getMaxHboxHeight()
-    {
-        return maxHboxHeight;
-    }
-
-    public static int getMaxProgressIndicatorWidth()
-    {
-        return maxProgressIndicatorWidth;
-    }
-
-    public static int getMaxProgressIndicatorHeight()
-    {
-        return maxProgressIndicatorHeight;
-    }
 
     public String getPlayerChoice()
     {
@@ -617,11 +653,6 @@ public class Controller
         return this.root;
     }
 
-    public void setRoot(VBox root)
-    {
-        this.root = root;
-    }
-
     public Stage getStage()
     {
         return this.stage;
@@ -630,16 +661,6 @@ public class Controller
     public void setStage(Stage stage)
     {
         this.stage = stage;
-    }
-
-    public Controller getController()
-    {
-        return controller;
-    }
-
-    public void setController(Controller controller)
-    {
-        this.controller = controller;
     }
 
     public String getAiChoice()
@@ -665,9 +686,14 @@ public class Controller
         return playStonesIDs;
     }
 
-    public void setPlayStonesIDs(HashMap<Integer, String> playStonesIDs)
+    public static int getMaxHBoxWidth()
     {
-        this.playStonesIDs = playStonesIDs;
+        return maxHBoxWidth;
+    }
+
+    public static int getMaxHBoxHeight()
+    {
+        return maxHBoxHeight;
     }
 
     public HBox getProgressBox()
@@ -675,19 +701,9 @@ public class Controller
         return progressBox;
     }
 
-    public void setProgressBox(HBox progressBox)
-    {
-        this.progressBox = progressBox;
-    }
-
     public HBox getEnemyBox()
     {
         return enemyBox;
-    }
-
-    public void setEnemyBox(HBox enemyBox)
-    {
-        this.enemyBox = enemyBox;
     }
 
     public HBox getTableBox()
@@ -695,19 +711,9 @@ public class Controller
         return tableBox;
     }
 
-    public void setTableBox(HBox tableBox)
-    {
-        this.tableBox = tableBox;
-    }
-
     public HBox getPlayerBox()
     {
         return playerBox;
-    }
-
-    public void setPlayerBox(HBox playerBox)
-    {
-        this.playerBox = playerBox;
     }
 
     public ImageView getComputerHand()
@@ -723,11 +729,6 @@ public class Controller
     public HBox getGameEndBox()
     {
         return gameEndBox;
-    }
-
-    public void setGameEndBox(HBox gameEndBox)
-    {
-        this.gameEndBox = gameEndBox;
     }
 
     public String getWinner()
@@ -805,8 +806,13 @@ public class Controller
         return winsCounterBox;
     }
 
-    public void setWinsCounterBox(VBox winsCounterBox)
+    public Stage getGameEndedPopupStage()
     {
-        this.winsCounterBox = winsCounterBox;
+        return gameEndedPopupStage;
+    }
+
+    public void setGameEndedPopupStage(Stage gameEndedPopupStage)
+    {
+        this.gameEndedPopupStage = gameEndedPopupStage;
     }
 }
