@@ -143,6 +143,7 @@ public class Controller {
         getComputerHand().setImage(new Image("file:resources/masterHand_default.png"));
 
         getEnemieProgressIndicator().setVisible(false);
+        resetAnimation();
     }
 
     private void handleButtonClick(ActionEvent event) throws InterruptedException {
@@ -485,6 +486,65 @@ public class Controller {
         });
     }
 
+    private void resetAnimation() {
+        Platform.runLater(() -> {
+            // Animiert die Balken zurück außerhalb des Bildschirms
+            TranslateTransition resetTopBarAnimation = new TranslateTransition(Duration.seconds(1), rTop);
+            resetTopBarAnimation.setToY(-100);
+
+            TranslateTransition resetBottomBarAnimation = new TranslateTransition(Duration.seconds(1), rBot);
+            resetBottomBarAnimation.setToY(100);
+
+            // Spielerhand zurück zur Mitte
+            TranslateTransition resetPlayerHandAnimation = new TranslateTransition(Duration.seconds(1),
+                    getPlayerHand());
+            resetPlayerHandAnimation.setToX(0);
+            resetPlayerHandAnimation.setToY(0);
+
+            // Skalierung der Spielerhand zurück auf Standard
+            ScaleTransition resetPlayerHandScaleAnimation = new ScaleTransition(Duration.seconds(1), getPlayerHand());
+            resetPlayerHandScaleAnimation.setToX(1.0);
+            resetPlayerHandScaleAnimation.setToY(1.0);
+
+            // Gegnerhand zurück zur Mitte
+            TranslateTransition resetComputerHandAnimation = new TranslateTransition(Duration.seconds(1),
+                    getComputerHand());
+            resetComputerHandAnimation.setToX(0);
+            resetComputerHandAnimation.setToY(0);
+
+            // Tisch zurück auf Standardgröße
+            ScaleTransition resetTableAnimation = new ScaleTransition(Duration.seconds(1), getTable());
+            resetTableAnimation.setToX(1.0);
+            resetTableAnimation.setToY(1.0);
+
+            // Fortschrittsanzeige zurück zur Mitte und unsichtbar
+            TranslateTransition resetProgressIndicatorAnimation = new TranslateTransition(Duration.seconds(1),
+                    getEnemieProgressIndicator());
+            resetProgressIndicatorAnimation.setToX(0);
+            resetProgressIndicatorAnimation.setToY(0);
+
+            // ParallelTransition erstellt eine Animation, die alle Rücksetz-Animationen zusammenführt
+            ParallelTransition resetParallelTransition = new ParallelTransition(resetTopBarAnimation,
+                    resetBottomBarAnimation,
+                    resetPlayerHandAnimation,
+                    resetPlayerHandScaleAnimation,
+                    resetComputerHandAnimation,
+                    resetTableAnimation,
+                    resetProgressIndicatorAnimation);
+
+            // Spielt die Animation ab
+            resetParallelTransition.play();
+
+            // Nach der Animation die Root-Elemente auf Standard zurücksetzen
+            resetParallelTransition.setOnFinished(event -> {
+                getRoot().getChildren().clear();
+                getRoot().getChildren()
+                        .addAll(getProgressBox(), getEnemyBox(), getTableBox(), getPlayerBox(), getWinsCounterBox());
+                getRoot().setStyle("-fx-background-color: transparent;");
+            });
+        });
+    }
+
     private ParallelTransition getParallelTransition(TranslateTransition playerHandTranslateAnimation) {
         TranslateTransition computerHandAnimation = new TranslateTransition(Duration.seconds(1), getComputerHand());
         computerHandAnimation.setToX((getRoot().getWidth() / 2.5));
@@ -492,7 +552,9 @@ public class Controller {
 
         TranslateTransition progressIndicatorAnimation = new TranslateTransition(Duration.seconds(1),
                 getEnemieProgressIndicator());
-        progressIndicatorAnimation.setToX((getRoot().getWidth() / 2.5));
+        computerHandAnimation.setToX((getRoot().getWidth() / 2.5));
+        computerHandAnimation.setToY((getRoot().getHeight() / 13.5));
+//        progressIndicatorAnimation.setToY((-1)*(getRoot().getWidth() / 2.5));
 
 
         ScaleTransition playerHandScaleAnimation = new ScaleTransition(Duration.seconds(1), getPlayerHand());
@@ -512,7 +574,8 @@ public class Controller {
                 playerHandTranslateAnimation,
                 playerHandScaleAnimation,
                 computerHandAnimation,
-                tableAnimation);
+                tableAnimation,
+                progressIndicatorAnimation);
     }
 
 
