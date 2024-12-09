@@ -25,7 +25,8 @@ import javafx.util.Duration;
 import java.util.HashMap;
 import java.util.Random;
 
-public class Controller {
+public class Controller
+{
     /**
      * Rock
      * Paper
@@ -52,6 +53,8 @@ public class Controller {
     private Rectangle rBot = new Rectangle(100, 100, Color.BLACK);
     private TranslateTransition bottomBarAnimation;
     private Stage stage;
+    private Stage gameEndedPopupStage;
+    private boolean initializedGameEndedPopupStage;
     private Button rockButton;
     private Button paperButton;
     private Button scissorsButton;
@@ -102,8 +105,7 @@ public class Controller {
         getRoot().setMaxSize(Controller.getMaxHBoxWidth(), Controller.getMaxHBoxHeight());
         getRoot().prefWidthProperty().bind(getStage().widthProperty());
         getRoot().prefHeightProperty().bind(getStage().heightProperty()); // Binde Höhe an die Stage
-        getRoot().getChildren()
-                .addAll(getProgressBox(), getEnemyBox(), getTableBox(), getPlayerBox(), getWinsCounterBox());
+        getRoot().getChildren().addAll(getProgressBox(), getEnemyBox(), getTableBox(), getPlayerBox(), getWinsCounterBox());
         getRoot().getStylesheets().add("file:resources/style.css");
 
         Scene scene = new Scene(getRoot());
@@ -116,8 +118,10 @@ public class Controller {
 
     private void showGameEndScreen()
     {
-        // Als Popup anzeigen
-        setGameEndedPopupStage(initializeGameEndedPopup());
+        if (!isInitializedGameEndedPopupStage())
+        {
+            setGameEndedPopupStage(initializeGameEndedPopup());
+        }
 
         getGameEndedPopupStage().show();
     }
@@ -130,6 +134,9 @@ public class Controller {
         stage.initOwner(getStage());
         stage.initModality(Modality.WINDOW_MODAL);
         stage.setScene(new Scene(getGameEndBox()));
+
+        setInitializedGameEndedPopupStage(true);
+
         return stage;
     }
 
@@ -152,6 +159,8 @@ public class Controller {
         getComputerHand().setImage(new Image("file:resources/masterHand_default.png"));
 
         getEnemieProgressIndicator().setVisible(false);
+
+        resetAnimation();
     }
 
     private void handleButtonClick(ActionEvent event) throws InterruptedException
@@ -410,8 +419,7 @@ public class Controller {
         addImageViewsToBoxes(getEnemyBox(), getComputerHand());
         addImageViewsToBoxes(getTableBox(), getTable());
         getPlayerBox().getChildren().removeAll();
-        getPlayerBox().getChildren()
-                .addAll(getRockButton(), getPaperButton(), getPlayerHand(), getScissorsButton(), getWellButton());
+        getPlayerBox().getChildren().addAll(getRockButton(), getPaperButton(), getPlayerHand(), getScissorsButton(), getWellButton());
         getPlayerHand().prefHeight(getRockButton().heightProperty().getValue());
         getPlayerHand().prefWidth(getRockButton().widthProperty().getValue());
     }
@@ -457,8 +465,7 @@ public class Controller {
         for (Button button : buttons)
         {
             HBox.setHgrow(button, Priority.ALWAYS); // Button in HBox wachsen lassen
-            button.prefWidthProperty()
-                    .bind(getPlayerBox().widthProperty().divide(4).subtract(20)); // gleichmäßige Breite
+            button.prefWidthProperty().bind(getPlayerBox().widthProperty().divide(4).subtract(20)); // gleichmäßige Breite
             button.prefHeightProperty().bind(getPlayerBox().heightProperty().multiply(0.8)); // Höhe relativ zur HBox
         }
     }
@@ -544,8 +551,7 @@ public class Controller {
             }
 
 
-            TranslateTransition playerHandTranslateAnimation = new TranslateTransition(Duration.seconds(1),
-                    getPlayerHand());
+            TranslateTransition playerHandTranslateAnimation = new TranslateTransition(Duration.seconds(1), getPlayerHand());
             playerHandTranslateAnimation.setToX((-1) * (getRoot().getWidth() / 2.5));
             playerHandTranslateAnimation.setToY((-1) * (getRoot().getHeight() / 2.2));
 
@@ -554,8 +560,39 @@ public class Controller {
         });
     }
 
-    private ParallelTransition getParallelTransition(TranslateTransition playerHandTranslateAnimation)
-    {
+    private ParallelTransition getParallelTransition(TranslateTransition playerHandTranslateAnimation) {
+        TranslateTransition computerHandAnimation = new TranslateTransition(Duration.seconds(1), getComputerHand());
+        computerHandAnimation.setToX((getRoot().getWidth() / 2.5));
+        computerHandAnimation.setToY((getRoot().getHeight() / 13.5));
+
+        TranslateTransition progressIndicatorAnimation = new TranslateTransition(Duration.seconds(1),
+                getEnemieProgressIndicator());
+        computerHandAnimation.setToX((getRoot().getWidth() / 2.5));
+        computerHandAnimation.setToY((getRoot().getHeight() / 13.5));
+//        progressIndicatorAnimation.setToY((-1)*(getRoot().getWidth() / 2.5));
+
+
+        ScaleTransition playerHandScaleAnimation = new ScaleTransition(Duration.seconds(1), getPlayerHand());
+        playerHandScaleAnimation.setFromX(1.0);
+        playerHandScaleAnimation.setToX(2);
+        playerHandScaleAnimation.setFromY(1);
+        playerHandScaleAnimation.setFromY(2);
+
+        ScaleTransition tableAnimation = new ScaleTransition(Duration.seconds(1), getTable());
+        tableAnimation.setFromX(1.0);
+        tableAnimation.setToX(.6);
+        tableAnimation.setFromY(1);
+        tableAnimation.setFromY(1.5);
+
+        return new ParallelTransition(topBarAnimation,
+                bottomBarAnimation,
+                playerHandTranslateAnimation,
+                playerHandScaleAnimation,
+                computerHandAnimation,
+                tableAnimation,
+                progressIndicatorAnimation);
+    }
+
     private void resetAnimation() {
         Platform.runLater(() -> {
             // Animiert die Balken zurück außerhalb des Bildschirms
@@ -614,40 +651,6 @@ public class Controller {
             });
         });
     }
-
-    private ParallelTransition getParallelTransition(TranslateTransition playerHandTranslateAnimation) {
-        TranslateTransition computerHandAnimation = new TranslateTransition(Duration.seconds(1), getComputerHand());
-        computerHandAnimation.setToX((getRoot().getWidth() / 2.5));
-        computerHandAnimation.setToY((getRoot().getHeight() / 13.5));
-
-        TranslateTransition progressIndicatorAnimation = new TranslateTransition(Duration.seconds(1),
-                getEnemieProgressIndicator());
-        computerHandAnimation.setToX((getRoot().getWidth() / 2.5));
-        computerHandAnimation.setToY((getRoot().getHeight() / 13.5));
-//        progressIndicatorAnimation.setToY((-1)*(getRoot().getWidth() / 2.5));
-
-
-        ScaleTransition playerHandScaleAnimation = new ScaleTransition(Duration.seconds(1), getPlayerHand());
-        playerHandScaleAnimation.setFromX(1.0);
-        playerHandScaleAnimation.setToX(2);
-        playerHandScaleAnimation.setFromY(1);
-        playerHandScaleAnimation.setFromY(2);
-
-        ScaleTransition tableAnimation = new ScaleTransition(Duration.seconds(1), getTable());
-        tableAnimation.setFromX(1.0);
-        tableAnimation.setToX(.6);
-        tableAnimation.setFromY(1);
-        tableAnimation.setFromY(1.5);
-
-        return new ParallelTransition(topBarAnimation,
-                bottomBarAnimation,
-                playerHandTranslateAnimation,
-                playerHandScaleAnimation,
-                computerHandAnimation,
-                tableAnimation,
-                progressIndicatorAnimation);
-    }
-
 
     public String getPlayerChoice()
     {
@@ -875,5 +878,15 @@ public class Controller {
     public void setGameEndedPopupStage(Stage gameEndedPopupStage)
     {
         this.gameEndedPopupStage = gameEndedPopupStage;
+    }
+
+    public boolean isInitializedGameEndedPopupStage()
+    {
+        return initializedGameEndedPopupStage;
+    }
+
+    public void setInitializedGameEndedPopupStage(boolean initializedGameEndedPopupStage)
+    {
+        this.initializedGameEndedPopupStage = initializedGameEndedPopupStage;
     }
 }
