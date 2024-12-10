@@ -54,7 +54,6 @@ public class Controller
     private TranslateTransition bottomBarAnimation;
     private Stage stage;
     private Stage gameEndedPopupStage;
-    private boolean initializedGameEndedPopupStage;
     private Button rockButton;
     private Button paperButton;
     private Button scissorsButton;
@@ -105,7 +104,7 @@ public class Controller
         getRoot().setMaxSize(Controller.getMaxHBoxWidth(), Controller.getMaxHBoxHeight());
         getRoot().prefWidthProperty().bind(getStage().widthProperty());
         getRoot().prefHeightProperty().bind(getStage().heightProperty()); // Binde Höhe an die Stage
-        getRoot().getChildren().addAll(getProgressBox(), getEnemyBox(), getTableBox(), getPlayerBox()/*, getWinsCounterBox()*/);
+        getRoot().getChildren().addAll(getProgressBox(), getEnemyBox(), getTableBox(), getPlayerBox());
         getRoot().getStylesheets().add("file:resources/style.css");
 
         Scene scene = new Scene(getRoot());
@@ -118,11 +117,6 @@ public class Controller
 
     private void showGameEndScreen()
     {
-        /*if (!isInitializedGameEndedPopupStage())
-        {
-            setGameEndedPopupStage(initializeGameEndedPopup());
-        }*/
-
         getGameEndedPopupStage().show();
     }
 
@@ -151,8 +145,6 @@ public class Controller
             node.setVisible(true);
         }
         getPlayerHand().setVisible(false);
-
-        /*getWinsCounterBox().setVisible(false);*/
 
         getRoot().getChildren().remove(getGameEndBox());
 
@@ -349,11 +341,6 @@ public class Controller
 
     private void initializeGameEndBox()
     {
-        /*if (!getGameEndBox().getChildren().isEmpty())
-        {
-            return;
-        }*/
-
         getGameEndBox().setSpacing(10);
         getGameEndBox().setStyle("-fx-background-color: rgba(0, 0, 0, 0.8); -fx-padding: 20;");
         getGameEndBox().setAlignment(Pos.CENTER);
@@ -381,10 +368,6 @@ public class Controller
         box.setStyle("-fx-background-color: rgba(0, 0, 0, 0.8); -fx-padding: 10;");
         userLabel.setStyle("--fx-font-size: 20px; -fx-text-fill: white;");
         box.getChildren().addAll(userLabel, counterLabel);
-        //box.setVisible(true);
-
-        /*getWinsCounterBox().getChildren().add(box);*/
-        //getGameEndBox().getChildren().add(box);
 
         return box;
     }
@@ -532,6 +515,8 @@ public class Controller
     {
         Platform.runLater(() ->
         {
+            getStage().setResizable(false);
+
             getRoot().getChildren().clear(); // use clear() instead of removeAll()
             getRoot().getChildren().addAll(getrTop(), getComputerHand(), getTableBox(), getPlayerHand(), getrBot());
 
@@ -623,6 +608,8 @@ public class Controller
                         .addAll(getProgressBox(), getEnemyBox(), getTableBox(), getPlayerBox());
                 getRoot().setStyle("-fx-background-color: transparent;");
             });
+
+            getStage().setResizable(true);
         });
     }
 
@@ -889,16 +876,6 @@ public class Controller
     public void setGameEndedPopupStage(Stage gameEndedPopupStage)
     {
         this.gameEndedPopupStage = gameEndedPopupStage;
-    }
-
-    public boolean isInitializedGameEndedPopupStage()
-    {
-        return initializedGameEndedPopupStage;
-    }
-
-    public void setInitializedGameEndedPopupStage(boolean initializedGameEndedPopupStage)
-    {
-        this.initializedGameEndedPopupStage = initializedGameEndedPopupStage;
     }
 
     public Rectangle getrTop()
