@@ -63,8 +63,8 @@ public class Controller
     private ImageView table;
     private ImageView computerHand;
     private ImageView playerHand;
-    private HBox playerWinsCounterBox;
-    private HBox aiWinsCounterBox;
+    private VBox playerWinsCounterBox;
+    private VBox aiWinsCounterBox;
 
     public void start(Stage stage)
     {
@@ -105,7 +105,7 @@ public class Controller
         getRoot().setMaxSize(Controller.getMaxHBoxWidth(), Controller.getMaxHBoxHeight());
         getRoot().prefWidthProperty().bind(getStage().widthProperty());
         getRoot().prefHeightProperty().bind(getStage().heightProperty()); // Binde Höhe an die Stage
-        getRoot().getChildren().addAll(getProgressBox(), getEnemyBox(), getTableBox(), getPlayerBox(), getWinsCounterBox());
+        getRoot().getChildren().addAll(getProgressBox(), getEnemyBox(), getTableBox(), getPlayerBox()/*, getWinsCounterBox()*/);
         getRoot().getStylesheets().add("file:resources/style.css");
 
         Scene scene = new Scene(getRoot());
@@ -118,10 +118,10 @@ public class Controller
 
     private void showGameEndScreen()
     {
-        if (!isInitializedGameEndedPopupStage())
+        /*if (!isInitializedGameEndedPopupStage())
         {
             setGameEndedPopupStage(initializeGameEndedPopup());
-        }
+        }*/
 
         getGameEndedPopupStage().show();
     }
@@ -135,7 +135,7 @@ public class Controller
         stage.initModality(Modality.WINDOW_MODAL);
         stage.setScene(new Scene(getGameEndBox()));
 
-        setInitializedGameEndedPopupStage(true);
+        //setInitializedGameEndedPopupStage(true);
 
         return stage;
     }
@@ -152,11 +152,11 @@ public class Controller
         }
         getPlayerHand().setVisible(false);
 
-        getWinsCounterBox().setVisible(false);
+        /*getWinsCounterBox().setVisible(false);*/
 
         getRoot().getChildren().remove(getGameEndBox());
 
-        getComputerHand().setImage(new Image("file:resources/masterHand_default.png"));
+        getComputerHand().setImage(new Image("file:resources/img/masterHand_default.png"));
 
         getEnemieProgressIndicator().setVisible(false);
 
@@ -185,7 +185,6 @@ public class Controller
         removeplayerBoxThread.start();
 
         prepareAnimation();
-        System.out.println("Animation done");
 
         play();
     }
@@ -278,11 +277,11 @@ public class Controller
     {
         switch (getPlayerChoice())
         {
-            case Rock.id -> getPlayerHand().setImage(new Image("file:resources/img/hovered/player_rock.png"));
-            case Paper.id -> getPlayerHand().setImage(new Image("file:resources/img/hovered/player_paper.png"));
-            case Scissors.id -> getPlayerHand().setImage(new Image("file:resources/img/hovered/player_scissors.png"));
-            case Well.id -> getPlayerHand().setImage(new Image("file:resources/img/hovered/player_well.png"));
-            default -> getPlayerHand().setImage(new Image("file:resources/img/hovered/player_default.png"));
+            case Rock.id -> getPlayerHand().setImage(new Image("file:resources/img/player_rock.png"));
+            case Paper.id -> getPlayerHand().setImage(new Image("file:resources/img/player_paper.png"));
+            case Scissors.id -> getPlayerHand().setImage(new Image("file:resources/img/player_scissors.png"));
+            case Well.id -> getPlayerHand().setImage(new Image("file:resources/img/player_well.png"));
+            default -> getPlayerHand().setImage(new Image("file:resources/img/player_default.png"));
         }
     }
 
@@ -290,11 +289,11 @@ public class Controller
     {
         switch (getAiChoice())
         {
-            case Rock.id -> getComputerHand().setImage(new Image("file:resources/masterHand_rock.png"));
-            case Paper.id -> getComputerHand().setImage(new Image("file:resources/masterHand_paper.png"));
-            case Scissors.id -> getComputerHand().setImage(new Image("file:resources/masterHand_scissors.png"));
-            case Well.id -> getComputerHand().setImage(new Image("file:resources/masterHand_well.png"));
-            default -> getComputerHand().setImage(new Image("file:resources/masterHand_default.png"));
+            case Rock.id -> getComputerHand().setImage(new Image("file:resources/img/masterHand_rock.png"));
+            case Paper.id -> getComputerHand().setImage(new Image("file:resources/img/masterHand_paper.png"));
+            case Scissors.id -> getComputerHand().setImage(new Image("file:resources/img/masterHand_scissors.png"));
+            case Well.id -> getComputerHand().setImage(new Image("file:resources/img/masterHand_well.png"));
+            default -> getComputerHand().setImage(new Image("file:resources/img/masterHand_default.png"));
         }
     }
 
@@ -304,7 +303,7 @@ public class Controller
         updateWinsCounterBox(getAiWinsCounterBox(), getAiWins());
     }
 
-    private void updateWinsCounterBox(HBox box, int wins)
+    private void updateWinsCounterBox(VBox box, int wins)
     {
         if (!box.getChildren().isEmpty())
         {
@@ -350,10 +349,10 @@ public class Controller
 
     private void initializeGameEndBox()
     {
-        if (!getGameEndBox().getChildren().isEmpty())
+        /*if (!getGameEndBox().getChildren().isEmpty())
         {
             return;
-        }
+        }*/
 
         getGameEndBox().setSpacing(10);
         getGameEndBox().setStyle("-fx-background-color: rgba(0, 0, 0, 0.8); -fx-padding: 20;");
@@ -368,22 +367,24 @@ public class Controller
         Button playAgainButton = new Button("Play Again");
         playAgainButton.setOnAction(event -> restartGame());
 
-        getGameEndBox().getChildren().addAll(winnerMessage, exitButton, playAgainButton);
+        getGameEndBox().getChildren().addAll(getPlayerWinsCounterBox(), winnerMessage, exitButton, playAgainButton, getAiWinsCounterBox());
     }
 
-    private HBox initializeWinsCounterPane(Pos position, String user)
+    private VBox initializeWinsCounterPane(Pos position, String user)
     {
-        HBox box = new HBox();
+        VBox box = new VBox();
         Label counterLabel = new Label();
-        Label userLabel = new Label(user);
+        Label userLabel = new Label(user + " Wins");
 
         box.setAlignment(position);
         box.setSpacing(10);
         box.setStyle("-fx-background-color: rgba(0, 0, 0, 0.8); -fx-padding: 10;");
-        box.getChildren().addAll(counterLabel, userLabel);
-        box.setVisible(false);
+        userLabel.setStyle("--fx-font-size: 20px; -fx-text-fill: white;");
+        box.getChildren().addAll(userLabel, counterLabel);
+        //box.setVisible(true);
 
-        getWinsCounterBox().getChildren().add(box);
+        /*getWinsCounterBox().getChildren().add(box);*/
+        //getGameEndBox().getChildren().add(box);
 
         return box;
     }
@@ -398,6 +399,8 @@ public class Controller
         setPlayerWinsCounterBox(initializeWinsCounterPane(Pos.TOP_RIGHT, "Player"));
         setAiWinsCounterBox(initializeWinsCounterPane(Pos.TOP_LEFT, "AI"));
 
+        setGameEndedPopupStage(initializeGameEndedPopup());
+
         setRockButton(initializeButton(getPlayStonesIDs().getOrDefault(0, null)));
         setPaperButton(initializeButton(getPlayStonesIDs().getOrDefault(1, null)));
         setScissorsButton(initializeButton(getPlayStonesIDs().getOrDefault(2, null)));
@@ -407,9 +410,9 @@ public class Controller
         initializePlayerBox();
         addProgressIndicatorToBox(getProgressBox(), getEnemieProgressIndicator());
 
-        setComputerHand(initializeImageView(true, new Image("file:resources/masterHand_default.png"), .2, .3));
-        setTable(initializeImageView(true, new Image("file:resources/table.png"), 1, .2));
-        setPlayerHand(initializeImageView(false, new Image("file:resources/player_default.png"), .1, .2));
+        setComputerHand(initializeImageView(true, new Image("file:resources/img/masterHand_default.png"), .2, .3));
+        setTable(initializeImageView(true, new Image("file:resources/img/table.png"), 1, .2));
+        setPlayerHand(initializeImageView(false, new Image("file:resources/img/player_default.png"), .1, .2));
 
         getPlayerBox().getStyleClass().add("hbox");
         getEnemyBox().getStyleClass().add("hbox");
@@ -489,8 +492,8 @@ public class Controller
                 if (node == getPlayerHand()) continue;
                 node.setVisible(false);
             }
-            getPlayerHand().prefWidth(playerHand.getFitWidth() * 2);
-            getPlayerHand().prefHeight(playerHand.getFitHeight() * 2);
+            getPlayerHand().prefWidth(getPlayerHand().getFitWidth() * 2);
+            getPlayerHand().prefHeight(getPlayerHand().getFitHeight() * 2);
             getPlayerHand().setVisible(true);
         });
     }
@@ -517,10 +520,10 @@ public class Controller
     private void prepareAnimation()
     {
         // Schwarze Balken
-        rTop = new Rectangle(getRoot().getWidth(), 100, Color.BLACK);
-        rBot = new Rectangle(getRoot().getWidth(), 100, Color.BLACK);
-        rTop.setTranslateY(-100); // Start außerhalb des Bildschirms
-        rBot.setTranslateY(100); // Start außerhalb des Bildschirms
+        setrTop(new Rectangle(getRoot().getWidth(), 100, Color.BLACK));
+        setrBot(new Rectangle(getRoot().getWidth(), 100, Color.BLACK));
+        getrTop().setTranslateY(-100);  // Start außerhalb des Bildschirms
+        getrBot().setTranslateY(100);   // Start außerhalb des Bildschirms
 
         startAnimation();
     }
@@ -530,24 +533,21 @@ public class Controller
         Platform.runLater(() ->
         {
             getRoot().getChildren().clear(); // use clear() instead of removeAll()
-            getRoot().getChildren().addAll(rTop, getComputerHand(), getTableBox(), getPlayerHand(), rBot);
+            getRoot().getChildren().addAll(getrTop(), getComputerHand(), getTableBox(), getPlayerHand(), getrBot());
 
             getRoot().setStyle("-fx-background-color: white;");
 
+            setTopBarAnimation(new TranslateTransition(Duration.seconds(1), getrTop()));
+            setBottomBarAnimation(new TranslateTransition(Duration.seconds(1), getrBot()));
+
             if (getRoot().getHeight() < 900)
             {
-                topBarAnimation = new TranslateTransition(Duration.seconds(1), rTop);
-                topBarAnimation.setToY(0);
-
-                bottomBarAnimation = new TranslateTransition(Duration.seconds(1), rBot);
-                bottomBarAnimation.setToY(0);
+                getTopBarAnimation().setToY(0);
+                getBottomBarAnimation().setToY(0);
             } else
             {
-                topBarAnimation = new TranslateTransition(Duration.seconds(1), rTop);
-                topBarAnimation.setToY((-1) * (getRoot().getHeight() / 50));
-
-                bottomBarAnimation = new TranslateTransition(Duration.seconds(1), rBot);
-                bottomBarAnimation.setToY((getRoot().getHeight() / 50));
+                getTopBarAnimation().setToY((-1) * (getRoot().getHeight() / 50));
+                getBottomBarAnimation().setToY((getRoot().getHeight() / 50));
             }
 
 
@@ -560,7 +560,8 @@ public class Controller
         });
     }
 
-    private ParallelTransition getParallelTransition(TranslateTransition playerHandTranslateAnimation) {
+    private ParallelTransition getParallelTransition(TranslateTransition playerHandTranslateAnimation)
+    {
         TranslateTransition computerHandAnimation = new TranslateTransition(Duration.seconds(1), getComputerHand());
         computerHandAnimation.setToX((getRoot().getWidth() / 2.5));
         computerHandAnimation.setToY((getRoot().getHeight() / 13.5));
@@ -584,8 +585,8 @@ public class Controller
         tableAnimation.setFromY(1);
         tableAnimation.setFromY(1.5);
 
-        return new ParallelTransition(topBarAnimation,
-                bottomBarAnimation,
+        return new ParallelTransition(getTopBarAnimation(),
+                getBottomBarAnimation(),
                 playerHandTranslateAnimation,
                 playerHandScaleAnimation,
                 computerHandAnimation,
@@ -593,13 +594,15 @@ public class Controller
                 progressIndicatorAnimation);
     }
 
-    private void resetAnimation() {
-        Platform.runLater(() -> {
+    private void resetAnimation()
+    {
+        Platform.runLater(() ->
+        {
             // Animiert die Balken zurück außerhalb des Bildschirms
-            TranslateTransition resetTopBarAnimation = new TranslateTransition(Duration.seconds(1), rTop);
+            TranslateTransition resetTopBarAnimation = new TranslateTransition(Duration.seconds(1), getrTop());
             resetTopBarAnimation.setToY(-100);
 
-            TranslateTransition resetBottomBarAnimation = new TranslateTransition(Duration.seconds(1), rBot);
+            TranslateTransition resetBottomBarAnimation = new TranslateTransition(Duration.seconds(1), getrBot());
             resetBottomBarAnimation.setToY(100);
 
             // Spielerhand zurück zur Mitte
@@ -609,47 +612,55 @@ public class Controller
             resetPlayerHandAnimation.setToY(0);
 
             // Skalierung der Spielerhand zurück auf Standard
-            ScaleTransition resetPlayerHandScaleAnimation = new ScaleTransition(Duration.seconds(1), getPlayerHand());
-            resetPlayerHandScaleAnimation.setToX(1.0);
-            resetPlayerHandScaleAnimation.setToY(1.0);
-
-            // Gegnerhand zurück zur Mitte
-            TranslateTransition resetComputerHandAnimation = new TranslateTransition(Duration.seconds(1),
-                    getComputerHand());
-            resetComputerHandAnimation.setToX(0);
-            resetComputerHandAnimation.setToY(0);
-
-            // Tisch zurück auf Standardgröße
-            ScaleTransition resetTableAnimation = new ScaleTransition(Duration.seconds(1), getTable());
-            resetTableAnimation.setToX(1.0);
-            resetTableAnimation.setToY(1.0);
-
-            // Fortschrittsanzeige zurück zur Mitte und unsichtbar
-            TranslateTransition resetProgressIndicatorAnimation = new TranslateTransition(Duration.seconds(1),
-                    getEnemieProgressIndicator());
-            resetProgressIndicatorAnimation.setToX(0);
-            resetProgressIndicatorAnimation.setToY(0);
-
-            // ParallelTransition erstellt eine Animation, die alle Rücksetz-Animationen zusammenführt
-            ParallelTransition resetParallelTransition = new ParallelTransition(resetTopBarAnimation,
-                    resetBottomBarAnimation,
-                    resetPlayerHandAnimation,
-                    resetPlayerHandScaleAnimation,
-                    resetComputerHandAnimation,
-                    resetTableAnimation,
-                    resetProgressIndicatorAnimation);
-
-            // Spielt die Animation ab
-            resetParallelTransition.play();
+            ParallelTransition resetParallelTransition = getParallelTransition(resetTopBarAnimation, resetBottomBarAnimation, resetPlayerHandAnimation);
 
             // Nach der Animation die Root-Elemente auf Standard zurücksetzen
-            resetParallelTransition.setOnFinished(event -> {
+            resetParallelTransition.setOnFinished(event ->
+            {
+                getEnemyBox().getChildren().add(getComputerHand());
                 getRoot().getChildren().clear();
                 getRoot().getChildren()
-                        .addAll(getProgressBox(), getEnemyBox(), getTableBox(), getPlayerBox(), getWinsCounterBox());
+                        .addAll(getProgressBox(), getEnemyBox(), getTableBox(), getPlayerBox());
                 getRoot().setStyle("-fx-background-color: transparent;");
             });
         });
+    }
+
+    private ParallelTransition getParallelTransition(TranslateTransition resetTopBarAnimation, TranslateTransition resetBottomBarAnimation, TranslateTransition resetPlayerHandAnimation)
+    {
+        ScaleTransition resetPlayerHandScaleAnimation = new ScaleTransition(Duration.seconds(1), getPlayerHand());
+        resetPlayerHandScaleAnimation.setToX(1.0);
+        resetPlayerHandScaleAnimation.setToY(1.0);
+
+        // Gegnerhand zurück zur Mitte
+        TranslateTransition resetComputerHandAnimation = new TranslateTransition(Duration.seconds(1),
+                getComputerHand());
+        resetComputerHandAnimation.setToX(0);
+        resetComputerHandAnimation.setToY(0);
+
+        // Tisch zurück auf Standardgröße
+        ScaleTransition resetTableAnimation = new ScaleTransition(Duration.seconds(1), getTable());
+        resetTableAnimation.setToX(1.0);
+        resetTableAnimation.setToY(1.0);
+
+        // Fortschrittsanzeige zurück zur Mitte und unsichtbar
+        TranslateTransition resetProgressIndicatorAnimation = new TranslateTransition(Duration.seconds(1),
+                getEnemieProgressIndicator());
+        resetProgressIndicatorAnimation.setToX(0);
+        resetProgressIndicatorAnimation.setToY(0);
+
+        // ParallelTransition erstellt eine Animation, die alle Rücksetz-Animationen zusammenführt
+        ParallelTransition resetParallelTransition = new ParallelTransition(resetTopBarAnimation,
+                resetBottomBarAnimation,
+                resetPlayerHandAnimation,
+                resetPlayerHandScaleAnimation,
+                resetComputerHandAnimation,
+                resetTableAnimation,
+                resetProgressIndicatorAnimation);
+
+        // Spielt die Animation ab
+        resetParallelTransition.play();
+        return resetParallelTransition;
     }
 
     public String getPlayerChoice()
@@ -845,22 +856,22 @@ public class Controller
         this.aiWins = aiWins;
     }
 
-    public HBox getPlayerWinsCounterBox()
+    public VBox getPlayerWinsCounterBox()
     {
         return playerWinsCounterBox;
     }
 
-    public void setPlayerWinsCounterBox(HBox playerWinsPane)
+    public void setPlayerWinsCounterBox(VBox playerWinsPane)
     {
         this.playerWinsCounterBox = playerWinsPane;
     }
 
-    public HBox getAiWinsCounterBox()
+    public VBox getAiWinsCounterBox()
     {
         return aiWinsCounterBox;
     }
 
-    public void setAiWinsCounterBox(HBox aiWinsCounterPane)
+    public void setAiWinsCounterBox(VBox aiWinsCounterPane)
     {
         this.aiWinsCounterBox = aiWinsCounterPane;
     }
@@ -888,5 +899,45 @@ public class Controller
     public void setInitializedGameEndedPopupStage(boolean initializedGameEndedPopupStage)
     {
         this.initializedGameEndedPopupStage = initializedGameEndedPopupStage;
+    }
+
+    public Rectangle getrTop()
+    {
+        return rTop;
+    }
+
+    public void setrTop(Rectangle rTop)
+    {
+        this.rTop = rTop;
+    }
+
+    public Rectangle getrBot()
+    {
+        return rBot;
+    }
+
+    public void setrBot(Rectangle rBot)
+    {
+        this.rBot = rBot;
+    }
+
+    public TranslateTransition getTopBarAnimation()
+    {
+        return topBarAnimation;
+    }
+
+    public void setTopBarAnimation(TranslateTransition topBarAnimation)
+    {
+        this.topBarAnimation = topBarAnimation;
+    }
+
+    public TranslateTransition getBottomBarAnimation()
+    {
+        return bottomBarAnimation;
+    }
+
+    public void setBottomBarAnimation(TranslateTransition bottomBarAnimation)
+    {
+        this.bottomBarAnimation = bottomBarAnimation;
     }
 }
