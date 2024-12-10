@@ -128,9 +128,12 @@ public class Controller
         stage.initOwner(getStage());
         stage.initModality(Modality.WINDOW_MODAL);
         stage.setScene(new Scene(getGameEndBox()));
+        stage.setMinHeight(500);
+        stage.setMinWidth(1200);
+        stage.setResizable(false);
 
-        //setInitializedGameEndedPopupStage(true);
-
+        stage.setOnCloseRequest(event -> restartGame());
+        
         return stage;
     }
 
@@ -534,7 +537,6 @@ public class Controller
                 getTopBarAnimation().setToY((-1) * (getRoot().getHeight() / 50));
                 getBottomBarAnimation().setToY((getRoot().getHeight() / 50));
             }
-
 
             TranslateTransition playerHandTranslateAnimation = new TranslateTransition(Duration.seconds(1), getPlayerHand());
             playerHandTranslateAnimation.setToX((-1) * (getRoot().getWidth() / 2.5));
