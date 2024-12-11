@@ -36,6 +36,8 @@ public class Controller
      */
     private static final int maxHBoxWidth = 1000;
     private static final int maxHBoxHeight = 700;
+    private static final int maxButtonWidth = 200;
+    private static final int maxButtonHeight = 100;
     private final HashMap<Integer, String> playStonesIDs = new HashMap<>();
     private final VBox root = new VBox();
     private final HBox gameEndBox = new HBox();
@@ -415,7 +417,7 @@ public class Controller
     private Button initializeButton(String id)
     {
         Button button = new Button();
-        button.setPrefHeight(getMaxHBoxHeight());
+        button.setMinSize(getMaxButtonWidth(), getMaxButtonHeight());
         button.setId(id);
         button.setOnAction(event -> new Thread(() ->
         {
@@ -757,6 +759,16 @@ public class Controller
     public static int getMaxHBoxHeight()
     {
         return maxHBoxHeight;
+    }
+
+    public static int getMaxButtonWidth()
+    {
+        return maxButtonWidth;
+    }
+
+    public static int getMaxButtonHeight()
+    {
+        return maxButtonHeight;
     }
 
     public HBox getProgressBox()
