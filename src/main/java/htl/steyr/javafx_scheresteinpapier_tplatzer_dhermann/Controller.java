@@ -26,8 +26,7 @@ import java.util.HashMap;
 import java.util.Objects;
 import java.util.Random;
 
-public class Controller
-{
+public class Controller {
     /**
      * Rock
      * Paper
@@ -67,6 +66,26 @@ public class Controller
     private VBox playerWinsCounterBox;
     private VBox aiWinsCounterBox;
 
+    public static int getMaxHBoxWidth()
+    {
+        return maxHBoxWidth;
+    }
+
+    public static int getMaxHBoxHeight()
+    {
+        return maxHBoxHeight;
+    }
+
+    public static int getMaxButtonWidth()
+    {
+        return maxButtonWidth;
+    }
+
+    public static int getMaxButtonHeight()
+    {
+        return maxButtonHeight;
+    }
+
     public void start(Stage stage)
     {
         setDefaultValues();
@@ -80,17 +99,14 @@ public class Controller
     {
         Thread sleepThread = new Thread(() ->
         {
-            try
-            {
+            try {
                 Thread.sleep(3000);
                 aiTurn();
                 updateComputerHand();
                 getEnemieProgressIndicator().setVisible(false);
-            } catch (InterruptedException e)
-            {
+            } catch (InterruptedException e) {
                 System.out.println(e.getMessage());
-            } finally
-            {
+            } finally {
                 Platform.runLater(this::selectWinner);
             }
         });
@@ -134,7 +150,7 @@ public class Controller
         stage.setMinWidth(550);
         stage.setResizable(false);
         stage.setOnCloseRequest(event -> restartGame());
-        
+
         return stage;
     }
 
@@ -144,15 +160,15 @@ public class Controller
 
         setDefaultValues();
 
-        for (Node node : getPlayerBox().getChildren())
-        {
+        for (Node node : getPlayerBox().getChildren()) {
             node.setVisible(true);
         }
         getPlayerHand().setVisible(false);
 
         getRoot().getChildren().remove(getGameEndBox());
 
-        getComputerHand().setImage(new Image(Objects.requireNonNull(getClass().getResource("/img/masterHand_default.png")).toExternalForm()));
+        getComputerHand().setImage(new Image(Objects.requireNonNull(getClass().getResource("/img/masterHand_default.png"))
+                .toExternalForm()));
 
         getEnemieProgressIndicator().setVisible(false);
 
@@ -164,8 +180,7 @@ public class Controller
         Button sourceButton = (Button) event.getSource();
         String buttonId = sourceButton.getId();
 
-        switch (buttonId)
-        {
+        switch (buttonId) {
             case Rock.id -> setPlayerChoice(getPlayStonesIDs().getOrDefault(0, null));
             case Paper.id -> setPlayerChoice(getPlayStonesIDs().getOrDefault(1, null));
             case Scissors.id -> setPlayerChoice(getPlayStonesIDs().getOrDefault(2, null));
@@ -193,58 +208,42 @@ public class Controller
     private int evaluateWinner()
     {
         if (getPlayerChoice().equals(getAiChoice())) return 0;
-        if (getPlayerChoice().equals(Scissors.id))
-        {
-            switch (getAiChoice())
-            {
-                case Paper.id ->
-                {
+        if (getPlayerChoice().equals(Scissors.id)) {
+            switch (getAiChoice()) {
+                case Paper.id -> {
                     return 1;
                 }
-                case Rock.id, Well.id ->
-                {
+                case Rock.id, Well.id -> {
                     return 2;
                 }
             }
         }
-        if (getPlayerChoice().equals(Rock.id))
-        {
-            switch (getAiChoice())
-            {
-                case Scissors.id ->
-                {
+        if (getPlayerChoice().equals(Rock.id)) {
+            switch (getAiChoice()) {
+                case Scissors.id -> {
                     return 1;
                 }
-                case Paper.id, Well.id ->
-                {
+                case Paper.id, Well.id -> {
                     return 2;
                 }
             }
         }
-        if (getPlayerChoice().equals(Paper.id))
-        {
-            switch (getAiChoice())
-            {
-                case Rock.id, Well.id ->
-                {
+        if (getPlayerChoice().equals(Paper.id)) {
+            switch (getAiChoice()) {
+                case Rock.id, Well.id -> {
                     return 1;
                 }
-                case Scissors.id ->
-                {
+                case Scissors.id -> {
                     return 2;
                 }
             }
         }
-        if (getPlayerChoice().equals(Well.id))
-        {
-            switch (getAiChoice())
-            {
-                case Scissors.id, Rock.id ->
-                {
+        if (getPlayerChoice().equals(Well.id)) {
+            switch (getAiChoice()) {
+                case Scissors.id, Rock.id -> {
                     return 1;
                 }
-                case Paper.id ->
-                {
+                case Paper.id -> {
                     return 2;
                 }
             }
@@ -255,8 +254,7 @@ public class Controller
 
     private void selectWinner()
     {
-        switch (evaluateWinner())
-        {
+        switch (evaluateWinner()) {
             case 1 -> setWinner("Player");
             case 2 -> setWinner("AI");
             case 0 -> setWinner("No Winner");
@@ -271,25 +269,33 @@ public class Controller
 
     private void updatePlayerHand()
     {
-        switch (getPlayerChoice())
-        {
-            case Rock.id -> getPlayerHand().setImage(new Image(Objects.requireNonNull(getClass().getResource("/img/player_rock.png")).toExternalForm()));
-            case Paper.id -> getPlayerHand().setImage(new Image(Objects.requireNonNull(getClass().getResource("/img/player_paper.png")).toExternalForm()));
-            case Scissors.id -> getPlayerHand().setImage(new Image(Objects.requireNonNull(getClass().getResource("/img/player_scissors.png")).toExternalForm()));
-            case Well.id -> getPlayerHand().setImage(new Image(Objects.requireNonNull(getClass().getResource("/img/player_well.png")).toExternalForm()));
-            default -> getPlayerHand().setImage(new Image(Objects.requireNonNull(getClass().getResource("/img/player_default.png")).toExternalForm()));
+        switch (getPlayerChoice()) {
+            case Rock.id -> getPlayerHand().setImage(new Image(Objects.requireNonNull(getClass().getResource(
+                    "/img/player_rock.png")).toExternalForm()));
+            case Paper.id -> getPlayerHand().setImage(new Image(Objects.requireNonNull(getClass().getResource(
+                    "/img/player_paper.png")).toExternalForm()));
+            case Scissors.id -> getPlayerHand().setImage(new Image(Objects.requireNonNull(getClass().getResource(
+                    "/img/player_scissors.png")).toExternalForm()));
+            case Well.id -> getPlayerHand().setImage(new Image(Objects.requireNonNull(getClass().getResource(
+                    "/img/player_well.png")).toExternalForm()));
+            default -> getPlayerHand().setImage(new Image(Objects.requireNonNull(getClass().getResource(
+                    "/img/player_default.png")).toExternalForm()));
         }
     }
 
     private void updateComputerHand()
     {
-        switch (getAiChoice())
-        {
-            case Rock.id -> getComputerHand().setImage(new Image(Objects.requireNonNull(getClass().getResource("/img/masterHand_rock.png")).toExternalForm()));
-            case Paper.id -> getComputerHand().setImage(new Image(Objects.requireNonNull(getClass().getResource("/img/masterHand_paper.png")).toExternalForm()));
-            case Scissors.id -> getComputerHand().setImage(new Image(Objects.requireNonNull(getClass().getResource("/img/masterHand_scissors.png")).toExternalForm()));
-            case Well.id -> getComputerHand().setImage(new Image(Objects.requireNonNull(getClass().getResource("/img/masterHand_well.png")).toExternalForm()));
-            default -> getComputerHand().setImage(new Image(Objects.requireNonNull(getClass().getResource("/img/masterHand_default.png")).toExternalForm()));
+        switch (getAiChoice()) {
+            case Rock.id -> getComputerHand().setImage(new Image(Objects.requireNonNull(getClass().getResource(
+                    "/img/masterHand_rock.png")).toExternalForm()));
+            case Paper.id -> getComputerHand().setImage(new Image(Objects.requireNonNull(getClass().getResource(
+                    "/img/masterHand_paper.png")).toExternalForm()));
+            case Scissors.id -> getComputerHand().setImage(new Image(Objects.requireNonNull(getClass().getResource(
+                    "/img/masterHand_scissors.png")).toExternalForm()));
+            case Well.id -> getComputerHand().setImage(new Image(Objects.requireNonNull(getClass().getResource(
+                    "/img/masterHand_well.png")).toExternalForm()));
+            default -> getComputerHand().setImage(new Image(Objects.requireNonNull(getClass().getResource(
+                    "/img/masterHand_default.png")).toExternalForm()));
         }
     }
 
@@ -301,10 +307,8 @@ public class Controller
 
     private void updateWinsCounterBox(VBox box, int wins)
     {
-        if (!box.getChildren().isEmpty())
-        {
-            if (box.getChildren().getLast() instanceof Label winsCounterLabel)
-            {
+        if (!box.getChildren().isEmpty()) {
+            if (box.getChildren().getLast() instanceof Label winsCounterLabel) {
                 winsCounterLabel.setText(String.valueOf(wins));
             }
         }
@@ -319,12 +323,9 @@ public class Controller
 
     private void updateGameEndText(String newWinnerMessage)
     {
-        if (!getGameEndBox().getChildren().isEmpty())
-        {
-            for (Node node : getGameEndBox().getChildren())
-            {
-                if (node instanceof Label winnerMessageLabel)
-                {
+        if (!getGameEndBox().getChildren().isEmpty()) {
+            for (Node node : getGameEndBox().getChildren()) {
+                if (node instanceof Label winnerMessageLabel) {
                     winnerMessageLabel.setText(newWinnerMessage);
                     break;
                 }
@@ -334,11 +335,9 @@ public class Controller
 
     private void incrementWins()
     {
-        if (getWinner().equals("Player"))
-        {
+        if (getWinner().equals("Player")) {
             setPlayerWins(getPlayerWins() + 1);
-        } else if (getWinner().equals("AI"))
-        {
+        } else if (getWinner().equals("AI")) {
             setAiWins(getAiWins() + 1);
         }
     }
@@ -427,8 +426,15 @@ public class Controller
         initializePlayerBox();
         addProgressIndicatorToBox(getProgressBox(), getEnemieProgressIndicator());
 
-        setComputerHand(initializeImageView(true, new Image(Objects.requireNonNull(getClass().getResource("/img/masterHand_default.png")).toExternalForm()), .2, .3));
-        setTable(initializeImageView(true, new Image(Objects.requireNonNull(getClass().getResource("/img/table.png")).toExternalForm()), 1, .2));
+        setComputerHand(initializeImageView(true,
+                new Image(Objects.requireNonNull(getClass().getResource("/img/masterHand_default.png"))
+                        .toExternalForm()),
+                .2,
+                .3));
+        setTable(initializeImageView(true,
+                new Image(Objects.requireNonNull(getClass().getResource("/img/table.png")).toExternalForm()),
+                1,
+                .2));
         setPlayerHand(initializeImageView(false, null, .1, .2));
 
         getPlayerBox().getStyleClass().add("hbox");
@@ -452,11 +458,9 @@ public class Controller
         button.setFocusTraversable(false);
         button.setOnAction(event -> new Thread(() ->
         {
-            try
-            {
+            try {
                 handleButtonClick(event);
-            } catch (InterruptedException e)
-            {
+            } catch (InterruptedException e) {
                 System.out.println(e.getMessage());
             }
         }).start());
@@ -484,10 +488,10 @@ public class Controller
 
         // Button-Einstellungen
         Button[] buttons = {getRockButton(), getPaperButton(), getScissorsButton(), getWellButton()};
-        for (Button button : buttons)
-        {
+        for (Button button : buttons) {
             HBox.setHgrow(button, Priority.ALWAYS); // Button in HBox wachsen lassen
-            button.prefWidthProperty().bind(getPlayerBox().widthProperty().divide(4).subtract(20)); // gleichmäßige Breite
+            button.prefWidthProperty()
+                    .bind(getPlayerBox().widthProperty().divide(4).subtract(20)); // gleichmäßige Breite
             button.prefHeightProperty().bind(getPlayerBox().heightProperty().multiply(0.8)); // Höhe relativ zur HBox
             button.setFocusTraversable(false);
         }
@@ -508,8 +512,7 @@ public class Controller
     {
         Platform.runLater(() ->
         {
-            for (Node node : getPlayerBox().getChildren())
-            {
+            for (Node node : getPlayerBox().getChildren()) {
                 if (node == getPlayerHand()) continue;
                 node.setVisible(false);
             }
@@ -558,20 +561,19 @@ public class Controller
             getRoot().getChildren().clear(); // use clear() instead of removeAll()
             getRoot().getChildren().addAll(getrTop(), getComputerHand(), getTableBox(), getPlayerHand(), getrBot());
 
-            setTopBarAnimation(new TranslateTransition(Duration.seconds(1), getrTop()));
-            setBottomBarAnimation(new TranslateTransition(Duration.seconds(1), getrBot()));
+            setTopBarAnimation(new TranslateTransition(Duration.seconds(3), getrTop()));
+            setBottomBarAnimation(new TranslateTransition(Duration.seconds(3), getrBot()));
 
-            if (getRoot().getHeight() < 900)
-            {
+            if (getRoot().getHeight() < 900) {
                 getTopBarAnimation().setToY(0);
                 getBottomBarAnimation().setToY(0);
-            } else
-            {
+            } else {
                 getTopBarAnimation().setToY((-1) * (getRoot().getHeight() / 50));
                 getBottomBarAnimation().setToY((getRoot().getHeight() / 50));
             }
 
-            TranslateTransition playerHandTranslateAnimation = new TranslateTransition(Duration.seconds(1), getPlayerHand());
+            TranslateTransition playerHandTranslateAnimation = new TranslateTransition(Duration.seconds(3),
+                    getPlayerHand());
             playerHandTranslateAnimation.setToX((-1) * (getRoot().getWidth() / 2.5));
             playerHandTranslateAnimation.setToY((-1) * (getRoot().getHeight() / 2.2));
 
@@ -582,24 +584,24 @@ public class Controller
 
     private ParallelTransition getParallelTransition(TranslateTransition playerHandTranslateAnimation)
     {
-        TranslateTransition computerHandAnimation = new TranslateTransition(Duration.seconds(1), getComputerHand());
+        TranslateTransition computerHandAnimation = new TranslateTransition(Duration.seconds(3), getComputerHand());
         computerHandAnimation.setToX((getRoot().getWidth() / 2.5));
         computerHandAnimation.setToY((getRoot().getHeight() / 13.5));
 
-        TranslateTransition progressIndicatorAnimation = new TranslateTransition(Duration.seconds(1),
+        TranslateTransition progressIndicatorAnimation = new TranslateTransition(Duration.seconds(3),
                 getEnemieProgressIndicator());
         computerHandAnimation.setToX((getRoot().getWidth() / 2.5));
         computerHandAnimation.setToY((getRoot().getHeight() / 13.5));
 //        progressIndicatorAnimation.setToY((-1)*(getRoot().getWidth() / 2.5));
 
 
-        ScaleTransition playerHandScaleAnimation = new ScaleTransition(Duration.seconds(1), getPlayerHand());
+        ScaleTransition playerHandScaleAnimation = new ScaleTransition(Duration.seconds(3), getPlayerHand());
         playerHandScaleAnimation.setFromX(1.0);
         playerHandScaleAnimation.setToX(2);
         playerHandScaleAnimation.setFromY(1);
         playerHandScaleAnimation.setFromY(2);
 
-        ScaleTransition tableAnimation = new ScaleTransition(Duration.seconds(1), getTable());
+        ScaleTransition tableAnimation = new ScaleTransition(Duration.seconds(3), getTable());
         tableAnimation.setFromX(1.0);
         tableAnimation.setToX(.6);
         tableAnimation.setFromY(1);
@@ -619,20 +621,22 @@ public class Controller
         Platform.runLater(() ->
         {
             // Animiert die Balken zurück außerhalb des Bildschirms
-            TranslateTransition resetTopBarAnimation = new TranslateTransition(Duration.seconds(1), getrTop());
+            TranslateTransition resetTopBarAnimation = new TranslateTransition(Duration.seconds(3), getrTop());
             resetTopBarAnimation.setToY(-100);
 
-            TranslateTransition resetBottomBarAnimation = new TranslateTransition(Duration.seconds(1), getrBot());
+            TranslateTransition resetBottomBarAnimation = new TranslateTransition(Duration.seconds(3), getrBot());
             resetBottomBarAnimation.setToY(100);
 
             // Spielerhand zurück zur Mitte
-            TranslateTransition resetPlayerHandAnimation = new TranslateTransition(Duration.seconds(1),
+            TranslateTransition resetPlayerHandAnimation = new TranslateTransition(Duration.seconds(3),
                     getPlayerHand());
             resetPlayerHandAnimation.setToX(0);
             resetPlayerHandAnimation.setToY(0);
 
             // Skalierung der Spielerhand zurück auf Standard
-            ParallelTransition resetParallelTransition = getParallelTransition(resetTopBarAnimation, resetBottomBarAnimation, resetPlayerHandAnimation);
+            ParallelTransition resetParallelTransition = getParallelTransition(resetTopBarAnimation,
+                    resetBottomBarAnimation,
+                    resetPlayerHandAnimation);
 
             // Nach der Animation die Root-Elemente auf Standard zurücksetzen
             resetParallelTransition.setOnFinished(event ->
@@ -647,25 +651,27 @@ public class Controller
         });
     }
 
-    private ParallelTransition getParallelTransition(TranslateTransition resetTopBarAnimation, TranslateTransition resetBottomBarAnimation, TranslateTransition resetPlayerHandAnimation)
+    private ParallelTransition getParallelTransition(TranslateTransition resetTopBarAnimation,
+                                                     TranslateTransition resetBottomBarAnimation,
+                                                     TranslateTransition resetPlayerHandAnimation)
     {
-        ScaleTransition resetPlayerHandScaleAnimation = new ScaleTransition(Duration.seconds(1), getPlayerHand());
+        ScaleTransition resetPlayerHandScaleAnimation = new ScaleTransition(Duration.seconds(3), getPlayerHand());
         resetPlayerHandScaleAnimation.setToX(1.0);
         resetPlayerHandScaleAnimation.setToY(1.0);
 
         // Gegnerhand zurück zur Mitte
-        TranslateTransition resetComputerHandAnimation = new TranslateTransition(Duration.seconds(1),
+        TranslateTransition resetComputerHandAnimation = new TranslateTransition(Duration.seconds(3),
                 getComputerHand());
         resetComputerHandAnimation.setToX(0);
         resetComputerHandAnimation.setToY(0);
 
         // Tisch zurück auf Standardgröße
-        ScaleTransition resetTableAnimation = new ScaleTransition(Duration.seconds(1), getTable());
+        ScaleTransition resetTableAnimation = new ScaleTransition(Duration.seconds(3), getTable());
         resetTableAnimation.setToX(1.0);
         resetTableAnimation.setToY(1.0);
 
         // Fortschrittsanzeige zurück zur Mitte und unsichtbar
-        TranslateTransition resetProgressIndicatorAnimation = new TranslateTransition(Duration.seconds(1),
+        TranslateTransition resetProgressIndicatorAnimation = new TranslateTransition(Duration.seconds(3),
                 getEnemieProgressIndicator());
         resetProgressIndicatorAnimation.setToX(0);
         resetProgressIndicatorAnimation.setToY(0);
@@ -766,8 +772,7 @@ public class Controller
 
     public void setAiChoice(int aiChoice)
     {
-        switch (aiChoice)
-        {
+        switch (aiChoice) {
             case -1 -> this.aiChoice = null;
             case 0 -> this.aiChoice = playStonesIDs.getOrDefault(0, null);
             case 1 -> this.aiChoice = playStonesIDs.getOrDefault(1, null);
@@ -780,26 +785,6 @@ public class Controller
     public HashMap<Integer, String> getPlayStonesIDs()
     {
         return playStonesIDs;
-    }
-
-    public static int getMaxHBoxWidth()
-    {
-        return maxHBoxWidth;
-    }
-
-    public static int getMaxHBoxHeight()
-    {
-        return maxHBoxHeight;
-    }
-
-    public static int getMaxButtonWidth()
-    {
-        return maxButtonWidth;
-    }
-
-    public static int getMaxButtonHeight()
-    {
-        return maxButtonHeight;
     }
 
     public HBox getProgressBox()
