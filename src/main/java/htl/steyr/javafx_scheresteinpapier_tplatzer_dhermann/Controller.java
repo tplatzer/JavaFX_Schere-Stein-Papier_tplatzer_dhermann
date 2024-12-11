@@ -66,6 +66,7 @@ public class Controller
     private ImageView playerHand;
     private VBox playerWinsCounterBox;
     private VBox aiWinsCounterBox;
+    private MusicPlayer musicPlayer;
 
     public void start(Stage stage)
     {
@@ -257,8 +258,16 @@ public class Controller
     {
         switch (evaluateWinner())
         {
-            case 1 -> setWinner("Player");
-            case 2 -> setWinner("AI");
+            case 1 ->
+            {
+                setWinner("Player");
+                new Thread(() -> getMusicPlayer().playMusic((Objects.requireNonNull(getClass().getResource("/sound/player_win.wav")).toExternalForm().replace("file:/", "/")))).start();
+            }
+            case 2 ->
+            {
+                setWinner("AI");
+                new Thread(() -> getMusicPlayer().playMusic((Objects.requireNonNull(getClass().getResource("/sound/player_lose.wav")).toExternalForm().replace("file:/", "/")))).start();
+            }
             case 0 -> setWinner("No Winner");
         }
         incrementWins();
@@ -388,6 +397,8 @@ public class Controller
         getPlayStonesIDs().put(1, Paper.getId());
         getPlayStonesIDs().put(2, Scissors.getId());
         getPlayStonesIDs().put(3, Well.getId());
+
+        setMusicPlayer(new MusicPlayer());
 
         setPlayerWinsCounterBox(initializeWinsCounterPane(Pos.TOP_RIGHT, "Player"));
         setAiWinsCounterBox(initializeWinsCounterPane(Pos.TOP_LEFT, "AI"));
@@ -934,5 +945,15 @@ public class Controller
     public void setBottomBarAnimation(TranslateTransition bottomBarAnimation)
     {
         this.bottomBarAnimation = bottomBarAnimation;
+    }
+
+    public MusicPlayer getMusicPlayer()
+    {
+        return musicPlayer;
+    }
+
+    public void setMusicPlayer(MusicPlayer musicPlayer)
+    {
+        this.musicPlayer = musicPlayer;
     }
 }
