@@ -135,3 +135,5 @@ Thumbs.db
 
 # Sonstige temporäre Dateien
 *.class
+
+src/main/resources/META-INF
