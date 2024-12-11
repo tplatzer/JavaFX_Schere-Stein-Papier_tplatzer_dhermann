@@ -10,7 +10,6 @@ import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
-import javafx.scene.control.ProgressIndicator;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.HBox;
@@ -60,7 +59,6 @@ public class Controller
     private Button paperButton;
     private Button scissorsButton;
     private Button wellButton;
-    private ProgressIndicator enemieProgressIndicator;
     private ImageView table;
     private ImageView computerHand;
     private ImageView playerHand;
@@ -88,7 +86,6 @@ public class Controller
                 Thread.sleep(3000);
                 aiTurn();
                 updateComputerHand();
-                getEnemieProgressIndicator().setVisible(false);
             } catch (InterruptedException e)
             {
                 System.out.println(e.getMessage());
@@ -159,8 +156,6 @@ public class Controller
 
         getComputerHand().setImage(new Image(Objects.requireNonNull(getClass().getResource("/img/masterHand_default.png")).toExternalForm()));
 
-        getEnemieProgressIndicator().setVisible(false);
-
         playBackgroundMusic();
 
         resetAnimation();
@@ -180,8 +175,6 @@ public class Controller
         }
 
         updatePlayerHand();
-
-        getEnemieProgressIndicator().setVisible(true);
 
         Thread removeplayerBoxThread = new Thread(this::removePlayerBoxes);
         removeplayerBoxThread.setDaemon(true);
@@ -456,10 +449,8 @@ public class Controller
         setPaperButton(initializeButton(getPlayStonesIDs().getOrDefault(1, null)));
         setScissorsButton(initializeButton(getPlayStonesIDs().getOrDefault(2, null)));
         setWellButton(initializeButton(getPlayStonesIDs().getOrDefault(3, null)));
-        setEnemieProgressIndicator(initializeProgressIndicator());
 
         initializePlayerBox();
-        addProgressIndicatorToBox(getProgressBox(), getEnemieProgressIndicator());
 
         setComputerHand(initializeImageView(true, new Image(Objects.requireNonNull(getClass().getResource("/img/masterHand_default.png")).toExternalForm()), .2, .3));
         setTable(initializeImageView(true, new Image(Objects.requireNonNull(getClass().getResource("/img/table.png")).toExternalForm()), 1, .2));
@@ -527,17 +518,6 @@ public class Controller
         }
     }
 
-    private ProgressIndicator initializeProgressIndicator()
-    {
-        ProgressIndicator progressIndicator = new ProgressIndicator();
-        progressIndicator.setId("enemie_progress_indicator");
-        progressIndicator.setMinSize(100, 50);
-        progressIndicator.setFocusTraversable(false);
-        progressIndicator.setVisible(false);
-
-        return progressIndicator;
-    }
-
     private void removePlayerBoxes()
     {
         Platform.runLater(() ->
@@ -565,11 +545,6 @@ public class Controller
         box.setSpacing(20); // Optional: Abstand für mehrere Elemente
         box.prefWidthProperty().bind(getStage().widthProperty()); // Passe Breite an Fensterbreite an
         box.getChildren().add(image);
-    }
-
-    private void addProgressIndicatorToBox(HBox box, ProgressIndicator progressIndicator)
-    {
-        box.getChildren().add(progressIndicator);
     }
 
     private void prepareAnimation()
@@ -622,11 +597,8 @@ public class Controller
         computerHandAnimation.setToX((getRoot().getWidth() / 2.5));
         computerHandAnimation.setToY((getRoot().getHeight() / 13.5));
 
-        TranslateTransition progressIndicatorAnimation = new TranslateTransition(Duration.seconds(3),
-                getEnemieProgressIndicator());
         computerHandAnimation.setToX((getRoot().getWidth() / 2.5));
         computerHandAnimation.setToY((getRoot().getHeight() / 13.5));
-//        progressIndicatorAnimation.setToY((-1)*(getRoot().getWidth() / 2.5));
 
 
         ScaleTransition playerHandScaleAnimation = new ScaleTransition(Duration.seconds(3), getPlayerHand());
@@ -646,8 +618,7 @@ public class Controller
                 playerHandTranslateAnimation,
                 playerHandScaleAnimation,
                 computerHandAnimation,
-                tableAnimation,
-                progressIndicatorAnimation);
+                tableAnimation);
     }
 
     private void resetAnimation()
@@ -700,20 +671,13 @@ public class Controller
         resetTableAnimation.setToX(1.0);
         resetTableAnimation.setToY(1.0);
 
-        // Fortschrittsanzeige zurück zur Mitte und unsichtbar
-        TranslateTransition resetProgressIndicatorAnimation = new TranslateTransition(Duration.seconds(3),
-                getEnemieProgressIndicator());
-        resetProgressIndicatorAnimation.setToX(0);
-        resetProgressIndicatorAnimation.setToY(0);
-
         // ParallelTransition erstellt eine Animation, die alle Rücksetz-Animationen zusammenführt
         ParallelTransition resetParallelTransition = new ParallelTransition(resetTopBarAnimation,
                 resetBottomBarAnimation,
                 resetPlayerHandAnimation,
                 resetPlayerHandScaleAnimation,
                 resetComputerHandAnimation,
-                resetTableAnimation,
-                resetProgressIndicatorAnimation);
+                resetTableAnimation);
 
         // Spielt die Animation ab
         resetParallelTransition.play();
@@ -768,16 +732,6 @@ public class Controller
     public void setWellButton(Button wellButton)
     {
         this.wellButton = wellButton;
-    }
-
-    public ProgressIndicator getEnemieProgressIndicator()
-    {
-        return enemieProgressIndicator;
-    }
-
-    public void setEnemieProgressIndicator(ProgressIndicator enemieProgressIndicator)
-    {
-        this.enemieProgressIndicator = enemieProgressIndicator;
     }
 
     public VBox getRoot()
