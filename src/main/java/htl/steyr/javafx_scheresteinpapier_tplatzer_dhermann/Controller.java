@@ -25,8 +25,7 @@ import java.util.HashMap;
 import java.util.Objects;
 import java.util.Random;
 
-public class Controller
-{
+public class Controller {
     /**
      * Rock
      * Paper
@@ -67,6 +66,32 @@ public class Controller
     private MusicPlayer backgroundMusicPlayer;
     private MusicPlayer drumrollPlayer;
 
+    public static int getMaxHBoxWidth()
+    {
+        return maxHBoxWidth;
+    }
+
+    public static int getMaxHBoxHeight()
+    {
+        return maxHBoxHeight;
+    }
+
+    public static int getMaxButtonWidth()
+    {
+        return maxButtonWidth;
+    }
+
+    public static int getMaxButtonHeight()
+    {
+        return maxButtonHeight;
+    }
+
+    /**
+     * Initializes and starts the game window.
+     * Sets up default values, initializes UI elements, and starts background music.
+     *
+     * @param stage The primary stage for the application
+     */
     public void start(Stage stage)
     {
         setDefaultValues();
@@ -77,20 +102,21 @@ public class Controller
         showWindow();
     }
 
+    /**
+     * Handles the game play logic in a separate thread.
+     * Waits for 3 seconds, then executes AI's turn and updates the display.
+     * Finally determines and displays the winner.
+     */
     private void play()
     {
-        Thread sleepThread = new Thread(() ->
-        {
-            try
-            {
+        Thread sleepThread = new Thread(() -> {
+            try {
                 Thread.sleep(3000);
                 aiTurn();
                 updateComputerHand();
-            } catch (InterruptedException e)
-            {
+            } catch (InterruptedException e) {
                 System.out.println(e.getMessage());
-            } finally
-            {
+            } finally {
                 Platform.runLater(this::selectWinner);
             }
         });
@@ -98,6 +124,10 @@ public class Controller
         sleepThread.start();
     }
 
+    /**
+     * Creates and displays the main game window.
+     * Sets up the root layout, configures window properties, and applies styling.
+     */
     private void showWindow()
     {
         getRoot().setSpacing(10);
@@ -111,18 +141,27 @@ public class Controller
 
         Scene scene = new Scene(getRoot());
         scene.getStylesheets().add(Objects.requireNonNull(getClass().getResource("/style.css")).toExternalForm());
-        getStage().getIcons().add(new Image(Objects.requireNonNull(getClass().getResourceAsStream("/img/masterHand_default.png"))));
+        getStage().getIcons()
+                .add(new Image(Objects.requireNonNull(getClass().getResourceAsStream("/img/masterHand_default.png"))));
         getStage().setScene(scene);
         getStage().setTitle("Schere Stein Papier");
         getStage().setHeight(900);
         getStage().show();
     }
 
+    /**
+     * Displays the game end screen popup.
+     */
     private void showGameEndScreen()
     {
         getGameEndedPopupStage().show();
     }
 
+    /**
+     * Creates and configures the popup window shown when the game ends.
+     *
+     * @return Configured Stage for the game end popup
+     */
     private Stage initializeGameEndedPopup()
     {
         initializeGameEndBox();
@@ -135,38 +174,48 @@ public class Controller
         stage.setMinWidth(550);
         stage.setResizable(false);
         stage.setOnCloseRequest(event -> restartGame());
-        
+
         return stage;
     }
 
+    /**
+     * Resets the game to its initial state.
+     * Clears previous game state, resets UI elements, and restarts background music.
+     */
     private void restartGame()
     {
         getGameEndedPopupStage().close();
 
         setDefaultValues();
 
-        for (Node node : getPlayerBox().getChildren())
-        {
+        for (Node node : getPlayerBox().getChildren()) {
             node.setVisible(true);
         }
         getPlayerHand().setVisible(false);
 
         getRoot().getChildren().remove(getGameEndBox());
 
-        getComputerHand().setImage(new Image(Objects.requireNonNull(getClass().getResource("/img/masterHand_default.png")).toExternalForm()));
+        getComputerHand().setImage(new Image(Objects.requireNonNull(getClass().getResource("/img/masterHand_default.png"))
+                .toExternalForm()));
 
         playBackgroundMusic();
 
         resetAnimation();
     }
 
+    /**
+     * Handles player's button clicks for move selection.
+     * Updates player's choice and triggers game progression.
+     *
+     * @param event The ActionEvent from the button click
+     * @throws InterruptedException If thread interruption occurs
+     */
     private void handleButtonClick(ActionEvent event) throws InterruptedException
     {
         Button sourceButton = (Button) event.getSource();
         String buttonId = sourceButton.getId();
 
-        switch (buttonId)
-        {
+        switch (buttonId) {
             case Rock.id -> setPlayerChoice(getPlayStonesIDs().getOrDefault(0, null));
             case Paper.id -> setPlayerChoice(getPlayStonesIDs().getOrDefault(1, null));
             case Scissors.id -> setPlayerChoice(getPlayStonesIDs().getOrDefault(2, null));
@@ -185,66 +234,50 @@ public class Controller
     }
 
     /**
-     * Return for Winner
-     * 0 = Draw
-     * 1 = Player
-     * 2 = AI
+     * Determines the winner of the current round.
+     * Compares player's choice against AI's choice using game rules.
+     *
+     * @return 0 for draw, 1 for player win, 2 for AI win
      */
     private int evaluateWinner()
     {
         if (getPlayerChoice().equals(getAiChoice())) return 0;
-        if (getPlayerChoice().equals(Scissors.id))
-        {
-            switch (getAiChoice())
-            {
-                case Paper.id ->
-                {
+        if (getPlayerChoice().equals(Scissors.id)) {
+            switch (getAiChoice()) {
+                case Paper.id -> {
                     return 1;
                 }
-                case Rock.id, Well.id ->
-                {
+                case Rock.id, Well.id -> {
                     return 2;
                 }
             }
         }
-        if (getPlayerChoice().equals(Rock.id))
-        {
-            switch (getAiChoice())
-            {
-                case Scissors.id ->
-                {
+        if (getPlayerChoice().equals(Rock.id)) {
+            switch (getAiChoice()) {
+                case Scissors.id -> {
                     return 1;
                 }
-                case Paper.id, Well.id ->
-                {
+                case Paper.id, Well.id -> {
                     return 2;
                 }
             }
         }
-        if (getPlayerChoice().equals(Paper.id))
-        {
-            switch (getAiChoice())
-            {
-                case Rock.id, Well.id ->
-                {
+        if (getPlayerChoice().equals(Paper.id)) {
+            switch (getAiChoice()) {
+                case Rock.id, Well.id -> {
                     return 1;
                 }
-                case Scissors.id ->
-                {
+                case Scissors.id -> {
                     return 2;
                 }
             }
         }
-        if (getPlayerChoice().equals(Well.id))
-        {
-            switch (getAiChoice())
-            {
-                case Scissors.id, Rock.id ->
-                {
+        if (getPlayerChoice().equals(Well.id)) {
+            switch (getAiChoice()) {
+                case Scissors.id, Rock.id -> {
                     return 1;
                 }
-                case Paper.id ->
-                {
+                case Paper.id -> {
                     return 2;
                 }
             }
@@ -253,19 +286,22 @@ public class Controller
         return 0;
     }
 
+    /**
+     * Processes the game result and updates the UI accordingly.
+     * Updates score, plays appropriate sound, and shows the game end screen.
+     */
     private void selectWinner()
     {
-        switch (evaluateWinner())
-        {
-            case 1 ->
-            {
+        switch (evaluateWinner()) {
+            case 1 -> {
                 setWinner("Player");
-                new Thread(() -> getBackgroundMusicPlayer().playMusicShort((Objects.requireNonNull(getClass().getResource("/sound/player_win.wav")).toExternalForm().replace("file:/", "/")))).start();
+                new Thread(() -> getBackgroundMusicPlayer().playMusicShort((Objects.requireNonNull(getClass().getResource(
+                        "/sound/player_win.wav")).toExternalForm().replace("file:/", "/")))).start();
             }
-            case 2 ->
-            {
+            case 2 -> {
                 setWinner("AI");
-                new Thread(() -> getBackgroundMusicPlayer().playMusicShort((Objects.requireNonNull(getClass().getResource("/sound/player_lose.wav")).toExternalForm().replace("file:/", "/")))).start();
+                new Thread(() -> getBackgroundMusicPlayer().playMusicShort((Objects.requireNonNull(getClass().getResource(
+                        "/sound/player_lose.wav")).toExternalForm().replace("file:/", "/")))).start();
             }
             case 0 -> setWinner("No Winner");
         }
@@ -277,47 +313,76 @@ public class Controller
         showGameEndScreen();
     }
 
+    /**
+     * Updates the player's hand image based on their selection.
+     * Changes the displayed image to match the player's choice (rock, paper, scissors, or well).
+     */
     private void updatePlayerHand()
     {
-        switch (getPlayerChoice())
-        {
-            case Rock.id -> getPlayerHand().setImage(new Image(Objects.requireNonNull(getClass().getResource("/img/player_rock.png")).toExternalForm()));
-            case Paper.id -> getPlayerHand().setImage(new Image(Objects.requireNonNull(getClass().getResource("/img/player_paper.png")).toExternalForm()));
-            case Scissors.id -> getPlayerHand().setImage(new Image(Objects.requireNonNull(getClass().getResource("/img/player_scissors.png")).toExternalForm()));
-            case Well.id -> getPlayerHand().setImage(new Image(Objects.requireNonNull(getClass().getResource("/img/player_well.png")).toExternalForm()));
-            default -> getPlayerHand().setImage(new Image(Objects.requireNonNull(getClass().getResource("/img/player_default.png")).toExternalForm()));
+        switch (getPlayerChoice()) {
+            case Rock.id -> getPlayerHand().setImage(new Image(Objects.requireNonNull(getClass().getResource(
+                    "/img/player_rock.png")).toExternalForm()));
+            case Paper.id -> getPlayerHand().setImage(new Image(Objects.requireNonNull(getClass().getResource(
+                    "/img/player_paper.png")).toExternalForm()));
+            case Scissors.id -> getPlayerHand().setImage(new Image(Objects.requireNonNull(getClass().getResource(
+                    "/img/player_scissors.png")).toExternalForm()));
+            case Well.id -> getPlayerHand().setImage(new Image(Objects.requireNonNull(getClass().getResource(
+                    "/img/player_well.png")).toExternalForm()));
+            default -> getPlayerHand().setImage(new Image(Objects.requireNonNull(getClass().getResource(
+                    "/img/player_default.png")).toExternalForm()));
         }
     }
 
+    /**
+     * Updates the computer's hand image based on AI's choice.
+     * Changes the displayed image to match the AI's selection.
+     */
     private void updateComputerHand()
     {
-        switch (getAiChoice())
-        {
-            case Rock.id -> getComputerHand().setImage(new Image(Objects.requireNonNull(getClass().getResource("/img/masterHand_rock.png")).toExternalForm()));
-            case Paper.id -> getComputerHand().setImage(new Image(Objects.requireNonNull(getClass().getResource("/img/masterHand_paper.png")).toExternalForm()));
-            case Scissors.id -> getComputerHand().setImage(new Image(Objects.requireNonNull(getClass().getResource("/img/masterHand_scissors.png")).toExternalForm()));
-            case Well.id -> getComputerHand().setImage(new Image(Objects.requireNonNull(getClass().getResource("/img/masterHand_well.png")).toExternalForm()));
-            default -> getComputerHand().setImage(new Image(Objects.requireNonNull(getClass().getResource("/img/masterHand_default.png")).toExternalForm()));
+        switch (getAiChoice()) {
+            case Rock.id -> getComputerHand().setImage(new Image(Objects.requireNonNull(getClass().getResource(
+                    "/img/masterHand_rock.png")).toExternalForm()));
+            case Paper.id -> getComputerHand().setImage(new Image(Objects.requireNonNull(getClass().getResource(
+                    "/img/masterHand_paper.png")).toExternalForm()));
+            case Scissors.id -> getComputerHand().setImage(new Image(Objects.requireNonNull(getClass().getResource(
+                    "/img/masterHand_scissors.png")).toExternalForm()));
+            case Well.id -> getComputerHand().setImage(new Image(Objects.requireNonNull(getClass().getResource(
+                    "/img/masterHand_well.png")).toExternalForm()));
+            default -> getComputerHand().setImage(new Image(Objects.requireNonNull(getClass().getResource(
+                    "/img/masterHand_default.png")).toExternalForm()));
         }
     }
 
+    /**
+     * Updates the win counters for both player and AI.
+     * Calls updateWinsCounterBox for each player's counter display.
+     */
     private void updateWinsCounterBoxes()
     {
         updateWinsCounterBox(getPlayerWinsCounterBox(), getPlayerWins());
         updateWinsCounterBox(getAiWinsCounterBox(), getAiWins());
     }
 
+    /**
+     * Updates a single win counter display with the current score.
+     * Finds the score label within the counter box and updates its text.
+     *
+     * @param box  The VBox containing the counter display
+     * @param wins The current number of wins to display
+     */
     private void updateWinsCounterBox(VBox box, int wins)
     {
-        if (!box.getChildren().isEmpty())
-        {
-            if (box.getChildren().getLast() instanceof Label winsCounterLabel)
-            {
+        if (!box.getChildren().isEmpty()) {
+            if (box.getChildren().getLast() instanceof Label winsCounterLabel) {
                 winsCounterLabel.setText(String.valueOf(wins));
             }
         }
     }
 
+    /**
+     * Resets the game state to default values.
+     * Clears player choice, AI choice, and winner status.
+     */
     private void setDefaultValues()
     {
         setPlayerChoice(null);
@@ -325,14 +390,17 @@ public class Controller
         setWinner(null);
     }
 
+    /**
+     * Updates the game end message displayed to users.
+     * Finds the message label within the game end box and sets its text.
+     *
+     * @param newWinnerMessage The message to display at game end
+     */
     private void updateGameEndText(String newWinnerMessage)
     {
-        if (!getGameEndBox().getChildren().isEmpty())
-        {
-            for (Node node : getGameEndBox().getChildren())
-            {
-                if (node instanceof Label winnerMessageLabel)
-                {
+        if (!getGameEndBox().getChildren().isEmpty()) {
+            for (Node node : getGameEndBox().getChildren()) {
+                if (node instanceof Label winnerMessageLabel) {
                     winnerMessageLabel.setText(newWinnerMessage);
                     break;
                 }
@@ -340,33 +408,53 @@ public class Controller
         }
     }
 
+    /**
+     * Increments the win counter for the winner of the current game.
+     * Updates either player or AI wins based on the current winner.
+     */
     private void incrementWins()
     {
-        if (getWinner().equals("Player"))
-        {
+        if (getWinner().equals("Player")) {
             setPlayerWins(getPlayerWins() + 1);
-        } else if (getWinner().equals("AI"))
-        {
+        } else if (getWinner().equals("AI")) {
             setAiWins(getAiWins() + 1);
         }
     }
 
+    /**
+     * Starts playing the background music for the game.
+     * Loads and plays the background music file in a continuous loop.
+     */
     private void playBackgroundMusic()
     {
-        getBackgroundMusicPlayer().playMusic((Objects.requireNonNull(getClass().getResource("/sound/background_music.wav")).toExternalForm().replace("file:/", "/")));
+        getBackgroundMusicPlayer().playMusic((Objects.requireNonNull(getClass().getResource(
+                "/sound/background_music.wav")).toExternalForm().replace("file:/", "/")));
     }
 
+    /**
+     * Stops the currently playing background music.
+     */
     private void stopBackgroundMusic()
     {
         getBackgroundMusicPlayer().stopMusic();
     }
 
+    /**
+     * Plays a short drumroll sound effect.
+     * Used during game animations and transitions.
+     */
     private void playDrumroll()
     {
-        getDrumrollPlayer().playMusicShort((Objects.requireNonNull(getClass().getResource("/sound/drum_roll.wav")).toExternalForm().replace("file:/", "/")));
+        getDrumrollPlayer().playMusicShort((Objects.requireNonNull(getClass().getResource("/sound/drum_roll.wav"))
+                .toExternalForm()
+                .replace("file:/", "/")));
 
     }
 
+    /**
+     * Initializes the game end box with styling and content.
+     * Sets up spacing, alignment, and creates a label to display the winner.
+     */
     private void initializeGameEndBox()
     {
         getGameEndBox().setSpacing(25);
@@ -403,6 +491,14 @@ public class Controller
 
     }
 
+    /**
+     * Initializes a wins counter pane for displaying player or AI scores.
+     * Creates and configures a VBox containing player/AI label and score counter.
+     *
+     * @param position The position alignment for the counter box (TOP_RIGHT or TOP_LEFT)
+     * @param user     The name to display ("Player" or "AI")
+     * @return VBox Configured counter display container
+     */
     private VBox initializeWinsCounterPane(Pos position, String user)
     {
         VBox box = new VBox();
@@ -430,6 +526,18 @@ public class Controller
         return box;
     }
 
+    /**
+     * Initializes all user interface elements and game components.
+     * This method:
+     * - Sets up the play stone IDs (Rock, Paper, Scissors, Well)
+     * - Initializes music players for background and effects
+     * - Creates score counter boxes for both players
+     * - Sets up the game end popup
+     * - Initializes all game buttons
+     * - Creates and configures the player box
+     * - Sets up computer hand, table, and player hand images
+     * - Applies styling to all game elements
+     */
     private void initializeUserElements()
     {
         getPlayStonesIDs().put(0, Rock.getId());
@@ -452,8 +560,15 @@ public class Controller
 
         initializePlayerBox();
 
-        setComputerHand(initializeImageView(true, new Image(Objects.requireNonNull(getClass().getResource("/img/masterHand_default.png")).toExternalForm()), .2, .3));
-        setTable(initializeImageView(true, new Image(Objects.requireNonNull(getClass().getResource("/img/table.png")).toExternalForm()), 1, .2));
+        setComputerHand(initializeImageView(true,
+                new Image(Objects.requireNonNull(getClass().getResource("/img/masterHand_default.png"))
+                        .toExternalForm()),
+                .2,
+                .3));
+        setTable(initializeImageView(true,
+                new Image(Objects.requireNonNull(getClass().getResource("/img/table.png")).toExternalForm()),
+                1,
+                .2));
         setPlayerHand(initializeImageView(false, null, .1, .2));
 
         getPlayerBox().getStyleClass().add("hbox");
@@ -469,25 +584,40 @@ public class Controller
         getPlayerHand().prefWidth(getRockButton().widthProperty().getValue());
     }
 
+    /**
+     * Initializes a button with standard game properties.
+     * Sets up the button with specified size, ID, and click handler.
+     * The click handler runs in a separate thread to handle game actions.
+     *
+     * @param id The identifier for the button
+     * @return Button Configured button with standard properties
+     */
     private Button initializeButton(String id)
     {
         Button button = new Button();
         button.setMinSize(getMaxButtonWidth(), getMaxButtonHeight());
         button.setId(id);
         button.setFocusTraversable(false);
-        button.setOnAction(event -> new Thread(() ->
-        {
-            try
-            {
+        button.setOnAction(event -> new Thread(() -> {
+            try {
                 handleButtonClick(event);
-            } catch (InterruptedException e)
-            {
+            } catch (InterruptedException e) {
                 System.out.println(e.getMessage());
             }
         }).start());
         return button;
     }
 
+    /**
+     * Initializes an ImageView with specified properties.
+     * Creates and configures an ImageView with size bindings relative to the stage dimensions.
+     *
+     * @param visibility   Initial visibility state of the image
+     * @param image        The Image to be displayed
+     * @param widthFactor  Multiplication factor for stage width to determine image width
+     * @param heightFactor Multiplication factor for stage height to determine image height
+     * @return ImageView Configured image view with the specified properties
+     */
     private ImageView initializeImageView(boolean visibility, Image image, double widthFactor, double heightFactor)
     {
         ImageView imageView = new ImageView();
@@ -500,30 +630,42 @@ public class Controller
         return imageView;
     }
 
+    /**
+     * Initializes the player's button box containing game controls.
+     * Configures an HBox with:
+     * - Disabled vertical content stretching
+     * - Width bound to window width
+     * - Centered alignment
+     * - Equal spacing between buttons
+     * - Properly sized and configured game buttons (rock, paper, scissors, well)
+     */
     private void initializePlayerBox()
     {
         getPlayerBox().setFillHeight(false); // Don't Stretch content vertical
         getPlayerBox().prefWidthProperty().bind(getStage().widthProperty()); // Bind width of HBox to window width
-        getPlayerBox().setAlignment(Pos.CENTER); // Buttons in der Mitte zentrieren
-        getPlayerBox().setSpacing(20); // Abstand zwischen Buttons
+        getPlayerBox().setAlignment(Pos.CENTER); // Centre buttons in the middle
+        getPlayerBox().setSpacing(20); // Distance between buttons
 
         // Button-Settings
         Button[] buttons = {getRockButton(), getPaperButton(), getScissorsButton(), getWellButton()};
-        for (Button button : buttons)
-        {
-            HBox.setHgrow(button, Priority.ALWAYS); // Button in HBox wachsen lassen
-            button.prefWidthProperty().bind(getPlayerBox().widthProperty().divide(4).subtract(20)); // gleichmäßige Breite
-            button.prefHeightProperty().bind(getPlayerBox().heightProperty().multiply(0.8)); // Höhe relativ zur HBox
+        for (Button button : buttons) {
+            HBox.setHgrow(button, Priority.ALWAYS); // Grow button in HBox
+            button.prefWidthProperty().bind(getPlayerBox().widthProperty().divide(4).subtract(20)); // Uniform width
+            button.prefHeightProperty()
+                    .bind(getPlayerBox().heightProperty().multiply(0.8)); // Height relative to the HBox
             button.setFocusTraversable(false);
         }
     }
 
+    /**
+     * Hides all elements in the player box except for the player's hand.
+     * Doubles the size of the player's hand and makes it visible.
+     * Executes on the JavaFX Application Thread.
+     */
     private void removePlayerBoxes()
     {
-        Platform.runLater(() ->
-        {
-            for (Node node : getPlayerBox().getChildren())
-            {
+        Platform.runLater(() -> {
+            for (Node node : getPlayerBox().getChildren()) {
                 if (node == getPlayerHand()) continue;
                 node.setVisible(false);
             }
@@ -533,37 +675,56 @@ public class Controller
         });
     }
 
+    /**
+     * Generates a random move for the AI opponent.
+     * Selects a random number between 0 and 3 (inclusive) representing rock, paper, scissors, or well.
+     */
     private void aiTurn()
     {
         Random random = new Random();
         setAiChoice(random.nextInt(4));
     }
 
+    /**
+     * Adds an ImageView to a specified HBox with proper alignment and sizing.
+     * Centers the image and binds the box width to the window width.
+     *
+     * @param box   The HBox container to add the image to
+     * @param image The ImageView to be added to the box
+     */
     private void addImageViewsToBoxes(HBox box, ImageView image)
     {
-        box.setAlignment(Pos.CENTER); // Zentriere ImageView
-        box.setSpacing(20); // Optional: Abstand für mehrere Elemente
-        box.prefWidthProperty().bind(getStage().widthProperty()); // Passe Breite an Fensterbreite an
+        box.setAlignment(Pos.CENTER); // Centre ImageView
+        box.setSpacing(20); // Optional: Spacing for multiple elements
+        box.prefWidthProperty().bind(getStage().widthProperty()); // Adjust width to window width
         box.getChildren().add(image);
     }
 
+    /**
+     * Prepares the animation sequence for the game.
+     * Creates black bars for transition effects and stops background music.
+     */
     private void prepareAnimation()
     {
-        // Schwarze Balken
+        // Black bars
         setrTop(new Rectangle(getRoot().getWidth(), 100, Color.BLACK));
         setrBot(new Rectangle(getRoot().getWidth(), 100, Color.BLACK));
-        getrTop().setTranslateY(-100);  // Start außerhalb des Bildschirms
-        getrBot().setTranslateY(100);   // Start außerhalb des Bildschirms
+        getrTop().setTranslateY(-100);  // Start outside the screen
+        getrBot().setTranslateY(100);   // Start outside the screen
 
         stopBackgroundMusic();
         startAnimation();
     }
 
+    /**
+     * Initiates the game animation sequence.
+     * Plays drumroll sound, disables window resizing, and animates game elements.
+     * Includes transitions for hands and black bars.
+     */
     private void startAnimation()
     {
         playDrumroll();
-        Platform.runLater(() ->
-        {
+        Platform.runLater(() -> {
             getStage().setResizable(false);
 
             getRoot().getChildren().clear(); // use clear() instead of removeAll()
@@ -572,17 +733,16 @@ public class Controller
             setTopBarAnimation(new TranslateTransition(Duration.seconds(3), getrTop()));
             setBottomBarAnimation(new TranslateTransition(Duration.seconds(3), getrBot()));
 
-            if (getRoot().getHeight() < 900)
-            {
+            if (getRoot().getHeight() < 900) {
                 getTopBarAnimation().setToY(0);
                 getBottomBarAnimation().setToY(0);
-            } else
-            {
+            } else {
                 getTopBarAnimation().setToY((-1) * (getRoot().getHeight() / 50));
                 getBottomBarAnimation().setToY((getRoot().getHeight() / 50));
             }
 
-            TranslateTransition playerHandTranslateAnimation = new TranslateTransition(Duration.seconds(3), getPlayerHand());
+            TranslateTransition playerHandTranslateAnimation = new TranslateTransition(Duration.seconds(3),
+                    getPlayerHand());
             playerHandTranslateAnimation.setToX((-1) * (getRoot().getWidth() / 2.5));
             playerHandTranslateAnimation.setToY((-1) * (getRoot().getHeight() / 2.2));
 
@@ -591,6 +751,49 @@ public class Controller
         });
     }
 
+    /**
+     * Resets all animations and returns game elements to their original positions.
+     * Restores window resizing and resets the layout to the default game state.
+     */
+    private void resetAnimation()
+    {
+        Platform.runLater(() -> {
+            // Animates the bars back outside the screen
+            TranslateTransition resetTopBarAnimation = new TranslateTransition(Duration.seconds(3), getrTop());
+            resetTopBarAnimation.setToY(-100);
+
+            TranslateTransition resetBottomBarAnimation = new TranslateTransition(Duration.seconds(3), getrBot());
+            resetBottomBarAnimation.setToY(100);
+
+            // Player hand back to the centre
+            TranslateTransition resetPlayerHandAnimation = new TranslateTransition(Duration.seconds(3),
+                    getPlayerHand());
+            resetPlayerHandAnimation.setToX(0);
+            resetPlayerHandAnimation.setToY(0);
+
+            // Scaling of the player hand back to standard
+            ParallelTransition resetParallelTransition = getParallelTransition(resetTopBarAnimation,
+                    resetBottomBarAnimation,
+                    resetPlayerHandAnimation);
+
+            // Reset the root elements to default after the animation
+            resetParallelTransition.setOnFinished(event -> {
+                getEnemyBox().getChildren().add(getComputerHand());
+                getRoot().getChildren().clear();
+                getRoot().getChildren().addAll(getProgressBox(), getEnemyBox(), getTableBox(), getPlayerBox());
+            });
+
+            getStage().setResizable(true);
+        });
+    }
+
+    /**
+     * Creates a parallel transition for the game animation.
+     * Combines multiple animations including hand movements and scaling effects.
+     *
+     * @param playerHandTranslateAnimation The translation animation for the player's hand
+     * @return ParallelTransition containing all combined animations
+     */
     private ParallelTransition getParallelTransition(TranslateTransition playerHandTranslateAnimation)
     {
         TranslateTransition computerHandAnimation = new TranslateTransition(Duration.seconds(3), getComputerHand());
@@ -621,57 +824,35 @@ public class Controller
                 tableAnimation);
     }
 
-    private void resetAnimation()
-    {
-        Platform.runLater(() ->
-        {
-            // Animiert die Balken zurück außerhalb des Bildschirms
-            TranslateTransition resetTopBarAnimation = new TranslateTransition(Duration.seconds(3), getrTop());
-            resetTopBarAnimation.setToY(-100);
-
-            TranslateTransition resetBottomBarAnimation = new TranslateTransition(Duration.seconds(3), getrBot());
-            resetBottomBarAnimation.setToY(100);
-
-            // Spielerhand zurück zur Mitte
-            TranslateTransition resetPlayerHandAnimation = new TranslateTransition(Duration.seconds(3),
-                    getPlayerHand());
-            resetPlayerHandAnimation.setToX(0);
-            resetPlayerHandAnimation.setToY(0);
-
-            // Skalierung der Spielerhand zurück auf Standard
-            ParallelTransition resetParallelTransition = getParallelTransition(resetTopBarAnimation, resetBottomBarAnimation, resetPlayerHandAnimation);
-
-            // Nach der Animation die Root-Elemente auf Standard zurücksetzen
-            resetParallelTransition.setOnFinished(event ->
-            {
-                getEnemyBox().getChildren().add(getComputerHand());
-                getRoot().getChildren().clear();
-                getRoot().getChildren()
-                        .addAll(getProgressBox(), getEnemyBox(), getTableBox(), getPlayerBox());
-            });
-
-            getStage().setResizable(true);
-        });
-    }
-
-    private ParallelTransition getParallelTransition(TranslateTransition resetTopBarAnimation, TranslateTransition resetBottomBarAnimation, TranslateTransition resetPlayerHandAnimation)
+    /**
+     * Creates a parallel transition for resetting the game state.
+     * Combines multiple reset animations for all game elements.
+     *
+     * @param resetTopBarAnimation     Animation for the top bar
+     * @param resetBottomBarAnimation  Animation for the bottom bar
+     * @param resetPlayerHandAnimation Animation for the player's hand
+     * @return ParallelTransition containing all reset animations
+     */
+    private ParallelTransition getParallelTransition(TranslateTransition resetTopBarAnimation,
+                                                     TranslateTransition resetBottomBarAnimation,
+                                                     TranslateTransition resetPlayerHandAnimation)
     {
         ScaleTransition resetPlayerHandScaleAnimation = new ScaleTransition(Duration.seconds(3), getPlayerHand());
         resetPlayerHandScaleAnimation.setToX(1.0);
         resetPlayerHandScaleAnimation.setToY(1.0);
 
-        // Gegnerhand zurück zur Mitte
+        // Opponent's hand back to the centre
         TranslateTransition resetComputerHandAnimation = new TranslateTransition(Duration.seconds(3),
                 getComputerHand());
         resetComputerHandAnimation.setToX(0);
         resetComputerHandAnimation.setToY(0);
 
-        // Tisch zurück auf Standardgröße
+        // Table back to standard size
         ScaleTransition resetTableAnimation = new ScaleTransition(Duration.seconds(3), getTable());
         resetTableAnimation.setToX(1.0);
         resetTableAnimation.setToY(1.0);
 
-        // ParallelTransition erstellt eine Animation, die alle Rücksetz-Animationen zusammenführt
+        // ParallelTransition creates an animation that merges all reset animations
         ParallelTransition resetParallelTransition = new ParallelTransition(resetTopBarAnimation,
                 resetBottomBarAnimation,
                 resetPlayerHandAnimation,
@@ -679,7 +860,7 @@ public class Controller
                 resetComputerHandAnimation,
                 resetTableAnimation);
 
-        // Spielt die Animation ab
+        // Plays the animation
         resetParallelTransition.play();
         return resetParallelTransition;
     }
@@ -756,8 +937,7 @@ public class Controller
 
     public void setAiChoice(int aiChoice)
     {
-        switch (aiChoice)
-        {
+        switch (aiChoice) {
             case -1 -> this.aiChoice = null;
             case 0 -> this.aiChoice = playStonesIDs.getOrDefault(0, null);
             case 1 -> this.aiChoice = playStonesIDs.getOrDefault(1, null);
@@ -770,26 +950,6 @@ public class Controller
     public HashMap<Integer, String> getPlayStonesIDs()
     {
         return playStonesIDs;
-    }
-
-    public static int getMaxHBoxWidth()
-    {
-        return maxHBoxWidth;
-    }
-
-    public static int getMaxHBoxHeight()
-    {
-        return maxHBoxHeight;
-    }
-
-    public static int getMaxButtonWidth()
-    {
-        return maxButtonWidth;
-    }
-
-    public static int getMaxButtonHeight()
-    {
-        return maxButtonHeight;
     }
 
     public HBox getProgressBox()
