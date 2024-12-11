@@ -10,7 +10,6 @@ import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
-import javafx.scene.control.ProgressIndicator;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.HBox;
@@ -60,13 +59,13 @@ public class Controller
     private Button paperButton;
     private Button scissorsButton;
     private Button wellButton;
-    private ProgressIndicator enemieProgressIndicator;
     private ImageView table;
     private ImageView computerHand;
     private ImageView playerHand;
     private VBox playerWinsCounterBox;
     private VBox aiWinsCounterBox;
-    private MusicPlayer musicPlayer;
+    private MusicPlayer backgroundMusicPlayer;
+    private MusicPlayer drumrollPlayer;
 
     public void start(Stage stage)
     {
@@ -74,6 +73,7 @@ public class Controller
         setStage(stage);
         initializeUserElements();
 
+        playBackgroundMusic();
         showWindow();
     }
 
@@ -86,7 +86,6 @@ public class Controller
                 Thread.sleep(3000);
                 aiTurn();
                 updateComputerHand();
-                getEnemieProgressIndicator().setVisible(false);
             } catch (InterruptedException e)
             {
                 System.out.println(e.getMessage());
@@ -112,9 +111,11 @@ public class Controller
 
         Scene scene = new Scene(getRoot());
         scene.getStylesheets().add(Objects.requireNonNull(getClass().getResource("/style.css")).toExternalForm());
+        getStage().getIcons().add(new Image(Objects.requireNonNull(getClass().getResourceAsStream("/img/masterHand_default.png"))));
         getStage().setScene(scene);
         getStage().setTitle("Schere Stein Papier");
         getStage().setHeight(900);
+        getStage().isFullScreen();
         getStage().show();
     }
 
@@ -131,8 +132,8 @@ public class Controller
         stage.initOwner(getStage());
         stage.initModality(Modality.WINDOW_MODAL);
         stage.setScene(new Scene(getGameEndBox()));
-        stage.setMinHeight(500);
-        stage.setMinWidth(1200);
+        stage.setMinHeight(200);
+        stage.setMinWidth(550);
         stage.setResizable(false);
         stage.setOnCloseRequest(event -> restartGame());
         
@@ -155,7 +156,7 @@ public class Controller
 
         getComputerHand().setImage(new Image(Objects.requireNonNull(getClass().getResource("/img/masterHand_default.png")).toExternalForm()));
 
-        getEnemieProgressIndicator().setVisible(false);
+        playBackgroundMusic();
 
         resetAnimation();
     }
@@ -174,8 +175,6 @@ public class Controller
         }
 
         updatePlayerHand();
-
-        getEnemieProgressIndicator().setVisible(true);
 
         Thread removeplayerBoxThread = new Thread(this::removePlayerBoxes);
         removeplayerBoxThread.setDaemon(true);
@@ -261,12 +260,12 @@ public class Controller
             case 1 ->
             {
                 setWinner("Player");
-                new Thread(() -> getMusicPlayer().playMusicShort((Objects.requireNonNull(getClass().getResource("/sound/player_win.wav")).toExternalForm().replace("file:/", "/")))).start();
+                new Thread(() -> getBackgroundMusicPlayer().playMusicShort((Objects.requireNonNull(getClass().getResource("/sound/player_win.wav")).toExternalForm().replace("file:/", "/")))).start();
             }
             case 2 ->
             {
                 setWinner("AI");
-                new Thread(() -> getMusicPlayer().playMusicShort((Objects.requireNonNull(getClass().getResource("/sound/player_lose.wav")).toExternalForm().replace("file:/", "/")))).start();
+                new Thread(() -> getBackgroundMusicPlayer().playMusicShort((Objects.requireNonNull(getClass().getResource("/sound/player_lose.wav")).toExternalForm().replace("file:/", "/")))).start();
             }
             case 0 -> setWinner("No Winner");
         }
@@ -352,25 +351,56 @@ public class Controller
         }
     }
 
+    private void playBackgroundMusic()
+    {
+        getBackgroundMusicPlayer().playMusic((Objects.requireNonNull(getClass().getResource("/sound/background_music.wav")).toExternalForm().replace("file:/", "/")));
+    }
+
+    private void stopBackgroundMusic()
+    {
+        getBackgroundMusicPlayer().stopMusic();
+    }
+
+    private void playDrumroll()
+    {
+        getDrumrollPlayer().playMusicShort((Objects.requireNonNull(getClass().getResource("/sound/drum_roll.wav")).toExternalForm().replace("file:/", "/")));
+
+    }
+
     private void initializeGameEndBox()
     {
-        getGameEndBox().setSpacing(10);
-        getGameEndBox().setStyle("-fx-background-color: rgba(0, 0, 0, 0.8); -fx-padding: 20;");
+        getGameEndBox().setSpacing(25);
         getGameEndBox().setAlignment(Pos.CENTER);
+        getGameEndBox().getStyleClass().add("gameEndBox");
 
         Label winnerMessage = new Label(getWinner() + " has won the Game!");
-        winnerMessage.setStyle("-fx-font-size: 20px; -fx-text-fill: white;");
         winnerMessage.setFocusTraversable(false);
+        winnerMessage.getStyleClass().add("winnerMessage");
 
         Button exitButton = new Button("Exit");
         exitButton.setOnAction(event -> Platform.exit());
         exitButton.setFocusTraversable(false);
+        exitButton.getStyleClass().add("button");
+        exitButton.getStyleClass().add("hidden-on-hover");
 
         Button playAgainButton = new Button("Play Again");
         playAgainButton.setOnAction(event -> restartGame());
         playAgainButton.setFocusTraversable(false);
+        playAgainButton.getStyleClass().add("button");
 
-        getGameEndBox().getChildren().addAll(getPlayerWinsCounterBox(), winnerMessage, exitButton, playAgainButton, getAiWinsCounterBox());
+        getGameEndBox().getStylesheets()
+                .add(Objects.requireNonNull(getClass().getResource("/gameEndBox.css")).toExternalForm());
+        getPlayerWinsCounterBox().getStyleClass().add("winsCounterBox");
+        getAiWinsCounterBox().getStyleClass().add("winsCounterBox");
+
+        VBox buttonBox = new VBox(10); // 10 is the spacing between buttons
+        buttonBox.setAlignment(Pos.CENTER); // Center the buttons
+        buttonBox.getChildren().addAll(exitButton, playAgainButton);
+
+        getGameEndBox().getChildren()
+                .addAll(getPlayerWinsCounterBox(), winnerMessage, buttonBox, getAiWinsCounterBox());
+
+
     }
 
     private VBox initializeWinsCounterPane(Pos position, String user)
@@ -379,14 +409,23 @@ public class Controller
         Label counterLabel = new Label();
         Label userLabel = new Label(user + " Wins");
 
+        box.setMaxHeight(100);
+        box.setMinHeight(100);
+        box.setPrefHeight(100);
+        box.setMaxWidth(100);
+        box.setMinWidth(100);
+        box.setPrefWidth(100);
+
         box.setAlignment(position);
         box.setSpacing(10);
-        box.setStyle("-fx-background-color: rgba(0, 0, 0, 0.8); -fx-padding: 10;");
-        userLabel.setStyle("--fx-font-size: 20px; -fx-text-fill: white;");
-        userLabel.setFocusTraversable(false);
-        counterLabel.setFocusTraversable(false);
+        box.getStyleClass().add("box");
         box.setFocusTraversable(false);
         box.getChildren().addAll(userLabel, counterLabel);
+        box.getStylesheets().add(Objects.requireNonNull(getClass().getResource("/style.css")).toExternalForm());
+        counterLabel.setFocusTraversable(false);
+        userLabel.getStyleClass().add("userLabel");
+        userLabel.setFocusTraversable(false);
+        userLabel.getStylesheets().add(Objects.requireNonNull(getClass().getResource("/style.css")).toExternalForm());
 
         return box;
     }
@@ -398,7 +437,8 @@ public class Controller
         getPlayStonesIDs().put(2, Scissors.getId());
         getPlayStonesIDs().put(3, Well.getId());
 
-        setMusicPlayer(new MusicPlayer());
+        setBackgroundMusicPlayer(new MusicPlayer());
+        setDrumrollPlayer(new MusicPlayer());
 
         setPlayerWinsCounterBox(initializeWinsCounterPane(Pos.TOP_RIGHT, "Player"));
         setAiWinsCounterBox(initializeWinsCounterPane(Pos.TOP_LEFT, "AI"));
@@ -409,10 +449,8 @@ public class Controller
         setPaperButton(initializeButton(getPlayStonesIDs().getOrDefault(1, null)));
         setScissorsButton(initializeButton(getPlayStonesIDs().getOrDefault(2, null)));
         setWellButton(initializeButton(getPlayStonesIDs().getOrDefault(3, null)));
-        setEnemieProgressIndicator(initializeProgressIndicator());
 
         initializePlayerBox();
-        addProgressIndicatorToBox(getProgressBox(), getEnemieProgressIndicator());
 
         setComputerHand(initializeImageView(true, new Image(Objects.requireNonNull(getClass().getResource("/img/masterHand_default.png")).toExternalForm()), .2, .3));
         setTable(initializeImageView(true, new Image(Objects.requireNonNull(getClass().getResource("/img/table.png")).toExternalForm()), 1, .2));
@@ -480,17 +518,6 @@ public class Controller
         }
     }
 
-    private ProgressIndicator initializeProgressIndicator()
-    {
-        ProgressIndicator progressIndicator = new ProgressIndicator();
-        progressIndicator.setId("enemie_progress_indicator");
-        progressIndicator.setMinSize(100, 50);
-        progressIndicator.setFocusTraversable(false);
-        progressIndicator.setVisible(false);
-
-        return progressIndicator;
-    }
-
     private void removePlayerBoxes()
     {
         Platform.runLater(() ->
@@ -520,11 +547,6 @@ public class Controller
         box.getChildren().add(image);
     }
 
-    private void addProgressIndicatorToBox(HBox box, ProgressIndicator progressIndicator)
-    {
-        box.getChildren().add(progressIndicator);
-    }
-
     private void prepareAnimation()
     {
         // Schwarze Balken
@@ -533,11 +555,13 @@ public class Controller
         getrTop().setTranslateY(-100);  // Start außerhalb des Bildschirms
         getrBot().setTranslateY(100);   // Start außerhalb des Bildschirms
 
+        stopBackgroundMusic();
         startAnimation();
     }
 
     private void startAnimation()
     {
+        playDrumroll();
         Platform.runLater(() ->
         {
             getStage().setResizable(false);
@@ -545,10 +569,8 @@ public class Controller
             getRoot().getChildren().clear(); // use clear() instead of removeAll()
             getRoot().getChildren().addAll(getrTop(), getComputerHand(), getTableBox(), getPlayerHand(), getrBot());
 
-            getRoot().setStyle("-fx-background-color: white;");
-
-            setTopBarAnimation(new TranslateTransition(Duration.seconds(1), getrTop()));
-            setBottomBarAnimation(new TranslateTransition(Duration.seconds(1), getrBot()));
+            setTopBarAnimation(new TranslateTransition(Duration.seconds(3), getrTop()));
+            setBottomBarAnimation(new TranslateTransition(Duration.seconds(3), getrBot()));
 
             if (getRoot().getHeight() < 900)
             {
@@ -560,7 +582,7 @@ public class Controller
                 getBottomBarAnimation().setToY((getRoot().getHeight() / 50));
             }
 
-            TranslateTransition playerHandTranslateAnimation = new TranslateTransition(Duration.seconds(1), getPlayerHand());
+            TranslateTransition playerHandTranslateAnimation = new TranslateTransition(Duration.seconds(3), getPlayerHand());
             playerHandTranslateAnimation.setToX((-1) * (getRoot().getWidth() / 2.5));
             playerHandTranslateAnimation.setToY((-1) * (getRoot().getHeight() / 2.2));
 
@@ -571,24 +593,21 @@ public class Controller
 
     private ParallelTransition getParallelTransition(TranslateTransition playerHandTranslateAnimation)
     {
-        TranslateTransition computerHandAnimation = new TranslateTransition(Duration.seconds(1), getComputerHand());
+        TranslateTransition computerHandAnimation = new TranslateTransition(Duration.seconds(3), getComputerHand());
         computerHandAnimation.setToX((getRoot().getWidth() / 2.5));
         computerHandAnimation.setToY((getRoot().getHeight() / 13.5));
 
-        TranslateTransition progressIndicatorAnimation = new TranslateTransition(Duration.seconds(1),
-                getEnemieProgressIndicator());
         computerHandAnimation.setToX((getRoot().getWidth() / 2.5));
         computerHandAnimation.setToY((getRoot().getHeight() / 13.5));
-//        progressIndicatorAnimation.setToY((-1)*(getRoot().getWidth() / 2.5));
 
 
-        ScaleTransition playerHandScaleAnimation = new ScaleTransition(Duration.seconds(1), getPlayerHand());
+        ScaleTransition playerHandScaleAnimation = new ScaleTransition(Duration.seconds(3), getPlayerHand());
         playerHandScaleAnimation.setFromX(1.0);
         playerHandScaleAnimation.setToX(2);
         playerHandScaleAnimation.setFromY(1);
         playerHandScaleAnimation.setFromY(2);
 
-        ScaleTransition tableAnimation = new ScaleTransition(Duration.seconds(1), getTable());
+        ScaleTransition tableAnimation = new ScaleTransition(Duration.seconds(3), getTable());
         tableAnimation.setFromX(1.0);
         tableAnimation.setToX(.6);
         tableAnimation.setFromY(1);
@@ -599,8 +618,7 @@ public class Controller
                 playerHandTranslateAnimation,
                 playerHandScaleAnimation,
                 computerHandAnimation,
-                tableAnimation,
-                progressIndicatorAnimation);
+                tableAnimation);
     }
 
     private void resetAnimation()
@@ -608,14 +626,14 @@ public class Controller
         Platform.runLater(() ->
         {
             // Animiert die Balken zurück außerhalb des Bildschirms
-            TranslateTransition resetTopBarAnimation = new TranslateTransition(Duration.seconds(1), getrTop());
+            TranslateTransition resetTopBarAnimation = new TranslateTransition(Duration.seconds(3), getrTop());
             resetTopBarAnimation.setToY(-100);
 
-            TranslateTransition resetBottomBarAnimation = new TranslateTransition(Duration.seconds(1), getrBot());
+            TranslateTransition resetBottomBarAnimation = new TranslateTransition(Duration.seconds(3), getrBot());
             resetBottomBarAnimation.setToY(100);
 
             // Spielerhand zurück zur Mitte
-            TranslateTransition resetPlayerHandAnimation = new TranslateTransition(Duration.seconds(1),
+            TranslateTransition resetPlayerHandAnimation = new TranslateTransition(Duration.seconds(3),
                     getPlayerHand());
             resetPlayerHandAnimation.setToX(0);
             resetPlayerHandAnimation.setToY(0);
@@ -630,7 +648,6 @@ public class Controller
                 getRoot().getChildren().clear();
                 getRoot().getChildren()
                         .addAll(getProgressBox(), getEnemyBox(), getTableBox(), getPlayerBox());
-                getRoot().setStyle("-fx-background-color: transparent;");
             });
 
             getStage().setResizable(true);
@@ -639,26 +656,20 @@ public class Controller
 
     private ParallelTransition getParallelTransition(TranslateTransition resetTopBarAnimation, TranslateTransition resetBottomBarAnimation, TranslateTransition resetPlayerHandAnimation)
     {
-        ScaleTransition resetPlayerHandScaleAnimation = new ScaleTransition(Duration.seconds(1), getPlayerHand());
+        ScaleTransition resetPlayerHandScaleAnimation = new ScaleTransition(Duration.seconds(3), getPlayerHand());
         resetPlayerHandScaleAnimation.setToX(1.0);
         resetPlayerHandScaleAnimation.setToY(1.0);
 
         // Gegnerhand zurück zur Mitte
-        TranslateTransition resetComputerHandAnimation = new TranslateTransition(Duration.seconds(1),
+        TranslateTransition resetComputerHandAnimation = new TranslateTransition(Duration.seconds(3),
                 getComputerHand());
         resetComputerHandAnimation.setToX(0);
         resetComputerHandAnimation.setToY(0);
 
         // Tisch zurück auf Standardgröße
-        ScaleTransition resetTableAnimation = new ScaleTransition(Duration.seconds(1), getTable());
+        ScaleTransition resetTableAnimation = new ScaleTransition(Duration.seconds(3), getTable());
         resetTableAnimation.setToX(1.0);
         resetTableAnimation.setToY(1.0);
-
-        // Fortschrittsanzeige zurück zur Mitte und unsichtbar
-        TranslateTransition resetProgressIndicatorAnimation = new TranslateTransition(Duration.seconds(1),
-                getEnemieProgressIndicator());
-        resetProgressIndicatorAnimation.setToX(0);
-        resetProgressIndicatorAnimation.setToY(0);
 
         // ParallelTransition erstellt eine Animation, die alle Rücksetz-Animationen zusammenführt
         ParallelTransition resetParallelTransition = new ParallelTransition(resetTopBarAnimation,
@@ -666,8 +677,7 @@ public class Controller
                 resetPlayerHandAnimation,
                 resetPlayerHandScaleAnimation,
                 resetComputerHandAnimation,
-                resetTableAnimation,
-                resetProgressIndicatorAnimation);
+                resetTableAnimation);
 
         // Spielt die Animation ab
         resetParallelTransition.play();
@@ -722,16 +732,6 @@ public class Controller
     public void setWellButton(Button wellButton)
     {
         this.wellButton = wellButton;
-    }
-
-    public ProgressIndicator getEnemieProgressIndicator()
-    {
-        return enemieProgressIndicator;
-    }
-
-    public void setEnemieProgressIndicator(ProgressIndicator enemieProgressIndicator)
-    {
-        this.enemieProgressIndicator = enemieProgressIndicator;
     }
 
     public VBox getRoot()
@@ -947,13 +947,23 @@ public class Controller
         this.bottomBarAnimation = bottomBarAnimation;
     }
 
-    public MusicPlayer getMusicPlayer()
+    public MusicPlayer getBackgroundMusicPlayer()
     {
-        return musicPlayer;
+        return backgroundMusicPlayer;
     }
 
-    public void setMusicPlayer(MusicPlayer musicPlayer)
+    public void setBackgroundMusicPlayer(MusicPlayer backgroundMusicPlayer)
     {
-        this.musicPlayer = musicPlayer;
+        this.backgroundMusicPlayer = backgroundMusicPlayer;
+    }
+
+    public MusicPlayer getDrumrollPlayer()
+    {
+        return drumrollPlayer;
+    }
+
+    public void setDrumrollPlayer(MusicPlayer drumrollPlayer)
+    {
+        this.drumrollPlayer = drumrollPlayer;
     }
 }
