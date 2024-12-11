@@ -25,7 +25,8 @@ import java.util.HashMap;
 import java.util.Objects;
 import java.util.Random;
 
-public class Controller {
+public class Controller
+{
     /**
      * Rock
      * Paper
@@ -66,26 +67,6 @@ public class Controller {
     private MusicPlayer backgroundMusicPlayer;
     private MusicPlayer drumrollPlayer;
 
-    public static int getMaxHBoxWidth()
-    {
-        return maxHBoxWidth;
-    }
-
-    public static int getMaxHBoxHeight()
-    {
-        return maxHBoxHeight;
-    }
-
-    public static int getMaxButtonWidth()
-    {
-        return maxButtonWidth;
-    }
-
-    public static int getMaxButtonHeight()
-    {
-        return maxButtonHeight;
-    }
-
     /**
      * Initializes and starts the game window.
      * Sets up default values, initializes UI elements, and starts background music.
@@ -109,14 +90,18 @@ public class Controller {
      */
     private void play()
     {
-        Thread sleepThread = new Thread(() -> {
-            try {
+        Thread sleepThread = new Thread(() ->
+        {
+            try
+            {
                 Thread.sleep(3000);
                 aiTurn();
                 updateComputerHand();
-            } catch (InterruptedException e) {
+            } catch (InterruptedException e)
+            {
                 System.out.println(e.getMessage());
-            } finally {
+            } finally
+            {
                 Platform.runLater(this::selectWinner);
             }
         });
@@ -188,7 +173,8 @@ public class Controller {
 
         setDefaultValues();
 
-        for (Node node : getPlayerBox().getChildren()) {
+        for (Node node : getPlayerBox().getChildren())
+        {
             node.setVisible(true);
         }
         getPlayerHand().setVisible(false);
@@ -215,7 +201,8 @@ public class Controller {
         Button sourceButton = (Button) event.getSource();
         String buttonId = sourceButton.getId();
 
-        switch (buttonId) {
+        switch (buttonId)
+        {
             case Rock.id -> setPlayerChoice(getPlayStonesIDs().getOrDefault(0, null));
             case Paper.id -> setPlayerChoice(getPlayStonesIDs().getOrDefault(1, null));
             case Scissors.id -> setPlayerChoice(getPlayStonesIDs().getOrDefault(2, null));
@@ -242,42 +229,58 @@ public class Controller {
     private int evaluateWinner()
     {
         if (getPlayerChoice().equals(getAiChoice())) return 0;
-        if (getPlayerChoice().equals(Scissors.id)) {
-            switch (getAiChoice()) {
-                case Paper.id -> {
+        if (getPlayerChoice().equals(Scissors.id))
+        {
+            switch (getAiChoice())
+            {
+                case Paper.id ->
+                {
                     return 1;
                 }
-                case Rock.id, Well.id -> {
+                case Rock.id, Well.id ->
+                {
                     return 2;
                 }
             }
         }
-        if (getPlayerChoice().equals(Rock.id)) {
-            switch (getAiChoice()) {
-                case Scissors.id -> {
+        if (getPlayerChoice().equals(Rock.id))
+        {
+            switch (getAiChoice())
+            {
+                case Scissors.id ->
+                {
                     return 1;
                 }
-                case Paper.id, Well.id -> {
+                case Paper.id, Well.id ->
+                {
                     return 2;
                 }
             }
         }
-        if (getPlayerChoice().equals(Paper.id)) {
-            switch (getAiChoice()) {
-                case Rock.id, Well.id -> {
+        if (getPlayerChoice().equals(Paper.id))
+        {
+            switch (getAiChoice())
+            {
+                case Rock.id, Well.id ->
+                {
                     return 1;
                 }
-                case Scissors.id -> {
+                case Scissors.id ->
+                {
                     return 2;
                 }
             }
         }
-        if (getPlayerChoice().equals(Well.id)) {
-            switch (getAiChoice()) {
-                case Scissors.id, Rock.id -> {
+        if (getPlayerChoice().equals(Well.id))
+        {
+            switch (getAiChoice())
+            {
+                case Scissors.id, Rock.id ->
+                {
                     return 1;
                 }
-                case Paper.id -> {
+                case Paper.id ->
+                {
                     return 2;
                 }
             }
@@ -292,16 +295,19 @@ public class Controller {
      */
     private void selectWinner()
     {
-        switch (evaluateWinner()) {
-            case 1 -> {
+        switch (evaluateWinner())
+        {
+            case 1 ->
+            {
                 setWinner("Player");
                 new Thread(() -> getBackgroundMusicPlayer().playMusicShort((Objects.requireNonNull(getClass().getResource(
-                        "/sound/player_win.wav")).toExternalForm().replace("file:/", "/")))).start();
+                        "/sound/player_win.wav")).toExternalForm().replace("file:", "")))).start();
             }
-            case 2 -> {
+            case 2 ->
+            {
                 setWinner("AI");
                 new Thread(() -> getBackgroundMusicPlayer().playMusicShort((Objects.requireNonNull(getClass().getResource(
-                        "/sound/player_lose.wav")).toExternalForm().replace("file:/", "/")))).start();
+                        "/sound/player_lose.wav")).toExternalForm().replace("file:", "")))).start();
             }
             case 0 -> setWinner("No Winner");
         }
@@ -319,7 +325,8 @@ public class Controller {
      */
     private void updatePlayerHand()
     {
-        switch (getPlayerChoice()) {
+        switch (getPlayerChoice())
+        {
             case Rock.id -> getPlayerHand().setImage(new Image(Objects.requireNonNull(getClass().getResource(
                     "/img/player_rock.png")).toExternalForm()));
             case Paper.id -> getPlayerHand().setImage(new Image(Objects.requireNonNull(getClass().getResource(
@@ -339,7 +346,8 @@ public class Controller {
      */
     private void updateComputerHand()
     {
-        switch (getAiChoice()) {
+        switch (getAiChoice())
+        {
             case Rock.id -> getComputerHand().setImage(new Image(Objects.requireNonNull(getClass().getResource(
                     "/img/masterHand_rock.png")).toExternalForm()));
             case Paper.id -> getComputerHand().setImage(new Image(Objects.requireNonNull(getClass().getResource(
@@ -372,8 +380,10 @@ public class Controller {
      */
     private void updateWinsCounterBox(VBox box, int wins)
     {
-        if (!box.getChildren().isEmpty()) {
-            if (box.getChildren().getLast() instanceof Label winsCounterLabel) {
+        if (!box.getChildren().isEmpty())
+        {
+            if (box.getChildren().getLast() instanceof Label winsCounterLabel)
+            {
                 winsCounterLabel.setText(String.valueOf(wins));
             }
         }
@@ -398,9 +408,12 @@ public class Controller {
      */
     private void updateGameEndText(String newWinnerMessage)
     {
-        if (!getGameEndBox().getChildren().isEmpty()) {
-            for (Node node : getGameEndBox().getChildren()) {
-                if (node instanceof Label winnerMessageLabel) {
+        if (!getGameEndBox().getChildren().isEmpty())
+        {
+            for (Node node : getGameEndBox().getChildren())
+            {
+                if (node instanceof Label winnerMessageLabel)
+                {
                     winnerMessageLabel.setText(newWinnerMessage);
                     break;
                 }
@@ -414,9 +427,11 @@ public class Controller {
      */
     private void incrementWins()
     {
-        if (getWinner().equals("Player")) {
+        if (getWinner().equals("Player"))
+        {
             setPlayerWins(getPlayerWins() + 1);
-        } else if (getWinner().equals("AI")) {
+        } else if (getWinner().equals("AI"))
+        {
             setAiWins(getAiWins() + 1);
         }
     }
@@ -428,7 +443,7 @@ public class Controller {
     private void playBackgroundMusic()
     {
         getBackgroundMusicPlayer().playMusic((Objects.requireNonNull(getClass().getResource(
-                "/sound/background_music.wav")).toExternalForm().replace("file:/", "/")));
+                "/sound/background_music.wav")).toExternalForm().replace("file:", "")));
     }
 
     /**
@@ -447,7 +462,7 @@ public class Controller {
     {
         getDrumrollPlayer().playMusicShort((Objects.requireNonNull(getClass().getResource("/sound/drum_roll.wav"))
                 .toExternalForm()
-                .replace("file:/", "/")));
+                .replace("file:", "")));
 
     }
 
@@ -598,10 +613,13 @@ public class Controller {
         button.setMinSize(getMaxButtonWidth(), getMaxButtonHeight());
         button.setId(id);
         button.setFocusTraversable(false);
-        button.setOnAction(event -> new Thread(() -> {
-            try {
+        button.setOnAction(event -> new Thread(() ->
+        {
+            try
+            {
                 handleButtonClick(event);
-            } catch (InterruptedException e) {
+            } catch (InterruptedException e)
+            {
                 System.out.println(e.getMessage());
             }
         }).start());
@@ -648,7 +666,8 @@ public class Controller {
 
         // Button-Settings
         Button[] buttons = {getRockButton(), getPaperButton(), getScissorsButton(), getWellButton()};
-        for (Button button : buttons) {
+        for (Button button : buttons)
+        {
             HBox.setHgrow(button, Priority.ALWAYS); // Grow button in HBox
             button.prefWidthProperty().bind(getPlayerBox().widthProperty().divide(4).subtract(20)); // Uniform width
             button.prefHeightProperty()
@@ -664,8 +683,10 @@ public class Controller {
      */
     private void removePlayerBoxes()
     {
-        Platform.runLater(() -> {
-            for (Node node : getPlayerBox().getChildren()) {
+        Platform.runLater(() ->
+        {
+            for (Node node : getPlayerBox().getChildren())
+            {
                 if (node == getPlayerHand()) continue;
                 node.setVisible(false);
             }
@@ -724,7 +745,8 @@ public class Controller {
     private void startAnimation()
     {
         playDrumroll();
-        Platform.runLater(() -> {
+        Platform.runLater(() ->
+        {
             getStage().setResizable(false);
 
             getRoot().getChildren().clear(); // use clear() instead of removeAll()
@@ -733,10 +755,12 @@ public class Controller {
             setTopBarAnimation(new TranslateTransition(Duration.seconds(3), getrTop()));
             setBottomBarAnimation(new TranslateTransition(Duration.seconds(3), getrBot()));
 
-            if (getRoot().getHeight() < 900) {
+            if (getRoot().getHeight() < 900)
+            {
                 getTopBarAnimation().setToY(0);
                 getBottomBarAnimation().setToY(0);
-            } else {
+            } else
+            {
                 getTopBarAnimation().setToY((-1) * (getRoot().getHeight() / 50));
                 getBottomBarAnimation().setToY((getRoot().getHeight() / 50));
             }
@@ -757,7 +781,8 @@ public class Controller {
      */
     private void resetAnimation()
     {
-        Platform.runLater(() -> {
+        Platform.runLater(() ->
+        {
             // Animates the bars back outside the screen
             TranslateTransition resetTopBarAnimation = new TranslateTransition(Duration.seconds(3), getrTop());
             resetTopBarAnimation.setToY(-100);
@@ -777,7 +802,8 @@ public class Controller {
                     resetPlayerHandAnimation);
 
             // Reset the root elements to default after the animation
-            resetParallelTransition.setOnFinished(event -> {
+            resetParallelTransition.setOnFinished(event ->
+            {
                 getEnemyBox().getChildren().add(getComputerHand());
                 getRoot().getChildren().clear();
                 getRoot().getChildren().addAll(getProgressBox(), getEnemyBox(), getTableBox(), getPlayerBox());
@@ -937,7 +963,8 @@ public class Controller {
 
     public void setAiChoice(int aiChoice)
     {
-        switch (aiChoice) {
+        switch (aiChoice)
+        {
             case -1 -> this.aiChoice = null;
             case 0 -> this.aiChoice = playStonesIDs.getOrDefault(0, null);
             case 1 -> this.aiChoice = playStonesIDs.getOrDefault(1, null);
@@ -945,6 +972,26 @@ public class Controller {
             case 3 -> this.aiChoice = playStonesIDs.getOrDefault(3, null);
         }
 
+    }
+
+    public static int getMaxHBoxWidth()
+    {
+        return maxHBoxWidth;
+    }
+
+    public static int getMaxHBoxHeight()
+    {
+        return maxHBoxHeight;
+    }
+
+    public static int getMaxButtonWidth()
+    {
+        return maxButtonWidth;
+    }
+
+    public static int getMaxButtonHeight()
+    {
+        return maxButtonHeight;
     }
 
     public HashMap<Integer, String> getPlayStonesIDs()
