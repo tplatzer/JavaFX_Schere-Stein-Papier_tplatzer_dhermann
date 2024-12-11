@@ -73,7 +73,6 @@ public class Controller
         setStage(stage);
         initializeUserElements();
 
-        playBackgroundMusic();
         showWindow();
     }
 
@@ -115,7 +114,6 @@ public class Controller
         getStage().setScene(scene);
         getStage().setTitle("Schere Stein Papier");
         getStage().setHeight(900);
-        getStage().isFullScreen();
         getStage().show();
     }
 
@@ -601,13 +599,13 @@ public class Controller
         computerHandAnimation.setToY((getRoot().getHeight() / 13.5));
 
 
-        ScaleTransition playerHandScaleAnimation = new ScaleTransition(Duration.seconds(3), getPlayerHand());
+        ScaleTransition playerHandScaleAnimation = new ScaleTransition(Duration.seconds(1), getPlayerHand());
         playerHandScaleAnimation.setFromX(1.0);
         playerHandScaleAnimation.setToX(2);
         playerHandScaleAnimation.setFromY(1);
         playerHandScaleAnimation.setFromY(2);
 
-        ScaleTransition tableAnimation = new ScaleTransition(Duration.seconds(3), getTable());
+        ScaleTransition tableAnimation = new ScaleTransition(Duration.seconds(1), getTable());
         tableAnimation.setFromX(1.0);
         tableAnimation.setToX(.6);
         tableAnimation.setFromY(1);
