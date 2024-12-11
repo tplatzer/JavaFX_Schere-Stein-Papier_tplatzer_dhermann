@@ -31,11 +31,11 @@
 
 .button {
     -fx-background-position: center;
-    -fx-background-radius: 10px; /* Hintergrund-Eckenradius */
+    -fx-background-radius: 10px;
     -fx-background-repeat: no-repeat;
-    -fx-background-size: contain; /* set the size of the image */
-    -fx-border-radius: 10px; /* Abgerundete Ecken */
-    -fx-padding: 10px; /* Innenabstand */
+    -fx-background-size: contain;
+    -fx-border-radius: 10px;
+    -fx-padding: 10px;
 }
 
 .box {

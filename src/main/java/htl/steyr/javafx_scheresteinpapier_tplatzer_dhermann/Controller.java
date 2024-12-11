@@ -86,7 +86,7 @@ public class Controller
     /**
      * Handles the game play logic in a separate thread.
      * Waits for 3 seconds, then executes AI's turn and updates the display.
-     * Finally determines and displays the winner.
+     * Finally, determines and displays the winner.
      */
     private void play()
     {
@@ -728,10 +728,10 @@ public class Controller
     private void prepareAnimation()
     {
         // Black bars
-        setrTop(new Rectangle(getRoot().getWidth(), 100, Color.BLACK));
-        setrBot(new Rectangle(getRoot().getWidth(), 100, Color.BLACK));
-        getrTop().setTranslateY(-100);  // Start outside the screen
-        getrBot().setTranslateY(100);   // Start outside the screen
+        setRTop(new Rectangle(getRoot().getWidth(), 100, Color.BLACK));
+        setRBot(new Rectangle(getRoot().getWidth(), 100, Color.BLACK));
+        getRTop().setTranslateY(-100);  // Start outside the screen
+        getRBot().setTranslateY(100);   // Start outside the screen
 
         stopBackgroundMusic();
         startAnimation();
@@ -750,10 +750,10 @@ public class Controller
             getStage().setResizable(false);
 
             getRoot().getChildren().clear(); // use clear() instead of removeAll()
-            getRoot().getChildren().addAll(getrTop(), getComputerHand(), getTableBox(), getPlayerHand(), getrBot());
+            getRoot().getChildren().addAll(getRTop(), getComputerHand(), getTableBox(), getPlayerHand(), getRBot());
 
-            setTopBarAnimation(new TranslateTransition(Duration.seconds(3), getrTop()));
-            setBottomBarAnimation(new TranslateTransition(Duration.seconds(3), getrBot()));
+            setTopBarAnimation(new TranslateTransition(Duration.seconds(3), getRTop()));
+            setBottomBarAnimation(new TranslateTransition(Duration.seconds(3), getRBot()));
 
             if (getRoot().getHeight() < 900)
             {
@@ -784,10 +784,10 @@ public class Controller
         Platform.runLater(() ->
         {
             // Animates the bars back outside the screen
-            TranslateTransition resetTopBarAnimation = new TranslateTransition(Duration.seconds(3), getrTop());
+            TranslateTransition resetTopBarAnimation = new TranslateTransition(Duration.seconds(3), getRTop());
             resetTopBarAnimation.setToY(-100);
 
-            TranslateTransition resetBottomBarAnimation = new TranslateTransition(Duration.seconds(3), getrBot());
+            TranslateTransition resetBottomBarAnimation = new TranslateTransition(Duration.seconds(3), getRBot());
             resetBottomBarAnimation.setToY(100);
 
             // Player hand back to the centre
@@ -1114,22 +1114,22 @@ public class Controller
         this.gameEndedPopupStage = gameEndedPopupStage;
     }
 
-    public Rectangle getrTop()
+    public Rectangle getRTop()
     {
         return rTop;
     }
 
-    public void setrTop(Rectangle rTop)
+    public void setRTop(Rectangle rTop)
     {
         this.rTop = rTop;
     }
 
-    public Rectangle getrBot()
+    public Rectangle getRBot()
     {
         return rBot;
     }
 
-    public void setrBot(Rectangle rBot)
+    public void setRBot(Rectangle rBot)
     {
         this.rBot = rBot;
     }
