@@ -133,8 +133,8 @@ public class Controller
         stage.initOwner(getStage());
         stage.initModality(Modality.WINDOW_MODAL);
         stage.setScene(new Scene(getGameEndBox()));
-        stage.setMinHeight(500);
-        stage.setMinWidth(1200);
+        stage.setMinHeight(200);
+        stage.setMinWidth(550);
         stage.setResizable(false);
         stage.setOnCloseRequest(event -> restartGame());
         
@@ -356,23 +356,38 @@ public class Controller
 
     private void initializeGameEndBox()
     {
-        getGameEndBox().setSpacing(10);
-        getGameEndBox().setStyle("-fx-background-color: rgba(0, 0, 0, 0.8); -fx-padding: 20;");
+        getGameEndBox().setSpacing(25);
         getGameEndBox().setAlignment(Pos.CENTER);
+        getGameEndBox().getStyleClass().add("gameEndBox");
 
         Label winnerMessage = new Label(getWinner() + " has won the Game!");
-        winnerMessage.setStyle("-fx-font-size: 20px; -fx-text-fill: white;");
         winnerMessage.setFocusTraversable(false);
+        winnerMessage.getStyleClass().add("winnerMessage");
 
         Button exitButton = new Button("Exit");
         exitButton.setOnAction(event -> Platform.exit());
         exitButton.setFocusTraversable(false);
+        exitButton.getStyleClass().add("button");
+        exitButton.getStyleClass().add("hidden-on-hover");
 
         Button playAgainButton = new Button("Play Again");
         playAgainButton.setOnAction(event -> restartGame());
         playAgainButton.setFocusTraversable(false);
+        playAgainButton.getStyleClass().add("button");
 
-        getGameEndBox().getChildren().addAll(getPlayerWinsCounterBox(), winnerMessage, exitButton, playAgainButton, getAiWinsCounterBox());
+        getGameEndBox().getStylesheets()
+                .add(Objects.requireNonNull(getClass().getResource("/gameEndBox.css")).toExternalForm());
+        getPlayerWinsCounterBox().getStyleClass().add("winsCounterBox");
+        getAiWinsCounterBox().getStyleClass().add("winsCounterBox");
+
+        VBox buttonBox = new VBox(10); // 10 is the spacing between buttons
+        buttonBox.setAlignment(Pos.CENTER); // Center the buttons
+        buttonBox.getChildren().addAll(exitButton, playAgainButton);
+
+        getGameEndBox().getChildren()
+                .addAll(getPlayerWinsCounterBox(), winnerMessage, buttonBox, getAiWinsCounterBox());
+
+
     }
 
     private VBox initializeWinsCounterPane(Pos position, String user)
@@ -381,14 +396,23 @@ public class Controller
         Label counterLabel = new Label();
         Label userLabel = new Label(user + " Wins");
 
+        box.setMaxHeight(100);
+        box.setMinHeight(100);
+        box.setPrefHeight(100);
+        box.setMaxWidth(100);
+        box.setMinWidth(100);
+        box.setPrefWidth(100);
+
         box.setAlignment(position);
         box.setSpacing(10);
-        box.setStyle("-fx-background-color: rgba(0, 0, 0, 0.8); -fx-padding: 10;");
-        userLabel.setStyle("--fx-font-size: 20px; -fx-text-fill: white;");
-        userLabel.setFocusTraversable(false);
-        counterLabel.setFocusTraversable(false);
+        box.getStyleClass().add("box");
         box.setFocusTraversable(false);
         box.getChildren().addAll(userLabel, counterLabel);
+        box.getStylesheets().add(Objects.requireNonNull(getClass().getResource("/style.css")).toExternalForm());
+        counterLabel.setFocusTraversable(false);
+        userLabel.getStyleClass().add("userLabel");
+        userLabel.setFocusTraversable(false);
+        userLabel.getStylesheets().add(Objects.requireNonNull(getClass().getResource("/style.css")).toExternalForm());
 
         return box;
     }
@@ -547,8 +571,6 @@ public class Controller
             getRoot().getChildren().clear(); // use clear() instead of removeAll()
             getRoot().getChildren().addAll(getrTop(), getComputerHand(), getTableBox(), getPlayerHand(), getrBot());
 
-            getRoot().setStyle("-fx-background-color: white;");
-
             setTopBarAnimation(new TranslateTransition(Duration.seconds(1), getrTop()));
             setBottomBarAnimation(new TranslateTransition(Duration.seconds(1), getrBot()));
 
@@ -632,7 +654,6 @@ public class Controller
                 getRoot().getChildren().clear();
                 getRoot().getChildren()
                         .addAll(getProgressBox(), getEnemyBox(), getTableBox(), getPlayerBox());
-                getRoot().setStyle("-fx-background-color: transparent;");
             });
 
             getStage().setResizable(true);

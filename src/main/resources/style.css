@@ -37,3 +37,13 @@
     -fx-border-radius: 10px; /* Abgerundete Ecken */
     -fx-padding: 10px; /* Innenabstand */
 }
+
+.box {
+    -fx-background-color: rgba(0, 0, 0, 0.8);
+    -fx-padding: 10;
+}
+
+.userLabel {
+    --fx-font-size: 20px;
+    -fx-text-fill: white;
+}
