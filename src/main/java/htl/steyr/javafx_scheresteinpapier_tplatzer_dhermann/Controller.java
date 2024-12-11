@@ -112,9 +112,11 @@ public class Controller
 
         Scene scene = new Scene(getRoot());
         scene.getStylesheets().add(Objects.requireNonNull(getClass().getResource("/style.css")).toExternalForm());
+        getStage().getIcons().add(new Image(Objects.requireNonNull(getClass().getResource("/img/aura.png")).toExternalForm()));
         getStage().setScene(scene);
         getStage().setTitle("Schere Stein Papier");
         getStage().setHeight(900);
+        getStage().isFullScreen();
         getStage().show();
     }
 
