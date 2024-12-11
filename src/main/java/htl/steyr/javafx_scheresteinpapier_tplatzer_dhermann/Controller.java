@@ -408,7 +408,7 @@ public class Controller
         addImageViewsToBoxes(getEnemyBox(), getComputerHand());
         addImageViewsToBoxes(getTableBox(), getTable());
         getPlayerBox().getChildren().removeAll();
-        getPlayerBox().getChildren().addAll(getRockButton(), getPaperButton(), getPlayerHand(), getScissorsButton(), getWellButton());
+        getPlayerBox().getChildren().addAll(getRockButton(), getPaperButton(), getScissorsButton(), getWellButton());
         getPlayerHand().prefHeight(getRockButton().heightProperty().getValue());
         getPlayerHand().prefWidth(getRockButton().widthProperty().getValue());
     }
