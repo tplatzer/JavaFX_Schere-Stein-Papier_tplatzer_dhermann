@@ -127,3 +127,11 @@ release.properties
 dependency-reduced-pom.xml
 buildNumber.properties
 *.MF
+*.log
+
+# Systemdateien
+*.DS_Store
+Thumbs.db
+
+# Sonstige temporäre Dateien
+*.class
