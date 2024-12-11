@@ -1,0 +1,18 @@
+.gameEndBox {
+    -fx-background-color: #212121;
+}
+
+.winnerMessage {
+    -fx-text-fill: #fefefe;
+}
+
+.hidden-on-hover:hover {
+    -fx-managed: false;
+    -fx-visible: false;
+    -fx-opacity: 0;
+}
+
+.winsCounterBox {
+    -fx-text-fill: #fefefe;
+    -fx-pref-height: 10%;
+}

@@ -1,0 +1,49 @@
+* {
+    margin: 0;
+    padding: 0;
+}
+
+.image {
+    width: 10%;
+    height: 10%;
+}
+
+#rock {
+    -fx-background-image: url("img/stone.png");
+}
+
+#paper {
+    -fx-background-image: url("img/paper.png");
+}
+
+#scissors {
+    -fx-background-image: url("img/scissors.png");
+}
+
+#well {
+    -fx-background-image: url("img/well.png");
+}
+
+
+.hbox {
+    -fx-alignment: baseline-center;
+}
+
+.button {
+    -fx-background-position: center;
+    -fx-background-radius: 10px; /* Hintergrund-Eckenradius */
+    -fx-background-repeat: no-repeat;
+    -fx-background-size: contain; /* set the size of the image */
+    -fx-border-radius: 10px; /* Abgerundete Ecken */
+    -fx-padding: 10px; /* Innenabstand */
+}
+
+.box {
+    -fx-background-color: rgba(0, 0, 0, 0.8);
+    -fx-padding: 10;
+}
+
+.userLabel {
+    --fx-font-size: 20px;
+    -fx-text-fill: white;
+}
