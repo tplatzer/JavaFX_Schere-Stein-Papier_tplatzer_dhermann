@@ -73,6 +73,8 @@ public class Controller
         setStage(stage);
         initializeUserElements();
 
+        playBackgroundMusic();
+
         showWindow();
     }
 
@@ -100,11 +102,11 @@ public class Controller
     private void showWindow()
     {
         getRoot().setSpacing(10);
-        getRoot().setAlignment(Pos.CENTER); // Zentriere alle Kinder
+        getRoot().setAlignment(Pos.CENTER); // Center all Children
         getRoot().setMinSize(Controller.getMaxHBoxWidth(), Controller.getMaxHBoxHeight());
         getRoot().setMaxSize(Controller.getMaxHBoxWidth(), Controller.getMaxHBoxHeight());
         getRoot().prefWidthProperty().bind(getStage().widthProperty());
-        getRoot().prefHeightProperty().bind(getStage().heightProperty()); // Binde Höhe an die Stage
+        getRoot().prefHeightProperty().bind(getStage().heightProperty()); // Bind Height on Stage
         getRoot().getChildren().addAll(getProgressBox(), getEnemyBox(), getTableBox(), getPlayerBox());
         getRoot().getStylesheets().add(Objects.requireNonNull(getClass().getResource("/style.css")).toExternalForm());
 
@@ -184,7 +186,8 @@ public class Controller
     }
 
     /**
-     * 0 = Unentschieden
+     * Return for Winner
+     * 0 = Draw
      * 1 = Player
      * 2 = AI
      */
@@ -500,12 +503,12 @@ public class Controller
 
     private void initializePlayerBox()
     {
-        getPlayerBox().setFillHeight(false); // Inhalte nicht in die Höhe ziehen
-        getPlayerBox().prefWidthProperty().bind(getStage().widthProperty()); // Breite der HBox an Fensterbreite binden
+        getPlayerBox().setFillHeight(false); // Don't Stretch content vertical
+        getPlayerBox().prefWidthProperty().bind(getStage().widthProperty()); // Bind width of HBox to window width
         getPlayerBox().setAlignment(Pos.CENTER); // Buttons in der Mitte zentrieren
         getPlayerBox().setSpacing(20); // Abstand zwischen Buttons
 
-        // Button-Einstellungen
+        // Button-Settings
         Button[] buttons = {getRockButton(), getPaperButton(), getScissorsButton(), getWellButton()};
         for (Button button : buttons)
         {
