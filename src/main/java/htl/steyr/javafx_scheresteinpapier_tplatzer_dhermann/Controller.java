@@ -23,6 +23,7 @@ import javafx.stage.Stage;
 import javafx.util.Duration;
 
 import java.util.HashMap;
+import java.util.Objects;
 import java.util.Random;
 
 public class Controller
@@ -38,7 +39,6 @@ public class Controller
     private final HashMap<Integer, String> playStonesIDs = new HashMap<>();
     private final VBox root = new VBox();
     private final HBox gameEndBox = new HBox();
-    private final VBox winsCounterBox = new VBox();
     private final HBox progressBox = new HBox();
     private final HBox enemyBox = new HBox();
     private final HBox tableBox = new HBox();
@@ -105,10 +105,10 @@ public class Controller
         getRoot().prefWidthProperty().bind(getStage().widthProperty());
         getRoot().prefHeightProperty().bind(getStage().heightProperty()); // Binde Höhe an die Stage
         getRoot().getChildren().addAll(getProgressBox(), getEnemyBox(), getTableBox(), getPlayerBox());
-        getRoot().getStylesheets().add(getClass().getResource("/style.css").toExternalForm());
+        getRoot().getStylesheets().add(Objects.requireNonNull(getClass().getResource("/style.css")).toExternalForm());
 
         Scene scene = new Scene(getRoot());
-        scene.getStylesheets().add(getClass().getResource("/style.css").toExternalForm());
+        scene.getStylesheets().add(Objects.requireNonNull(getClass().getResource("/style.css")).toExternalForm());
         getStage().setScene(scene);
         getStage().setTitle("Schere Stein Papier");
         getStage().setHeight(900);
@@ -131,7 +131,6 @@ public class Controller
         stage.setMinHeight(500);
         stage.setMinWidth(1200);
         stage.setResizable(false);
-
         stage.setOnCloseRequest(event -> restartGame());
         
         return stage;
@@ -151,7 +150,7 @@ public class Controller
 
         getRoot().getChildren().remove(getGameEndBox());
 
-        getComputerHand().setImage(new Image(getClass().getResource("/img/masterHand_default.png").toExternalForm()));
+        getComputerHand().setImage(new Image(Objects.requireNonNull(getClass().getResource("/img/masterHand_default.png")).toExternalForm()));
 
         getEnemieProgressIndicator().setVisible(false);
 
@@ -272,11 +271,11 @@ public class Controller
     {
         switch (getPlayerChoice())
         {
-            case Rock.id -> getPlayerHand().setImage(new Image(getClass().getResource("/img/player_rock.png").toExternalForm()));
-            case Paper.id -> getPlayerHand().setImage(new Image(getClass().getResource("/img/player_paper.png").toExternalForm()));
-            case Scissors.id -> getPlayerHand().setImage(new Image(getClass().getResource("/img/player_scissors.png").toExternalForm()));
-            case Well.id -> getPlayerHand().setImage(new Image(getClass().getResource("/img/player_well.png").toExternalForm()));
-            default -> getPlayerHand().setImage(new Image(getClass().getResource("/img/player_default.png").toExternalForm()));
+            case Rock.id -> getPlayerHand().setImage(new Image(Objects.requireNonNull(getClass().getResource("/img/player_rock.png")).toExternalForm()));
+            case Paper.id -> getPlayerHand().setImage(new Image(Objects.requireNonNull(getClass().getResource("/img/player_paper.png")).toExternalForm()));
+            case Scissors.id -> getPlayerHand().setImage(new Image(Objects.requireNonNull(getClass().getResource("/img/player_scissors.png")).toExternalForm()));
+            case Well.id -> getPlayerHand().setImage(new Image(Objects.requireNonNull(getClass().getResource("/img/player_well.png")).toExternalForm()));
+            default -> getPlayerHand().setImage(new Image(Objects.requireNonNull(getClass().getResource("/img/player_default.png")).toExternalForm()));
         }
     }
 
@@ -284,11 +283,11 @@ public class Controller
     {
         switch (getAiChoice())
         {
-            case Rock.id -> getComputerHand().setImage(new Image(getClass().getResource("/img/masterHand_rock.png").toExternalForm()));
-            case Paper.id -> getComputerHand().setImage(new Image(getClass().getResource("/img/masterHand_paper.png").toExternalForm()));
-            case Scissors.id -> getComputerHand().setImage(new Image(getClass().getResource("/img/masterHand_scissors.png").toExternalForm()));
-            case Well.id -> getComputerHand().setImage(new Image(getClass().getResource("/img/masterHand_well.png").toExternalForm()));
-            default -> getComputerHand().setImage(new Image(getClass().getResource("/img/masterHand_default.png").toExternalForm()));
+            case Rock.id -> getComputerHand().setImage(new Image(Objects.requireNonNull(getClass().getResource("/img/masterHand_rock.png")).toExternalForm()));
+            case Paper.id -> getComputerHand().setImage(new Image(Objects.requireNonNull(getClass().getResource("/img/masterHand_paper.png")).toExternalForm()));
+            case Scissors.id -> getComputerHand().setImage(new Image(Objects.requireNonNull(getClass().getResource("/img/masterHand_scissors.png")).toExternalForm()));
+            case Well.id -> getComputerHand().setImage(new Image(Objects.requireNonNull(getClass().getResource("/img/masterHand_well.png")).toExternalForm()));
+            default -> getComputerHand().setImage(new Image(Objects.requireNonNull(getClass().getResource("/img/masterHand_default.png")).toExternalForm()));
         }
     }
 
@@ -396,8 +395,8 @@ public class Controller
         initializePlayerBox();
         addProgressIndicatorToBox(getProgressBox(), getEnemieProgressIndicator());
 
-        setComputerHand(initializeImageView(true, new Image(getClass().getResource("/img/masterHand_default.png").toExternalForm()), .2, .3));
-        setTable(initializeImageView(true, new Image(getClass().getResource("/img/table.png").toExternalForm()), 1, .2));
+        setComputerHand(initializeImageView(true, new Image(Objects.requireNonNull(getClass().getResource("/img/masterHand_default.png")).toExternalForm()), .2, .3));
+        setTable(initializeImageView(true, new Image(Objects.requireNonNull(getClass().getResource("/img/table.png")).toExternalForm()), 1, .2));
         setPlayerHand(initializeImageView(false, null, .1, .2));
 
         getPlayerBox().getStyleClass().add("hbox");
@@ -863,11 +862,6 @@ public class Controller
     public void setAiWinsCounterBox(VBox aiWinsCounterPane)
     {
         this.aiWinsCounterBox = aiWinsCounterPane;
-    }
-
-    public VBox getWinsCounterBox()
-    {
-        return winsCounterBox;
     }
 
     public Stage getGameEndedPopupStage()
