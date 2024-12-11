@@ -72,7 +72,6 @@ public class Controller
         setDefaultValues();
         setStage(stage);
         initializeUserElements();
-
         playBackgroundMusic();
 
         showWindow();
