@@ -6,18 +6,41 @@ import java.io.IOException;
 
 public class MusicPlayer
 {
-    public void playMusic(String filePath)
+    private Clip clip;
+
+    public void playMusic(String filePath) {
+        File audioFile = new File(filePath);
+        try {
+            AudioInputStream audioInputStream = AudioSystem.getAudioInputStream(audioFile);
+            clip = AudioSystem.getClip();
+            clip.open(audioInputStream);
+
+            clip.start();
+            clip.loop(Clip.LOOP_CONTINUOUSLY);
+        } catch (UnsupportedAudioFileException | IOException | LineUnavailableException e) {
+            System.out.println(e.getMessage());
+        }
+    }
+
+    public void playMusicShort(String filePath)
     {
         try
         {
             AudioInputStream audioInputStream = AudioSystem.getAudioInputStream(new File(filePath));
-            Clip clip = AudioSystem.getClip();
+            clip = AudioSystem.getClip();
             clip.open(audioInputStream);
 
             clip.start();
         } catch (UnsupportedAudioFileException | IOException | LineUnavailableException e)
         {
             System.out.println(e.getMessage());
+        }
+    }
+
+    public void stopMusic() {
+        if (clip != null && clip.isRunning()) {
+            clip.stop();
+            clip.close();
         }
     }
 }

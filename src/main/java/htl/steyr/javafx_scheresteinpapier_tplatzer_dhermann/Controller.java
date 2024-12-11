@@ -261,12 +261,12 @@ public class Controller
             case 1 ->
             {
                 setWinner("Player");
-                new Thread(() -> getMusicPlayer().playMusic((Objects.requireNonNull(getClass().getResource("/sound/player_win.wav")).toExternalForm().replace("file:/", "/")))).start();
+                new Thread(() -> getMusicPlayer().playMusicShort((Objects.requireNonNull(getClass().getResource("/sound/player_win.wav")).toExternalForm().replace("file:/", "/")))).start();
             }
             case 2 ->
             {
                 setWinner("AI");
-                new Thread(() -> getMusicPlayer().playMusic((Objects.requireNonNull(getClass().getResource("/sound/player_lose.wav")).toExternalForm().replace("file:/", "/")))).start();
+                new Thread(() -> getMusicPlayer().playMusicShort((Objects.requireNonNull(getClass().getResource("/sound/player_lose.wav")).toExternalForm().replace("file:/", "/")))).start();
             }
             case 0 -> setWinner("No Winner");
         }
