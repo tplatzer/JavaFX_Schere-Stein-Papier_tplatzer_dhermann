@@ -351,12 +351,15 @@ public class Controller
 
         Label winnerMessage = new Label(getWinner() + " has won the Game!");
         winnerMessage.setStyle("-fx-font-size: 20px; -fx-text-fill: white;");
+        winnerMessage.setFocusTraversable(false);
 
         Button exitButton = new Button("Exit");
         exitButton.setOnAction(event -> Platform.exit());
+        exitButton.setFocusTraversable(false);
 
         Button playAgainButton = new Button("Play Again");
         playAgainButton.setOnAction(event -> restartGame());
+        playAgainButton.setFocusTraversable(false);
 
         getGameEndBox().getChildren().addAll(getPlayerWinsCounterBox(), winnerMessage, exitButton, playAgainButton, getAiWinsCounterBox());
     }
@@ -371,6 +374,9 @@ public class Controller
         box.setSpacing(10);
         box.setStyle("-fx-background-color: rgba(0, 0, 0, 0.8); -fx-padding: 10;");
         userLabel.setStyle("--fx-font-size: 20px; -fx-text-fill: white;");
+        userLabel.setFocusTraversable(false);
+        counterLabel.setFocusTraversable(false);
+        box.setFocusTraversable(false);
         box.getChildren().addAll(userLabel, counterLabel);
 
         return box;
@@ -419,6 +425,7 @@ public class Controller
         Button button = new Button();
         button.setMinSize(getMaxButtonWidth(), getMaxButtonHeight());
         button.setId(id);
+        button.setFocusTraversable(false);
         button.setOnAction(event -> new Thread(() ->
         {
             try
@@ -437,6 +444,7 @@ public class Controller
         ImageView imageView = new ImageView();
         imageView.setImage(image);
         imageView.setVisible(visibility);
+        imageView.setFocusTraversable(false);
         imageView.fitWidthProperty().bind(getStage().widthProperty().multiply(widthFactor));
         imageView.fitHeightProperty().bind(getStage().heightProperty().multiply(heightFactor));
 
@@ -457,6 +465,7 @@ public class Controller
             HBox.setHgrow(button, Priority.ALWAYS); // Button in HBox wachsen lassen
             button.prefWidthProperty().bind(getPlayerBox().widthProperty().divide(4).subtract(20)); // gleichmäßige Breite
             button.prefHeightProperty().bind(getPlayerBox().heightProperty().multiply(0.8)); // Höhe relativ zur HBox
+            button.setFocusTraversable(false);
         }
     }
 
@@ -465,6 +474,7 @@ public class Controller
         ProgressIndicator progressIndicator = new ProgressIndicator();
         progressIndicator.setId("enemie_progress_indicator");
         progressIndicator.setMinSize(100, 50);
+        progressIndicator.setFocusTraversable(false);
         progressIndicator.setVisible(false);
 
         return progressIndicator;
