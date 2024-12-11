@@ -105,10 +105,10 @@ public class Controller
         getRoot().prefWidthProperty().bind(getStage().widthProperty());
         getRoot().prefHeightProperty().bind(getStage().heightProperty()); // Binde Höhe an die Stage
         getRoot().getChildren().addAll(getProgressBox(), getEnemyBox(), getTableBox(), getPlayerBox());
-        getRoot().getStylesheets().add("file:resources/style.css");
+        getRoot().getStylesheets().add(getClass().getResource("/style.css").toExternalForm());
 
         Scene scene = new Scene(getRoot());
-        scene.getStylesheets().add("file:resources/style.css");
+        scene.getStylesheets().add(getClass().getResource("/style.css").toExternalForm());
         getStage().setScene(scene);
         getStage().setTitle("Schere Stein Papier");
         getStage().setHeight(900);
@@ -151,7 +151,7 @@ public class Controller
 
         getRoot().getChildren().remove(getGameEndBox());
 
-        getComputerHand().setImage(new Image("file:resources/img/masterHand_default.png"));
+        getComputerHand().setImage(new Image(getClass().getResource("/img/masterHand_default.png").toExternalForm()));
 
         getEnemieProgressIndicator().setVisible(false);
 
@@ -272,11 +272,11 @@ public class Controller
     {
         switch (getPlayerChoice())
         {
-            case Rock.id -> getPlayerHand().setImage(new Image("file:resources/img/player_rock.png"));
-            case Paper.id -> getPlayerHand().setImage(new Image("file:resources/img/player_paper.png"));
-            case Scissors.id -> getPlayerHand().setImage(new Image("file:resources/img/player_scissors.png"));
-            case Well.id -> getPlayerHand().setImage(new Image("file:resources/img/player_well.png"));
-            default -> getPlayerHand().setImage(new Image("file:resources/img/player_default.png"));
+            case Rock.id -> getPlayerHand().setImage(new Image(getClass().getResource("/img/player_rock.png").toExternalForm()));
+            case Paper.id -> getPlayerHand().setImage(new Image(getClass().getResource("/img/player_paper.png").toExternalForm()));
+            case Scissors.id -> getPlayerHand().setImage(new Image(getClass().getResource("/img/player_scissors.png").toExternalForm()));
+            case Well.id -> getPlayerHand().setImage(new Image(getClass().getResource("/img/player_well.png").toExternalForm()));
+            default -> getPlayerHand().setImage(new Image(getClass().getResource("/img/player_default.png").toExternalForm()));
         }
     }
 
@@ -284,11 +284,11 @@ public class Controller
     {
         switch (getAiChoice())
         {
-            case Rock.id -> getComputerHand().setImage(new Image("file:resources/img/masterHand_rock.png"));
-            case Paper.id -> getComputerHand().setImage(new Image("file:resources/img/masterHand_paper.png"));
-            case Scissors.id -> getComputerHand().setImage(new Image("file:resources/img/masterHand_scissors.png"));
-            case Well.id -> getComputerHand().setImage(new Image("file:resources/img/masterHand_well.png"));
-            default -> getComputerHand().setImage(new Image("file:resources/img/masterHand_default.png"));
+            case Rock.id -> getComputerHand().setImage(new Image(getClass().getResource("/img/masterHand_rock.png").toExternalForm()));
+            case Paper.id -> getComputerHand().setImage(new Image(getClass().getResource("/img/masterHand_paper.png").toExternalForm()));
+            case Scissors.id -> getComputerHand().setImage(new Image(getClass().getResource("/img/masterHand_scissors.png").toExternalForm()));
+            case Well.id -> getComputerHand().setImage(new Image(getClass().getResource("/img/masterHand_well.png").toExternalForm()));
+            default -> getComputerHand().setImage(new Image(getClass().getResource("/img/masterHand_default.png").toExternalForm()));
         }
     }
 
@@ -396,9 +396,9 @@ public class Controller
         initializePlayerBox();
         addProgressIndicatorToBox(getProgressBox(), getEnemieProgressIndicator());
 
-        setComputerHand(initializeImageView(true, new Image("file:resources/img/masterHand_default.png"), .2, .3));
-        setTable(initializeImageView(true, new Image("file:resources/img/table.png"), 1, .2));
-        setPlayerHand(initializeImageView(false, new Image("file:resources/img/player_default.png"), .1, .2));
+        setComputerHand(initializeImageView(true, new Image(getClass().getResource("/img/masterHand_default.png").toExternalForm()), .2, .3));
+        setTable(initializeImageView(true, new Image(getClass().getResource("/img/table.png").toExternalForm()), 1, .2));
+        setPlayerHand(initializeImageView(false, null, .1, .2));
 
         getPlayerBox().getStyleClass().add("hbox");
         getEnemyBox().getStyleClass().add("hbox");
